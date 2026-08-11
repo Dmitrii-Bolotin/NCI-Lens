@@ -1,8 +1,8 @@
 # SigmaLens
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![GitHub release](https://img.shields.io/github/v/release/Dmitrii-Bolotin/SigmaLens)](https://github.com/Dmitrii-Bolotin/SigmaLens/releases/releases)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21889631.svg)](https://doi.org/10.5281/zenodo.21889631)
+[![GitHub release](https://img.shields.io/github/v/release/Dmitrii-Bolotin/SigmaLens)](https://github.com/Dmitrii-Bolotin/SigmaLens/releases)
+[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.21889631-blue)](https://doi.org/10.5281/zenodo.21889631)
 [![Live demo](https://img.shields.io/badge/Demo-Live-blue?logo=github)](https://dmitrii-bolotin.github.io/SigmaLens/)
 
 
@@ -92,3 +92,19 @@ The entire application is a single HTML file using [Three.js r157](https://three
 # Just serve with any static server, e.g.:
 python -m http.server 8000
 # then open http://localhost:8000
+
+## 📝 Citation
+
+If you use SigmaLens in academic work, please cite:
+
+```bibtex
+@software{sigmalens,
+  author  = {Bolotin, Dmitrii S.},
+  title   = {SigmaLens: Browser-based analyzer of σ-hole and π-stacking interactions},
+  year    = {2026},
+  publisher = {GitHub},
+  url     = {https://github.com/Dmitrii-Bolotin/SigmaLens},
+  doi     = {10.5281/zenodo.21889631},
+  version = {2.2.2}
+}
+```
