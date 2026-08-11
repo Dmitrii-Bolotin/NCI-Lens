@@ -88,10 +88,12 @@ The entire application is a single HTML file using [Three.js r157](https://three
 - LRU texture cache for labels
 
 ### Local development
+
 ```bash
 # Just serve with any static server, e.g.:
 python -m http.server 8000
 # then open http://localhost:8000
+```
 
 ## 📝 Citation
 
