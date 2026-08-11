@@ -475,11 +475,21 @@ DEFAULT_H_CHARGE: 0.35,
 DEFAULT_ACCEPTOR_CHARGE: -0.45
 },
 SIGMA_HOLE: {
-DISTANCE_FACTOR: 0.95,
-OPTIMAL_ANGLE: 170,      // optimal R-X···A angle
-ANGULAR_DECAY: 3.0,      // Gaussian angular decay parameter
-RADIAL_DECAY: 8.0,       // exponential radial decay parameter
-OPTIMAL_RHO: 0.80        // optimal normalized distance
+    DISTANCE_FACTOR: 0.95,
+    OPTIMAL_ANGLE: 175,
+    ANGULAR_DECAY: 2.2,
+    RADIAL_DECAY: 6.0,
+    OPTIMAL_RHO: 0.75,
+
+    // Empirical substituent correction
+    SUBSTITUENT_BASE: 0.30,
+    SUBSTITUENT_OPPOSITE: 0.58,
+    SUBSTITUENT_INDUCTIVE: 0.15,
+    SUBSTITUENT_CAP: 1.25,
+
+    // Short-range charge-transfer-like bonus
+    SHORT_RANGE_RHO: 0.72,
+    SHORT_RANGE_BONUS: 0.18
 },
 PI_STACKING: {
 MIN_DISTANCE: 3.0,
@@ -500,11 +510,11 @@ STACKING: { WEAK: 5, MEDIUM: 15 }
 },
 // Energy limits
 ENERGY_LIMITS: {
-CONTACT_MAX: 60,
-CONTACT_SIGMA_LIMIT_FACTOR: 1.5,
-STACKING_MAX: 15,
-DISPERSION_MAX: 4.0,
-DISPERSION_CLAMP_LOW: -1.2
+    CONTACT_MAX: 110,
+    CONTACT_SIGMA_LIMIT_FACTOR: 2.5,
+    STACKING_MAX: 15,
+    DISPERSION_MAX: 4.0,
+    DISPERSION_CLAMP_LOW: 1.2
 },
 PEOE_ITERATIONS: 6,
 MEASUREMENT_TIMEOUT_MS: 1000,
@@ -573,18 +583,163 @@ const METALS = new Set([
 ]);
 // Sigma-hole donor parameters
 const SIGMA_HOLE_DONORS = {
-Cl: { type: 'halogen',    angleMin: 140, energy: 15 },
-Br: { type: 'halogen',    angleMin: 140, energy: 25 },
-I:  { type: 'halogen',    angleMin: 140, energy: 35 },
-S:  { type: 'chalcogen',  angleMin: 130, energy: 18 },
-Se: { type: 'chalcogen',  angleMin: 130, energy: 28 },
-Te: { type: 'chalcogen',  angleMin: 130, energy: 35 },
-Po: { type: 'chalcogen',  angleMin: 130, energy: 38 },
-P:  { type: 'pnictogen',  angleMin: 120, energy: 18 },
-As: { type: 'pnictogen',  angleMin: 120, energy: 23 },
-Sb: { type: 'pnictogen',  angleMin: 120, energy: 28 },
-Bi: { type: 'pnictogen',  angleMin: 120, energy: 35 }
+    Cl: {
+        type: 'halogen',
+        angleMin: 140,
+        angleOpt: 178,
+        energy: 22,
+        max: 45,
+        radialDecay: 6.0,
+        rhoOpt: 0.74
+    },
+    Br: {
+        type: 'halogen',
+        angleMin: 140,
+        angleOpt: 180,
+        energy: 55,
+        max: 90,
+        radialDecay: 5.5,
+        rhoOpt: 0.74
+    },
+    I: {
+        type: 'halogen',
+        angleMin: 140,
+        angleOpt: 180,
+        energy: 65,
+        max: 100,
+        radialDecay: 5.2,
+        rhoOpt: 0.74
+    },
+    S: {
+        type: 'chalcogen',
+        angleMin: 130,
+        angleOpt: 165,
+        energy: 26,
+        max: 50,
+        radialDecay: 6.0,
+        rhoOpt: 0.75
+    },
+    Se: {
+        type: 'chalcogen',
+        angleMin: 130,
+        angleOpt: 165,
+        energy: 42,
+        max: 75,
+        radialDecay: 6.0,
+        rhoOpt: 0.75
+    },
+    Te: {
+        type: 'chalcogen',
+        angleMin: 130,
+        angleOpt: 160,
+        energy: 48,
+        max: 85,
+        radialDecay: 5.6,
+        rhoOpt: 0.75
+    },
+    Po: {
+        type: 'chalcogen',
+        angleMin: 130,
+        angleOpt: 160,
+        energy: 55,
+        max: 90,
+        radialDecay: 5.3,
+        rhoOpt: 0.75
+    },
+    P: {
+        type: 'pnictogen',
+        angleMin: 120,
+        angleOpt: 165,
+        energy: 26,
+        max: 50,
+        radialDecay: 6.0,
+        rhoOpt: 0.75
+    },
+    As: {
+        type: 'pnictogen',
+        angleMin: 120,
+        angleOpt: 165,
+        energy: 38,
+        max: 70,
+        radialDecay: 5.7,
+        rhoOpt: 0.75
+    },
+    Sb: {
+        type: 'pnictogen',
+        angleMin: 120,
+        angleOpt: 160,
+        energy: 50,
+        max: 85,
+        radialDecay: 5.4,
+        rhoOpt: 0.75
+    },
+    Bi: {
+        type: 'pnictogen',
+        angleMin: 120,
+        angleOpt: 160,
+        energy: 60,
+        max: 95,
+        radialDecay: 5.2,
+        rhoOpt: 0.75
+    },
+    Kr: {
+        type: 'aerogen',
+        angleMin: 140,
+        angleOpt: 180,
+        energy: 25,
+        max: 45,
+        radialDecay: 6.0,
+        rhoOpt: 0.74
+    },
+    Xe: {
+        type: 'aerogen',
+        angleMin: 140,
+        angleOpt: 180,
+        energy: 60,
+        max: 100,
+        radialDecay: 5.2,
+        rhoOpt: 0.72
+    },
+    Rn: {
+        type: 'aerogen',
+        angleMin: 140,
+        angleOpt: 180,
+        energy: 70,
+        max: 110,
+        radialDecay: 5.0,
+        rhoOpt: 0.72
+    }
 };
+
+const SIGMA_ACCEPTOR_FACTORS = {
+    N: 1.00,
+    O: 0.90,
+    S: 0.85,
+    Se: 0.88,
+    F: 0.70,
+    Cl: 0.78,
+    Br: 0.82,
+    I: 0.85
+};
+
+const SIGMA_SUBSTITUENT_SCALE = {
+    H: 0.00,
+    C: 0.45,
+    N: 0.70,
+    O: 1.00,
+    F: 1.35,
+    Cl: 0.90,
+    Br: 0.70,
+    I: 0.60,
+    S: 0.40,
+    Se: 0.40,
+    Te: 0.30,
+    P: 0.30,
+    As: 0.30,
+    Sb: 0.30,
+    Bi: 0.30
+};
+
 // H-bond donor/acceptor atoms
 const HBOND_DONOR_ATOMS = new Set(['N', 'O', 'S', 'F']);
 const ACCEPTORS = new Set(['N', 'O', 'S', 'Se', 'F', 'Cl', 'Br', 'I']);
@@ -604,7 +759,7 @@ S:  [10.76, 9.13, 1.38], P: [9.54, 8.2, 1.43],
 F:  [14.66, 13.85, 0.47], Cl: [11.0, 9.69, 1.35], Br: [10.08, 9.02, 1.25], I: [9.9, 8.57, 1.35]
 };
 // Letter codes for interaction types in reports
-const TYPE_LETTER = { hbond: 'H', halogen: 'X', chalcogen: 'Ch', pnictogen: 'Pn' };
+const TYPE_LETTER = { hbond: 'H', halogen: 'X', chalcogen: 'Ch', pnictogen: 'Pn', aerogen: 'Ae' };
 const SUBSCRIPT_DIGITS = ['₀','₁','₂','₃','₄','₅','₆','₇','₈','₉'];
 const sub = (n) => String(n).split('').map(d => SUBSCRIPT_DIGITS[+d] || d).join('');
 // ============================================================
@@ -671,7 +826,7 @@ energyNote: 'H-связи — электростатика по Гастайге
 qWeakF: 'слабая', qMedF: 'средняя', qStrongF: 'прочная',
 qWeakM: 'слабый', qMedM: 'средний', qStrongM: 'прочный',
 found: 'Найдено', cntH: 'H-связи', cntHal: 'галогенных',
-cntCha: 'халькогенных', cntPni: 'пниктогенных', cntStack: 'π-стэкинга',
+cntCha: 'халькогенных', cntPni: 'пниктогенных', cntAer: 'аэрогенных', cntStack: 'π-стэкинга',
 noneFound: 'Нековалентных взаимодействий не найдено',
 selectedAtoms: 'Выбрано атомов', alertLoadFirst: 'Сначала загрузите структуру',
 alertClickAtom: 'Сначала кликните по любому атому нужной молекулы',
@@ -727,7 +882,7 @@ energyNote: 'H-bonds — Gasteiger electrostatics + dispersion; σ-holes and π-
 qWeakF: 'weak', qMedF: 'medium', qStrongF: 'strong',
 qWeakM: 'weak', qMedM: 'medium', qStrongM: 'strong',
 found: 'Found', cntH: 'H-bonds', cntHal: 'halogen',
-cntCha: 'chalcogen', cntPni: 'pnictogen', cntStack: 'π-stacking',
+cntCha: 'chalcogen', cntPni: 'pnictogen', cntAer: 'aerogen', cntStack: 'π-stacking',
 noneFound: 'No noncovalent interactions found',
 selectedAtoms: 'Atoms selected', alertLoadFirst: 'Load a structure first',
 alertClickAtom: 'First click any atom of the desired molecule',
@@ -783,7 +938,7 @@ energyNote: 'Ligações H — eletrostática de Gasteiger + dispersão; buracos 
 qWeakF: 'fraca', qMedF: 'média', qStrongF: 'forte',
 qWeakM: 'fraco', qMedM: 'médio', qStrongM: 'forte',
 found: 'Encontrado', cntH: 'ligações H', cntHal: 'halogênio',
-cntCha: 'calcogênio', cntPni: 'pnictogênio', cntStack: 'π-empilhamento',
+cntCha: 'calcogênio', cntPni: 'pnictogênio', cntAer: 'aerogênio', cntStack: 'π-empilhamento',
 noneFound: 'Nenhuma interação não covalente encontrada',
 selectedAtoms: 'Átomos selecionados', alertLoadFirst: 'Carregue uma estrutura primeiro',
 alertClickAtom: 'Primeiro clique em qualquer átomo da molécula desejada',
@@ -828,6 +983,28 @@ function currentLang() { return I18N[AppState.lang]; }
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 const getCovalentRadius = (element) => COVALENT_RADII[element] || 1.0;
 const getVdwRadius = (element) => VDW_RADII[element] || 1.7;
+// Elements whose short noncovalent σ-hole contacts must not be
+// mistaken for covalent bonds (noble gases, heavy chalcogens)
+const BOND_TOLERANCE_OVERRIDE = {
+'Xe|F': 0.30, 'Xe|Cl': 0.20, 'Xe|C': 0.30, 'Xe|O': 0.15, 'Xe|N': 0.15, 'Xe|S': 0.20, 'Xe|Se': 0.25,
+'Kr|F': 0.20, 'Kr|Cl': 0.15, 'Kr|C': 0.20, 'Kr|O': 0.10, 'Kr|N': 0.10,
+'Rn|F': 0.30, 'Rn|Cl': 0.20, 'Rn|C': 0.30, 'Rn|O': 0.15, 'Rn|N': 0.15,
+'Po|O': 0.25, 'Po|N': 0.25, 'Po|S': 0.30, 'Po|Se': 0.30, 'Po|C': 0.30, 'Po|F': 0.30,
+'Te|C': 0.25, 'Te|N': 0.15, 'Te|O': 0.15, 'Te|S': 0.25, 'Te|Se': 0.25, 'Te|Te': 0.25, 'Te|F': 0.25, 'Te|Cl': 0.25, 'Te|Br': 0.25, 'Te|I': 0.25,
+'Se|C': 0.30, 'Se|N': 0.15, 'Se|O': 0.15, 'Se|S': 0.25, 'Se|Se': 0.25,
+'I|C': 0.30, 'I|N': 0.15, 'I|O': 0.15, 'I|S': 0.20, 'I|Se': 0.25, 'I|F': 0.25, 'I|Cl': 0.25, 'I|Br': 0.25, 'I|I': 0.30,
+'Br|C': 0.30, 'Br|N': 0.15, 'Br|O': 0.15, 'Br|S': 0.20,
+'Sb|C': 0.30, 'Sb|N': 0.15, 'Sb|O': 0.15, 'Sb|S': 0.25, 'Sb|Se': 0.25, 'Sb|F': 0.30, 'Sb|Cl': 0.30,
+'Bi|C': 0.30, 'Bi|N': 0.15, 'Bi|O': 0.15, 'Bi|S': 0.25, 'Bi|Se': 0.25, 'Bi|F': 0.30, 'Bi|Cl': 0.30,
+'As|C': 0.30, 'As|N': 0.15, 'As|O': 0.15
+};
+function bondTolerance(elementA, elementB) {
+const t1 = BOND_TOLERANCE_OVERRIDE[elementA + '|' + elementB];
+if (t1 !== undefined) return t1;
+const t2 = BOND_TOLERANCE_OVERRIDE[elementB + '|' + elementA];
+if (t2 !== undefined) return t2;
+return CONSTANTS.BOND_DETECTION.TOLERANCE;
+}
 function atomColor(element, scheme) {
 if (METALS.has(element)) return new THREE.Color(METAL_GRAY);
 return new THREE.Color(scheme[element] || scheme.default);
@@ -1343,9 +1520,8 @@ const key = `${element}:${x.toFixed(3)},${y.toFixed(3)},${z.toFixed(3)}`;
 if (seen.has(key)) return;
 seen.add(key);
 atomsOut.push({ element, x, y, z, label, U });
-placed.push({ x, y, z, r: getCovalentRadius(element) });
+placed.push({ x, y, z, r: getCovalentRadius(element), element });
 };
-const bondTol = CONSTANTS.BOND_DETECTION.TOLERANCE;
 // Lattice translations: −1…1 for internal gluing, −2…2 for placement
 const INNER_DELTAS = [], PLACE_DELTAS = [];
 for (let dx = -1; dx <= 1; dx++)
@@ -1412,7 +1588,7 @@ if (!n) return [];
 const adj = Array.from({ length: n }, () => []);
 for (let i = 0; i < n; i++) {
 for (let j = i + 1; j < n; j++) {
-const thr = atoms[i].cr + atoms[j].cr + bondTol;
+const thr = atoms[i].cr + atoms[j].cr + bondTolerance(atoms[i].element, atoms[j].element);
 let best = null, bestD = Infinity;
 for (const [dx, dy, dz, off] of INNER_DELTAS) {
 const dX = atoms[i].x + off[0] - atoms[j].x;
@@ -1496,7 +1672,7 @@ let bonds = 0, minD = Infinity;
 for (const c of comp) {
 const cx2 = c.x + off[0], cy2 = c.y + off[1], cz2 = c.z + off[2];
 for (const p of placed) {
-const thr = c.cr + p.r + bondTol;
+const thr = c.cr + p.r + bondTolerance(c.element, p.element);
 const dX = cx2 - p.x;
 if (dX > thr || dX < -thr) continue;
 const dY = cy2 - p.y;
@@ -1650,53 +1826,155 @@ return charges;
 // NONCOVALENT INTERACTION ENERGY CALCULATION
 // ============================================================
 function dispersionEnergy(elementA, elementB, distance) {
-const paramsA = LJ_PARAMS[elementA] || DEFAULT_LJ;
-const paramsB = LJ_PARAMS[elementB] || DEFAULT_LJ;
-const epsilon = Math.sqrt(paramsA[0] * paramsB[0]);
-const sigma = paramsA[1] + paramsB[1];
-const t = clamp(sigma / distance, 0.5, 1.6);
-const energy = epsilon * (Math.pow(t, 12) - 2 * Math.pow(t, 6));
-return clamp(
-energy,
--epsilon * CONSTANTS.ENERGY_LIMITS.DISPERSION_CLAMP_LOW,
-CONSTANTS.ENERGY_LIMITS.DISPERSION_MAX
-);
+    const paramsA = LJ_PARAMS[elementA] || DEFAULT_LJ;
+    const paramsB = LJ_PARAMS[elementB] || DEFAULT_LJ;
+    const epsilon = Math.sqrt(paramsA[0] * paramsB[0]);
+    const sigma = paramsA[1] + paramsB[1];
+    const t = clamp(sigma / distance, 0.5, 1.6);
+    const energy = epsilon * (Math.pow(t, 12) - 2 * Math.pow(t, 6));
+
+    return clamp(
+        energy,
+        -CONSTANTS.ENERGY_LIMITS.DISPERSION_CLAMP_LOW * epsilon,
+        CONSTANTS.ENERGY_LIMITS.DISPERSION_MAX
+    );
 }
-function estimateContactEnergy(contact, charges) {
-const dispersionContribution = Math.abs(dispersionEnergy(contact.elX, contact.elA, contact.distance));
-let totalEnergy;
-if (contact.type === 'hbond') {
-const angleFactor = 0.4 + 0.6 * clamp((contact.angle - 90) / 90, 0, 1);
-let qH = charges ? charges[contact.iX] : 0;
-let qA = charges ? charges[contact.iA] : 0;
-if (!qH && !qA) {
-qH = CONSTANTS.HYDROGEN_BOND.DEFAULT_H_CHARGE;
-qA = CONSTANTS.HYDROGEN_BOND.DEFAULT_ACCEPTOR_CHARGE;
+function getAtomNeighbors(structure) {
+    if (!structure?.centeredAtoms || !structure.bonds) return [];
+
+    if (structure._neighbors && structure._neighborsBonds === structure.bonds) {
+        return structure._neighbors;
+    }
+
+    const neighbors = structure.centeredAtoms.map(() => []);
+
+    structure.bonds.forEach(bond => {
+        neighbors[bond.i].push(bond.j);
+        neighbors[bond.j].push(bond.i);
+    });
+
+    structure._neighbors = neighbors;
+    structure._neighborsBonds = structure.bonds;
+
+    return neighbors;
 }
-const electrostatics = Math.abs(1389 * qH * qA / (4 * contact.distance));
-totalEnergy = clamp(electrostatics * angleFactor + dispersionContribution, 1, CONSTANTS.ENERGY_LIMITS.CONTACT_MAX);
-} else {
-// Sigma-hole
-const donorInfo = SIGMA_HOLE_DONORS[contact.elX];
-const intrinsicEnergy = donorInfo?.energy || 30;
-const minAngle = donorInfo?.angleMin || 140;
-const angleWidth = CONSTANTS.SIGMA_HOLE.OPTIMAL_ANGLE - minAngle;
-let angleFactor = 0;
-if (contact.angle >= minAngle) {
-const deviation = Math.abs(contact.angle - CONSTANTS.SIGMA_HOLE.OPTIMAL_ANGLE) / angleWidth;
-angleFactor = Math.exp(-CONSTANTS.SIGMA_HOLE.ANGULAR_DECAY * deviation * deviation);
+
+function sigmaSubstituentFactor(contact, structure) {
+    const neighbors = getAtomNeighbors(structure);
+
+    if (!neighbors.length || !structure.centeredAtoms?.[contact.iX]) {
+        return 1.0;
+    }
+
+    const scale = element => SIGMA_SUBSTITUENT_SCALE[element] ?? 0.20;
+
+    const oppositeElement = structure.centeredAtoms[contact.iD]?.element || 'C';
+    const oppositeFactor = scale(oppositeElement);
+
+    let inductiveFactor = 0;
+
+    (neighbors[contact.iX] || []).forEach(neighborIndex => {
+        if (neighborIndex === contact.iD) return;
+
+        const neighborAtom = structure.centeredAtoms[neighborIndex];
+        if (!neighborAtom) return;
+
+        inductiveFactor += scale(neighborAtom.element);
+    });
+
+    const c = CONSTANTS.SIGMA_HOLE;
+
+    const totalFactor =
+        c.SUBSTITUENT_BASE +
+        c.SUBSTITUENT_OPPOSITE * oppositeFactor +
+        c.SUBSTITUENT_INDUCTIVE * inductiveFactor;
+
+    return clamp(totalFactor, 0.10, c.SUBSTITUENT_CAP);
 }
-const rho = contact.distance / (getVdwRadius(contact.elX) + getVdwRadius(contact.elA));
-const radialFactor = rho < CONSTANTS.SIGMA_HOLE.OPTIMAL_RHO
-? intrinsicEnergy
-: intrinsicEnergy * Math.exp(-CONSTANTS.SIGMA_HOLE.RADIAL_DECAY * (rho - CONSTANTS.SIGMA_HOLE.OPTIMAL_RHO));
-totalEnergy = clamp(
-radialFactor * angleFactor + dispersionContribution,
-0,
-intrinsicEnergy * CONSTANTS.ENERGY_LIMITS.CONTACT_SIGMA_LIMIT_FACTOR
-);
-}
-return totalEnergy;
+
+function estimateContactEnergy(contact, charges, structure = null) {
+    const dispersionContribution = Math.abs(dispersionEnergy(contact.elX, contact.elA, contact.distance));
+    let totalEnergy;
+
+    if (contact.type === 'hbond') {
+        const angleFactor = 0.4 + 0.6 * clamp((contact.angle - 90) / 90, 0, 1);
+
+        let qH = charges ? charges[contact.iX] : 0;
+        let qA = charges ? charges[contact.iA] : 0;
+
+        if (!qH && !qA) {
+            qH = CONSTANTS.HYDROGEN_BOND.DEFAULT_H_CHARGE;
+            qA = CONSTANTS.HYDROGEN_BOND.DEFAULT_ACCEPTOR_CHARGE;
+        }
+
+        const electrostatics = Math.abs(1389 * qH * qA / (4 * contact.distance));
+
+        totalEnergy = clamp(
+            electrostatics * angleFactor + dispersionContribution,
+            1,
+            CONSTANTS.ENERGY_LIMITS.CONTACT_MAX
+        );
+    } else {
+        const donorInfo = SIGMA_HOLE_DONORS[contact.elX];
+
+        const intrinsicEnergy = donorInfo?.energy ?? 30;
+
+        const maxEnergy = Math.min(
+            donorInfo?.max ?? intrinsicEnergy * CONSTANTS.ENERGY_LIMITS.CONTACT_SIGMA_LIMIT_FACTOR,
+            CONSTANTS.ENERGY_LIMITS.CONTACT_MAX
+        );
+
+        const minAngle = donorInfo?.angleMin ?? 140;
+        const optimalAngle = donorInfo?.angleOpt ?? CONSTANTS.SIGMA_HOLE.OPTIMAL_ANGLE;
+        const angleWidth = Math.max(8, optimalAngle - minAngle);
+
+        let angleFactor = 0;
+
+        if (contact.angle >= minAngle) {
+            const deviation = Math.abs(contact.angle - optimalAngle) / angleWidth;
+            angleFactor = Math.exp(-CONSTANTS.SIGMA_HOLE.ANGULAR_DECAY * deviation * deviation);
+        }
+
+        const rho = contact.distance / (getVdwRadius(contact.elX) + getVdwRadius(contact.elA));
+
+        const rhoOpt = donorInfo?.rhoOpt ?? CONSTANTS.SIGMA_HOLE.OPTIMAL_RHO;
+        const radialDecay = donorInfo?.radialDecay ?? CONSTANTS.SIGMA_HOLE.RADIAL_DECAY;
+
+        const radialFactor = rho < rhoOpt
+            ? 1.0
+            : Math.exp(-radialDecay * (rho - rhoOpt));
+
+        const substituentFactor = structure
+            ? sigmaSubstituentFactor(contact, structure)
+            : 1.0;
+
+        const acceptorFactor = SIGMA_ACCEPTOR_FACTORS[contact.elA] ?? 1.0;
+
+        let shortRangeBonus = 0;
+        const shortRangeRho = CONSTANTS.SIGMA_HOLE.SHORT_RANGE_RHO;
+
+        if (rho < shortRangeRho) {
+            shortRangeBonus =
+                CONSTANTS.SIGMA_HOLE.SHORT_RANGE_BONUS *
+                intrinsicEnergy *
+                ((shortRangeRho - rho) / 0.10);
+
+            shortRangeBonus = clamp(shortRangeBonus, 0, 0.35 * maxEnergy);
+        }
+
+        const rawEnergy =
+            intrinsicEnergy *
+            substituentFactor *
+            acceptorFactor *
+            radialFactor *
+            angleFactor +
+            shortRangeBonus +
+            dispersionContribution;
+
+        totalEnergy = clamp(rawEnergy, 0, maxEnergy);
+    }
+
+    return totalEnergy;
 }
 function estimateStackingEnergy(stack) {
 const sizeFactor = clamp((stack.n1 + stack.n2) / 12, 0.5, 2);
@@ -1752,7 +2030,7 @@ if (!cell) continue;
 for (const j of cell) {
 if (j <= i) continue;
 const other = atoms[j];
-const maxDistance = radiusI + getCovalentRadius(other.element) + TOLERANCE;
+const maxDistance = radiusI + getCovalentRadius(other.element) + bondTolerance(atom.element, other.element);
 const distanceSquared = (atom.x - other.x) ** 2 + (atom.y - other.y) ** 2 + (atom.z - other.z) ** 2;
 if (distanceSquared < maxDistance * maxDistance) {
 bonds.push({ i, j });
@@ -2426,6 +2704,7 @@ if (counts.hbond) parts.push(counts.hbond + ' ' + lang.cntH);
 if (counts.halogen) parts.push(counts.halogen + ' ' + lang.cntHal);
 if (counts.chalcogen) parts.push(counts.chalcogen + ' ' + lang.cntCha);
 if (counts.pnictogen) parts.push(counts.pnictogen + ' ' + lang.cntPni);
+if (counts.aerogen) parts.push(counts.aerogen + ' ' + lang.cntAer);
 if (stackCount) parts.push(stackCount + ' ' + lang.cntStack);
 element.textContent = parts.length
 ? lang.found + ': ' + parts.join(', ')
@@ -2463,9 +2742,10 @@ const colorMap = {
 hbond: settings.hbondColor,
 halogen: settings.halogenColor,
 chalcogen: settings.chalcogenColor,
-pnictogen: settings.pnictogenColor
+pnictogen: settings.pnictogenColor,
+aerogen: '#00b3b3'
 };
-const typeCounters = { hbond: 0, halogen: 0, chalcogen: 0, pnictogen: 0 };
+const typeCounters = { hbond: 0, halogen: 0, chalcogen: 0, pnictogen: 0, aerogen: 0 };
 detectInteractions(structure).forEach(x => {
 const visibleI = !structure.visibleAtoms || structure.visibleAtoms.has(x.iX);
 const visibleA = !structure.visibleAtoms || (structure.visibleAtoms.has(x.iA) && x.sym === 'x,y,z');
@@ -2484,7 +2764,7 @@ addPartnerGhost(structure, x.from, color, x.iX);
 // "All" mode: ghost at the symmetry copy end
 addPartnerGhost(structure, x.to, color, x.iA);
 }
-const energy = estimateContactEnergy(x, structure.charges);
+const energy = estimateContactEnergy(x, structure.charges, structure);
 totalEnergy += energy;
 energyRows.push({
 t: tag,
@@ -3250,7 +3530,7 @@ return atom.element + (i + 1);
 };
 let csv = ['Type', 'R', 'X', 'A', 'R-X(A)', 'X...A(A)', 'R...A(A)', 'angle(deg)', 'symmetry', 'E(kJ/mol)'].join(',') + '\n';
 interactions.forEach(x => {
-const energy = estimateContactEnergy(x, structure.charges);
+const energy = estimateContactEnergy(x, structure.charges, structure);
 csv += [
 x.type,
 labelFn(x.iD),
