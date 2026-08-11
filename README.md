@@ -3,13 +3,13 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![GitHub release](https://img.shields.io/github/v/release/Dmitrii-Bolotin/SigmaLens)](https://github.com/Dmitrii-Bolotin/SigmaLens/releases)
 [![Live demo](https://img.shields.io/badge/Demo-Live-blue?logo=github)](https://dmitrii-bolotin.github.io/SigmaLens/)
-![screenshot](screenshot.png)
+
 
 **A browser-based 3D molecular structure viewer with built-in analysis of hydrogen bonds, σ-hole interactions, and π-stacking in crystal structures.**
 
 SigmaLens is a zero-installation single-file web application designed for supramolecular chemists and crystallographers who need fast inspection of non-covalent interactions directly from CIF, PDB, MOL, SDF, and XYZ files.
 
-![screenshot](assets/screenshot.png)
+![screenshot](screenshot.png)
 
 ## ✨ Key Features
 
