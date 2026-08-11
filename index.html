@@ -1,0 +1,3534 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>SigmaLens</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+body {
+margin: 0;
+overflow: hidden;
+background: white;
+font-family: 'Manrope', 'Segoe UI', Tahoma, sans-serif;
+user-select: none;
+}
+#left-panel {
+position: absolute;
+top: 20px;
+left: 20px;
+width: 290px;
+background: rgba(255, 255, 255, 0.95);
+backdrop-filter: blur(15px);
+border-radius: 16px;
+box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+border: 1px solid #ddd;
+padding: 0;
+z-index: 10;
+overflow: hidden;
+box-sizing: border-box;
+transition: transform 0.3s;
+}
+#left-panel.hidden { transform: translateX(-350px); }
+#panel-scroll {
+display: flex;
+flex-direction: column;
+gap: 10px;
+padding: 16px;
+max-height: calc(100vh - 100px);
+overflow-y: auto;
+box-sizing: border-box;
+scrollbar-width: thin;
+scrollbar-color: #ccc transparent;
+}
+#panel-scroll::-webkit-scrollbar { width: 6px; }
+#panel-scroll::-webkit-scrollbar-track { background: transparent; }
+#panel-scroll::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+#btn-show { position: absolute; top: 20px; left: 20px; z-index: 11; display: none; }
+#energy-box {
+position: absolute;
+top: 20px;
+right: 20px;
+width: 300px;
+background: rgba(255, 255, 255, 0.95);
+backdrop-filter: blur(15px);
+border-radius: 16px;
+box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+border: 1px solid #ddd;
+padding: 14px 16px;
+z-index: 9;
+display: none;
+max-height: 50vh;
+overflow-y: auto;
+box-sizing: border-box;
+font-size: 12px;
+color: #333;
+}
+.e-head {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 6px;
+gap: 6px;
+}
+#energy-box b.h { font-size: 13px; color: #0a2f44; }
+#e-collapse, .p-collapse {
+background: #f4f4f4;
+border: 1px solid #ccc;
+border-radius: 8px;
+padding: 2px 8px;
+cursor: pointer;
+font-size: 11px;
+}
+.e-row { display: flex; align-items: center; gap: 6px; margin: 3px 0; }
+.e-dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+.e-t { font-weight: 700; color: #0a2f44; min-width: 26px; }
+.e-total {
+border-top: 1px solid #eee;
+margin-top: 6px;
+padding-top: 6px;
+font-weight: 700;
+color: #0a2f44;
+}
+.e-note { color: #999; font-size: 10px; margin-top: 6px; }
+#branding h1 { font-weight: 800; font-size: 22px; margin: 0; color: #0a2f44; letter-spacing: -0.5px; }
+#branding p { font-weight: 600; font-size: 12px; margin: 2px 0 0; color: #2c5f8a; }
+.control-row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.control-row.center { justify-content: center; flex-wrap: nowrap; }
+.control-row.center > button {
+width: 44px;
+height: 44px;
+padding: 0;
+border-radius: 50%;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+button, select, .file-label {
+background: #f4f4f4;
+border: 1px solid #ccc;
+color: #222;
+padding: 8px 12px;
+border-radius: 20px;
+font-size: 13px;
+font-weight: 500;
+cursor: pointer;
+transition: all 0.2s;
+white-space: nowrap;
+font-family: 'Manrope', sans-serif;
+}
+button:hover, select:hover, .file-label:hover { background: #e0e0e0; border-color: #999; }
+button.active { background: #2c5f8a; border-color: #0a2f44; color: white; }
+select {
+background: white;
+min-width: 110px;
+text-align: left;
+padding: 6px 10px;
+}
+#file-input { display: none; }
+.file-label {
+display: block;
+width: 100%;
+box-sizing: border-box;
+text-align: center;
+background: #d9f2d9;
+border-color: #8fbf8f;
+color: #1e5b1e;
+font-weight: 700;
+}
+.file-label:hover { background: #c6ebc6; border-color: #6fae6f; }
+.wide-btn {
+flex: 1;
+border-radius: 12px;
+padding: 10px 6px;
+font-weight: 700;
+font-size: 13px;
+}
+.chk {
+display: flex;
+align-items: center;
+gap: 6px;
+font-size: 12px;
+color: #555;
+font-weight: 600;
+justify-content: center;
+}
+.chk input { accent-color: #2c5f8a; }
+.setting-group {
+display: flex;
+align-items: center;
+gap: 5px;
+background: none;
+padding: 6px 2px;
+border: none;
+border-bottom: 1px solid #f0f0f0;
+border-radius: 0;
+justify-content: space-between;
+}
+.setting-group label {
+font-size: 12px;
+font-weight: 600;
+color: #333;
+white-space: nowrap;
+}
+.setting-group input[type="color"] {
+width: 26px;
+height: 26px;
+border: none;
+background: none;
+cursor: pointer;
+}
+.setting-group input[type="range"] { width: 60px; margin: 0 5px; }
+.setting-group select { min-width: 70px; font-size: 12px; padding: 4px; }
+#delete-selected-btn { background: #ffd6d6; border-color: #cc6666; display: none; }
+#delete-selected-btn.show { display: inline-block; }
+#nc-status {
+font-size: 12px;
+color: #555;
+font-weight: 600;
+text-align: center;
+min-height: 16px;
+}
+#status-msg {
+font-size: 12px;
+color: #555;
+min-height: 18px;
+font-weight: 500;
+}
+#drop-overlay {
+position: fixed;
+inset: 0;
+background: rgba(44, 95, 138, 0.15);
+backdrop-filter: blur(8px);
+z-index: 100;
+display: none;
+align-items: center;
+justify-content: center;
+}
+#drop-overlay.show { display: flex; }
+#drop-overlay .inner {
+background: white;
+padding: 60px 80px;
+border-radius: 24px;
+border: 3px dashed #2c5f8a;
+text-align: center;
+}
+#drop-overlay h2 { margin: 0 0 10px; font-size: 28px; color: #0a2f44; }
+#drop-overlay p { margin: 0; font-size: 14px; color: #666; }
+.section-divider {
+font-size: 13px;
+font-weight: 700;
+color: #0a2f44;
+margin-top: 2px;
+cursor: pointer;
+display: flex;
+justify-content: space-between;
+align-items: center;
+}
+.section-divider .caret {
+background: #f4f4f4;
+border: 1px solid #ccc;
+border-radius: 8px;
+padding: 2px 8px;
+font-size: 11px;
+transition: transform 0.2s;
+}
+.section-divider.open .caret { transform: rotate(90deg); }
+.section-body { display: none; flex-direction: column; gap: 2px; }
+.section-body.open { display: flex; }
+#joystick {
+position: relative;
+width: 44px;
+height: 44px;
+border-radius: 50%;
+background: #fff;
+flex: none;
+border: 1px solid #ddd;
+overflow: hidden;
+}
+#joystick::before {
+content: '';
+position: absolute;
+inset: 0;
+z-index: 2;
+pointer-events: none;
+background:
+linear-gradient(45deg, transparent calc(50% - 1px), #fff calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)),
+linear-gradient(135deg, transparent calc(50% - 1px), #fff calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px));
+}
+.pad {
+position: absolute;
+inset: 0;
+background: #f4f4f4;
+border: none;
+border-radius: 0;
+padding: 0;
+}
+.pad:hover { background: #dfe7f0; }
+.pad:active { background: #c9d8ea; }
+.pad span { position: absolute; font-size: 13px; color: #222; }
+#pad-up span { top: 4px; left: 50%; transform: translateX(-50%); font-size: 9px; }
+#pad-right span { right: 4px; top: 50%; transform: translateY(-50%); font-size: 9px; }
+#pad-down span { bottom: 4px; left: 50%; transform: translateX(-50%); font-size: 9px; }
+#pad-left span { left: 4px; top: 50%; transform: translateY(-50%); font-size: 9px; }
+#bottom-bar {
+position: absolute;
+bottom: 20px;
+left: 20px;
+display: flex;
+gap: 8px;
+z-index: 12;
+}
+#btn-help {
+width: 32px;
+height: 32px;
+border-radius: 50%;
+background: #2c5f8a;
+border: 1px solid #0a2f44;
+color: #fff;
+font-size: 16px;
+font-weight: 800;
+cursor: pointer;
+box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+display: flex;
+align-items: center;
+justify-content: center;
+padding: 0;
+font-family: 'Manrope', sans-serif;
+}
+#btn-help:hover { background: #3a72a2; }
+.flag-btn {
+width: 32px;
+height: 32px;
+border-radius: 50%;
+padding: 0;
+border: 1px solid #bbb;
+cursor: pointer;
+overflow: hidden;
+background: #fff;
+box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+transition: transform 0.15s;
+}
+.flag-btn:hover { transform: scale(1.1); }
+.flag-btn svg { width: 100%; height: 100%; display: block; }
+.flag-btn.active { outline: 2px solid #2c5f8a; outline-offset: 1px; }
+#help-overlay {
+position: fixed;
+inset: 0;
+background: rgba(10, 47, 68, 0.45);
+backdrop-filter: blur(4px);
+z-index: 200;
+display: none;
+align-items: center;
+justify-content: center;
+}
+#help-overlay.show { display: flex; }
+#help-window {
+background: #fff;
+border-radius: 20px;
+width: min(680px, calc(100vw - 40px));
+max-height: calc(100vh - 60px);
+overflow-y: auto;
+padding: 22px 26px;
+box-sizing: border-box;
+box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+font-size: 13px;
+color: #333;
+line-height: 1.55;
+user-select: text;
+}
+#help-window h2 { margin: 0 0 2px; font-size: 20px; color: #0a2f44; }
+#help-window .sub { color: #2c5f8a; font-weight: 600; font-size: 12px; margin-bottom: 8px; }
+#help-window h3 { margin: 14px 0 4px; font-size: 14px; color: #0a2f44; }
+#help-window ul { margin: 4px 0; padding-left: 18px; }
+#help-window li { margin: 3px 0; }
+#help-window b { color: #0a2f44; }
+#help-close {
+position: sticky;
+top: 0;
+margin-left: auto;
+display: block;
+background: #f4f4f4;
+border: 1px solid #ccc;
+border-radius: 10px;
+padding: 4px 10px;
+cursor: pointer;
+font-size: 13px;
+z-index: 1;
+}
+#help-close:hover { background: #e0e0e0; }
+</style>
+</head>
+<body>
+<button id="btn-show">☰</button>
+<div id="energy-box"></div>
+<div id="left-panel"><div id="panel-scroll">
+<div id="branding" style="display:flex;align-items:flex-start">
+<div><h1>SigmaLens</h1><p data-i18n="branding">Разработка BOLLAB</p></div>
+<button id="btn-hide" style="margin-left:auto" title="Скрыть панель" data-i18n-title="hidePanel">⬅</button>
+</div>
+<div class="control-row">
+<label for="file-input" class="file-label" data-i18n="load">📂 Загрузить</label>
+<input type="file" id="file-input" accept=".xyz,.cif,.txt,.pdb,.mol,.sdf" multiple>
+</div>
+<select id="structure-select"><option value="" data-i18n="noStructures">-- Нет структур --</option></select>
+<div class="control-row center">
+<button id="btn-labels" title="Подписи атомов" data-i18n-title="labelsTitle">🔤</button>
+<button id="btn-export" title="Экспорт измерений CSV" data-i18n-title="exportTitle">📥</button>
+<button id="btn-contacts" title="Таблица контактов (IUCr)" data-i18n-title="contactsTitle">📋</button>
+<button id="delete-selected-btn" title="Удалить выбранное" data-i18n-title="deleteTitle">🗑️</button>
+<div id="joystick">
+<button id="pad-up" class="pad" style="clip-path:polygon(50% 50%,14.6% 14.6%,50% 0,85.4% 14.6%)"><span>▲</span></button>
+<button id="pad-right" class="pad" style="clip-path:polygon(50% 50%,85.4% 14.6%,100% 50%,85.4% 85.4%)"><span>▶</span></button>
+<button id="pad-down" class="pad" style="clip-path:polygon(50% 50%,85.4% 85.4%,50% 100%,14.6% 85.4%)"><span>▼</span></button>
+<button id="pad-left" class="pad" style="clip-path:polygon(50% 50%,14.6% 85.4%,0 50%,14.6% 14.6%)"><span>◀</span></button>
+</div>
+</div>
+<div class="control-row">
+<button id="btn-isolate" class="wide-btn" title="Оставить только эту молекулу" data-i18n="fragment">⛶ Фрагмент</button>
+<button id="btn-show-all" class="wide-btn" title="Показать всё обратно" data-i18n="showAll">👁 Всё</button>
+</div>
+<div class="control-row">
+<button id="btn-noncovalent" class="wide-btn" title="H-связи и σ-дырочные взаимодействия" data-i18n="sigmaBtn">σ-дырки</button>
+<button id="btn-stacking" class="wide-btn" title="π-стэкинг взаимодействий" data-i18n="stackBtn">π-стэкинг</button>
+</div>
+<label class="chk">
+<input type="checkbox" id="chk-14" checked>
+<span data-i18n="chk14">исключать гиперконъюгацию в заторможенных конформациях</span>
+</label>
+<div id="nc-status"></div>
+<div class="section-divider" data-sec="sec-view"><span data-i18n="secView">Вид</span><span class="caret">▸</span></div>
+<div class="section-body" id="sec-view">
+<div class="setting-group"><label data-i18n="lbBg">Фон</label><input type="color" id="bg-color" value="#ffffff"></div>
+<div class="setting-group">
+<label data-i18n="lbStyle">Стиль</label>
+<select id="atom-style">
+<option value="ballstick" data-i18n="optBallstick">Шаро-стержни</option>
+<option value="vdw" data-i18n="optVdw">Ван-дер-Ваальс</option>
+<option value="ellipsoid" data-i18n="optEllipsoid">Эллипсоиды</option>
+<option value="sticks" data-i18n="optSticks">Только связи</option>
+</select>
+</div>
+<div class="setting-group"><label data-i18n="lbFont">Шрифт</label><input type="range" id="font-size" min="0.5" max="3" step="0.1" value="1.5"></div>
+</div>
+<div class="section-divider" data-sec="sec-color"><span data-i18n="secColor">Цвет</span><span class="caret">▸</span></div>
+<div class="section-body" id="sec-color">
+<div class="setting-group"><label data-i18n="lbBonds">Связи</label><input type="color" id="bond-color" value="#333333"></div>
+<div class="setting-group"><label>📏</label><input type="color" id="dist-color" value="#14337f"></div>
+<div class="setting-group"><label>📐</label><input type="color" id="angle-color" value="#006400"></div>
+<div class="setting-group"><label>🌀</label><input type="color" id="torsion-color" value="#800020"></div>
+<div class="setting-group"><label data-i18n="lbAtoms">Ат.</label><input type="color" id="label-color" value="#000000"></div>
+<div class="setting-group"><label data-i18n="lbHbond">H-связь</label><input type="color" id="hbond-color" value="#4488ff"></div>
+<div class="setting-group"><label data-i18n="lbHalogen">Галоген</label><input type="color" id="halogen-color" value="#9944ff"></div>
+<div class="setting-group"><label data-i18n="lbChalcogen">Халькоген</label><input type="color" id="chalcogen-color" value="#ffcc00"></div>
+<div class="setting-group"><label data-i18n="lbPnictogen">Пниктоген</label><input type="color" id="pnictogen-color" value="#ff8800"></div>
+<div class="setting-group"><label data-i18n="lbRings">⬡ Кольца</label><input type="color" id="ring-color" value="#00aa88"></div>
+</div>
+<div id="status-msg"></div>
+</div></div>
+<div id="drop-overlay"><div class="inner"><h2 data-i18n="dropH2">📂 Бросьте файлы сюда</h2><p>.xyz .cif .pdb .mol .sdf</p></div></div>
+<div id="bottom-bar">
+<button id="btn-help" title="Справка и руководство пользователя" data-i18n-title="helpTitle">?</button>
+<button class="flag-btn" data-lang="ru" title="Русский"><svg viewBox="0 0 24 24"><rect width="24" height="8" fill="#ffffff"/><rect y="8" width="24" height="8" fill="#0039a6"/><rect y="16" width="24" height="8" fill="#d52b1e"/></svg></button>
+<button class="flag-btn" data-lang="pt" title="Português (Brasil)"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#009c3b"/><polygon points="12,3 21,12 12,21 3,12" fill="#ffdf00"/><circle cx="12" cy="12" r="4.2" fill="#002776"/></svg></button>
+<button class="flag-btn" data-lang="en" title="English (US)"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#b22234"/><g fill="#ffffff"><rect y="2" width="24" height="2"/><rect y="6" width="24" height="2"/><rect y="10" width="24" height="2"/><rect y="14" width="24" height="2"/><rect y="18" width="24" height="2"/><rect y="22" width="24" height="2"/></g><rect width="10" height="12" fill="#3c3b6e"/></svg></button>
+</div>
+<div id="help-overlay">
+<div id="help-window">
+<button id="help-close" data-i18n="helpClose">✕ Закрыть</button>
+<div id="help-window-content"></div>
+</div>
+</div>
+<script type="importmap">
+{
+"imports": {
+"three": "https://unpkg.com/three@0.157.0/build/three.module.js",
+"three/addons/": "https://unpkg.com/three@0.157.0/examples/jsm/"
+}
+}
+</script>
+<script type="module">
+/**
+* SigmaLens — 3D molecular structure viewer
+* with measurements and noncovalent interaction analysis.
+*/
+import * as THREE from 'three';
+import { TrackballControls } from 'three/addons/controls/TrackballControls.js';
+import { Line2 } from 'three/addons/lines/Line2.js';
+import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
+import { LineGeometry } from 'three/addons/lines/LineGeometry.js';
+// ============================================================
+// CONSTANTS
+// ============================================================
+const CONSTANTS = {
+// Geometric thresholds
+BOND_DETECTION: {
+TOLERANCE: 0.45,         // angstrom — covalent bond detection tolerance
+CELL_SIZE: 5.0           // spatial grid cell size for neighbor search
+},
+HYDROGEN_BOND: {
+DISTANCE_FACTOR: 0.95,   // factor of the sum of vdW radii
+MIN_ANGLE: 110,          // minimum D-H···A angle (degrees)
+DEFAULT_H_CHARGE: 0.35,
+DEFAULT_ACCEPTOR_CHARGE: -0.45
+},
+SIGMA_HOLE: {
+DISTANCE_FACTOR: 0.95,
+OPTIMAL_ANGLE: 170,      // optimal R-X···A angle
+ANGULAR_DECAY: 3.0,      // Gaussian angular decay parameter
+RADIAL_DECAY: 8.0,       // exponential radial decay parameter
+OPTIMAL_RHO: 0.80        // optimal normalized distance
+},
+PI_STACKING: {
+MIN_DISTANCE: 3.0,
+MAX_DISTANCE: 5.0,
+MAX_PLANARITY_ANGLE: 30,
+MAX_SLIP_ANGLE: 45,
+RING_COPLANARITY_TOLERANCE: 0.15
+},
+RING_DETECTION: {
+MIN_SIZE: 5,
+MAX_SIZE: 6,
+MAX_DEGREE_FOR_AROMATIC: 3
+},
+// Energy thresholds (kJ/mol)
+ENERGY_QUALITY: {
+CONTACT: { WEAK: 8, MEDIUM: 25 },
+STACKING: { WEAK: 5, MEDIUM: 15 }
+},
+// Energy limits
+ENERGY_LIMITS: {
+CONTACT_MAX: 60,
+CONTACT_SIGMA_LIMIT_FACTOR: 1.5,
+STACKING_MAX: 15,
+DISPERSION_MAX: 4.0,
+DISPERSION_CLAMP_LOW: -1.2
+},
+PEOE_ITERATIONS: 6,
+MEASUREMENT_TIMEOUT_MS: 1000,
+TEXTURE_CACHE_MAX_SIZE: 200,
+SPRITE_HIT_THRESHOLD: 30,
+ATOM_LABEL_HIT_THRESHOLD: 16,
+LABEL_LINE_DISTANCE_THRESHOLD: 0.5,
+CAMERA_FIT_PADDING: 1.5,
+EIGENVALUE_MAX_ITERATIONS: 32,
+EIGENVALUE_CONVERGENCE: 1e-9,
+GHOST_SPHERE: {
+RADIUS: 0.25,
+SEGMENTS_W: 16,
+SEGMENTS_H: 12,
+OPACITY: 0.4,
+EMISSIVE_INTENSITY: 0.6
+},
+RING_CENTROID_SPHERE: {
+RADIUS: 0.12,
+SEGMENTS_W: 12,
+SEGMENTS_H: 8
+},
+ATOM_SPHERE_SEGMENTS: { W: 24, H: 12 },
+JUNCTION_SPHERE_SEGMENTS: { W: 16, H: 10 },
+BOND_CYLINDER_SEGMENTS: 6,
+STICK_CYLINDER_SEGMENTS: 8,
+UNIT_CELL_ARROW_HEAD: { LENGTH: 0.3, WIDTH: 0.15 }
+};
+// Covalent radii (angstrom)
+const COVALENT_RADII = {
+H: 0.31, He: 0.28, Li: 1.28, Be: 0.96, B: 0.84, C: 0.76, N: 0.71, O: 0.66, F: 0.57, Ne: 0.58,
+Na: 1.66, Mg: 1.41, Al: 1.21, Si: 1.11, P: 1.07, S: 1.05, Cl: 1.02, Ar: 1.06,
+K: 2.03, Ca: 1.76, Sc: 1.7, Ti: 1.6, V: 1.53, Cr: 1.39, Mn: 1.5, Fe: 1.42, Co: 1.38, Ni: 1.24,
+Cu: 1.32, Zn: 1.22, Ga: 1.22, Ge: 1.2, As: 1.19, Se: 1.2, Br: 1.2, Kr: 1.16,
+Rb: 2.2, Sr: 1.95, Y: 1.9, Zr: 1.75, Nb: 1.64, Mo: 1.54, Tc: 1.47, Ru: 1.46, Rh: 1.42,
+Pd: 1.39, Ag: 1.45, Cd: 1.44, In: 1.42, Sn: 1.39, Sb: 1.39, Te: 1.38, I: 1.39, Xe: 1.4,
+Cs: 2.44, Ba: 2.15, La: 2.07, Hf: 1.75, Ta: 1.7, W: 1.62, Re: 1.51, Os: 1.44, Ir: 1.41,
+Pt: 1.36, Au: 1.36, Hg: 1.32, Tl: 1.45, Pb: 1.46, Bi: 1.48, Po: 1.4, At: 1.5, Rn: 1.5
+};
+// van der Waals radii (angstrom)
+const VDW_RADII = {
+H: 1.2, He: 1.4, Li: 1.82, Be: 1.53, B: 1.92, C: 1.7, N: 1.55, O: 1.52, F: 1.47, Ne: 1.54,
+Na: 2.27, Mg: 1.73, Al: 1.84, Si: 2.1, P: 1.8, S: 1.8, Cl: 1.75, Ar: 1.88,
+K: 2.75, Ca: 2.31, Sc: 2.15, Ti: 2.11, V: 2.07, Cr: 2.06, Mn: 2.05, Fe: 2.04, Co: 2, Ni: 1.97,
+Cu: 1.96, Zn: 2.01, Ga: 1.87, Ge: 2.11, As: 1.85, Se: 1.9, Br: 1.85, Kr: 2.02,
+Rb: 3.03, Sr: 2.49, Y: 2.19, Zr: 2.23, Nb: 2.18, Mo: 2.17, Ru: 2.13, Rh: 2.1,
+Pd: 2.1, Ag: 2.11, Cd: 2.18, In: 1.93, Sn: 2.17, Sb: 2.06, Te: 2.06, I: 1.98, Xe: 2.16,
+Cs: 3.43, Ba: 2.68, La: 2.43, Ce: 2.42, Pr: 2.4, Nd: 2.39, Sm: 2.36, Eu: 2.35,
+Gd: 2.34, Tb: 2.33, Dy: 2.31, Ho: 2.3, Er: 2.29, Tm: 2.27, Yb: 2.26, Lu: 2.24,
+Hf: 2.23, Ta: 2.22, W: 2.18, Re: 2.16, Os: 2.16, Ir: 2.13, Pt: 2.13, Au: 2.14,
+Hg: 2.23, Tl: 1.96, Pb: 2.02, Bi: 2.07, Po: 1.97, At: 2.02, Rn: 2.2,
+Fr: 3.48, Ra: 2.83, Ac: 2.47, Th: 2.45, Pa: 2.43, U: 2.41, Np: 2.39, Pu: 2.43, Am: 2.44, Cm: 2.45
+};
+// Atom color schemes
+const ATOM_COLOR_SCHEMES = {
+default: { H: 0xffffff, C: 0x909090, N: 0x3050F0, O: 0xFF0D0D, F: 0x90E050, S: 0xFFFF30, P: 0xFF8000, Cl: 0x1E7A1E, Br: 0x8B4A1A, I: 0x6A3AB2, Se: 0xFFA100, Te: 0xD47A00, Po: 0xAB5C00, default: 0xDD80DD },
+jmol:    { H: 0xFFFFFF, C: 0x909090, N: 0x3050F0, O: 0xFF0D0D, S: 0xC8C832, P: 0xFF8000, Cl: 0x1E7A1E, Br: 0x8B4A1A, I: 0x6A3AB2, Se: 0xFFA100, Te: 0xD47A00, Po: 0xAB5C00, default: 0xDD80DD },
+dark:    { H: 0xDDDDDD, C: 0x505050, N: 0x2030B0, O: 0xB01010, S: 0xB0B020, P: 0xB06000, Cl: 0x155a15, Br: 0x6a3814, I: 0x4a2a80, Se: 0xb07000, Te: 0x94560a, Po: 0x8a4a00, default: 0xAA66AA }
+};
+const METAL_GRAY = 0xbfc4c9;
+const METALS = new Set([
+'Li', 'Na', 'K', 'Rb', 'Cs', 'Fr', 'Be', 'Mg', 'Ca', 'Sr', 'Ba', 'Ra',
+'Sc', 'Y', 'La', 'Ti', 'Zr', 'Hf', 'V', 'Nb', 'Ta', 'Cr', 'Mo', 'W',
+'Mn', 'Tc', 'Re', 'Fe', 'Ru', 'Os', 'Co', 'Rh', 'Ir', 'Ni', 'Pd', 'Pt',
+'Cu', 'Ag', 'Au', 'Zn', 'Cd', 'Hg', 'Al', 'Ga', 'In', 'Tl', 'Sn', 'Pb', 'Bi'
+]);
+// Sigma-hole donor parameters
+const SIGMA_HOLE_DONORS = {
+Cl: { type: 'halogen',    angleMin: 140, energy: 15 },
+Br: { type: 'halogen',    angleMin: 140, energy: 25 },
+I:  { type: 'halogen',    angleMin: 140, energy: 35 },
+S:  { type: 'chalcogen',  angleMin: 130, energy: 18 },
+Se: { type: 'chalcogen',  angleMin: 130, energy: 28 },
+Te: { type: 'chalcogen',  angleMin: 130, energy: 35 },
+Po: { type: 'chalcogen',  angleMin: 130, energy: 38 },
+P:  { type: 'pnictogen',  angleMin: 120, energy: 18 },
+As: { type: 'pnictogen',  angleMin: 120, energy: 23 },
+Sb: { type: 'pnictogen',  angleMin: 120, energy: 28 },
+Bi: { type: 'pnictogen',  angleMin: 120, energy: 35 }
+};
+// H-bond donor/acceptor atoms
+const HBOND_DONOR_ATOMS = new Set(['N', 'O', 'S', 'F']);
+const ACCEPTORS = new Set(['N', 'O', 'S', 'Se', 'F', 'Cl', 'Br', 'I']);
+// Lennard-Jones parameters [ε, σ]
+const LJ_PARAMS = {
+H: [0.6, 1.2], C: [2.0, 1.7], N: [1.6, 1.55], O: [1.4, 1.5], F: [1.0, 1.47],
+S: [2.6, 1.8], Cl: [2.2, 1.75], Br: [2.8, 1.85], I: [3.4, 1.98],
+Se: [3.0, 1.9], Te: [3.6, 2.1], P: [2.4, 1.8]
+};
+const DEFAULT_LJ = [1.5, 1.7];
+// PEOE parameters (a, b, c for χ = a + b*q + c*q²)
+const PEOE_PARAMS = {
+H:  [7.17, 6.24, -0.56], C3: [7.98, 9.18, 1.88], C2: [8.79, 9.32, 1.51], C1: [10.39, 9.45, 0.73],
+N3: [11.54, 10.82, 1.36], N2: [12.87, 11.15, 0.85],
+O3: [14.18, 12.92, 1.39], O2: [17.07, 13.79, 0.47],
+S:  [10.76, 9.13, 1.38], P: [9.54, 8.2, 1.43],
+F:  [14.66, 13.85, 0.47], Cl: [11.0, 9.69, 1.35], Br: [10.08, 9.02, 1.25], I: [9.9, 8.57, 1.35]
+};
+// Letter codes for interaction types in reports
+const TYPE_LETTER = { hbond: 'H', halogen: 'X', chalcogen: 'Ch', pnictogen: 'Pn' };
+const SUBSCRIPT_DIGITS = ['₀','₁','₂','₃','₄','₅','₆','₇','₈','₉'];
+const sub = (n) => String(n).split('').map(d => SUBSCRIPT_DIGITS[+d] || d).join('');
+// ============================================================
+// APPLICATION STATE
+// ============================================================
+const AppState = {
+structures: [],
+currentStructureIndex: 0,
+persistentMeasurements: [],
+selectedMeasurement: null,
+draggedObject: null,
+dragPlane: new THREE.Plane(),
+dragOffset: new THREE.Vector3(),
+measureSession: { atoms: [], tempLines: [], tempSprite: null, timer: null },
+activePointers: new Map(),
+panStartPos: new THREE.Vector2(),
+panStartTarget: new THREE.Vector3(),
+isThreeFingerPan: false,
+energyCollapsed: false,
+currentSelectedAtomIndex: -1,
+shiftSelectedAtoms: new Set(),
+lang: 'en'
+};
+const settings = {
+bgColor: '#ffffff',
+atomScheme: 'default',
+atomStyle: 'ballstick',
+bondColor: '#333333',
+fontSize: 1.5,
+distColor: '#14337f',
+angleColor: '#006400',
+torsionColor: '#800020',
+labelColor: '#000000',
+showLabels: false,
+showNoncovalent: false,
+showStacking: false,
+exclude14: true,
+hbondColor: '#4488ff',
+halogenColor: '#9944ff',
+chalcogenColor: '#ffcc00',
+pnictogenColor: '#ff8800',
+ringColor: '#00aa88'
+};
+// ============================================================
+// TRANSLATIONS
+// ============================================================
+const I18N = {
+ru: {
+branding: 'Разработка BOLLAB', hidePanel: 'Скрыть панель', load: '📂 Загрузить',
+labelsTitle: 'Подписи атомов', exportTitle: 'Экспорт измерений CSV',
+contactsTitle: 'Таблица контактов (IUCr)', deleteTitle: 'Удалить выбранное',
+fragment: '⛶ Фрагмент', showAll: '👁 Всё', sigmaBtn: 'σ-дырки',
+sigmaTitle: 'H-связи и σ-дырочные взаимодействия', stackBtn: 'π-стэкинг',
+stackTitle: 'π-стэкинг взаимодействий', chk14: 'исключать гиперконъюгацию в заторможенных конформациях',
+secView: 'Вид', secColor: 'Цвет', lbBg: 'Фон', lbStyle: 'Стиль', lbFont: 'Шрифт',
+lbBonds: 'Связи', lbAtoms: 'Ат.', lbHbond: 'H-связь', lbHalogen: 'Галоген',
+lbChalcogen: 'Халькоген', lbPnictogen: 'Пниктоген', lbRings: '⬡ Кольца',
+optBallstick: 'Шаро-стержни', optVdw: 'Ван-дер-Ваальс',
+optEllipsoid: 'Эллипсоиды', optSticks: 'Только связи',
+noStructures: '-- Нет структур --', dropH2: '📂 Бросьте файлы сюда',
+helpTitle: 'Справка и руководство пользователя', helpClose: '✕ Закрыть',
+energiesHead: 'Энергии, кДж/моль', units: 'кДж/моль',
+energyNote: 'H-связи — электростатика по Гастайгеру + дисперсия; σ-дырки и π-стэкинг — эмпирическая геометрическая модель; точность ±40%',
+qWeakF: 'слабая', qMedF: 'средняя', qStrongF: 'прочная',
+qWeakM: 'слабый', qMedM: 'средний', qStrongM: 'прочный',
+found: 'Найдено', cntH: 'H-связи', cntHal: 'галогенных',
+cntCha: 'халькогенных', cntPni: 'пниктогенных', cntStack: 'π-стэкинга',
+noneFound: 'Нековалентных взаимодействий не найдено',
+selectedAtoms: 'Выбрано атомов', alertLoadFirst: 'Сначала загрузите структуру',
+alertClickAtom: 'Сначала кликните по любому атому нужной молекулы',
+alertFormats: 'Поддерживаются .xyz, .cif, .pdb, .mol, .sdf',
+alertNoStruct: 'Структуры не найдены в', exampleName: 'Пример', loadError: 'Ошибка загрузки файла: ', atomsWord: 'атом(ов)', structureWord: 'Структура',
+help: `<h2>SigmaLens — руководство пользователя</h2>
+<div class="sub">3D-просмотр молекулярных структур с измерениями и анализом нековалентных взаимодействий</div>
+<h3>📂 Загрузка структур</h3><ul>
+<li>Кнопка «Загрузить» или перетаскивание файла в окно: .xyz, .cif, .pdb, .mol, .sdf (можно несколько).</li>
+<li>Переключение между структурами — выпадающий список под кнопкой загрузки.</li>
+<li>Для .cif учитываются ячейка и симметрия кристалла — контакты с соседними молекулами тоже ищутся.</li></ul>
+<h3>🖱️ Камера и навигация</h3><ul>
+<li>Левая кнопка мыши — вращение, колесо — масштаб, правая кнопка — сдвиг.</li>
+<li>Сенсорный экран: 1 палец — вращение, щипок — масштаб, 3 пальца — сдвиг.</li>
+<li>Круглый джойстик в панели — сдвиг камеры в четырёх направлениях.</li></ul>
+<h3>📏 Измерения — кликайте по атомам последовательно</h3><ul>
+<li><b>2 атома</b> → расстояние (длина связи).</li>
+<li><b>3 атома</b> → валентный угол (вершина — средний атом).</li>
+<li><b>4 атома</b> → торсионный угол.</li>
+<li><b>Важно:</b> на клик следующего атома даётся ~1 секунда. Пауза — измерение фиксируется и начинается новое. Клик по пустому месту отменяет текущий набор.</li>
+<li>Числа с результатами можно <b>перетаскивать</b>; при отдалении появляется линия-указатель.</li>
+<li>Клик по числу выделяет измерение, кнопка 🗑️ удаляет его.</li>
+<li>📥 — экспорт всех измерений в CSV.</li></ul>
+<h3>🧩 Кнопки панели</h3><ul>
+<li>🔤 — показать/скрыть подписи атомов.</li>
+<li>📋 — экспорт таблицы нековалентных контактов в CSV (формат IUCr).</li>
+<li>⛶ <b>Фрагмент</b> — кликните атом и нажмите кнопку: останется только эта молекула. 👁 <b>Всё</b> — вернуть обратно.</li>
+<li><b>Shift + клик</b> по атомам из разных молекул — мульти-выделение (оранжевая подсветка). Затем «Фрагмент» оставит все молекулы, содержащие выделенные атомы. Повторный Shift+клик по тому же атому снимает выделение; Shift+клик по пустому месту очищает всё.</li>
+<li>Полупрозрачная сфера на месте скрытого атома-партнёра — клик по ней раскрывает скрытый фрагмент.</li>
+<li>Разделы «Вид» и «Цвет» — фон, стиль отображения, шрифт подписей и цвета линий.</li></ul>
+<h3>⚛️ Нековалентные взаимодействия</h3><ul>
+<li><b>σ-дырки</b> — H-связи (синие) и галогенные/халькогенные/пниктогенные связи (фиолетовые/жёлтые/оранжевые): пунктир с расстоянием и углом.</li>
+<li><b>π-стэкинг</b> — стекинг ароматических колец (зелёный); sp³-циклы (например, циклогексил) не учитываются.</li>
+<li>Галочка «исключать гиперконъюгацию» убирает внутримолекулярные контакты близких по цепи атомов.</li>
+<li>Окно «Энергии» справа вверху: энергия каждого контакта и сумма Σ (кДж/моль); точность ±40%.</li></ul>`
+},
+en: {
+branding: 'Developed by BOLLAB', hidePanel: 'Hide panel', load: '📂 Load',
+labelsTitle: 'Atom labels', exportTitle: 'Export measurements CSV',
+contactsTitle: 'Contact table (IUCr)', deleteTitle: 'Delete selected',
+fragment: '⛶ Fragment', showAll: '👁 All', sigmaBtn: 'σ-holes',
+sigmaTitle: 'H-bonds and σ-hole interactions', stackBtn: 'π-stacking',
+stackTitle: 'π-stacking interactions', chk14: 'exclude hyperconjugation in staggered conformations',
+secView: 'View', secColor: 'Color', lbBg: 'Background', lbStyle: 'Style', lbFont: 'Font',
+lbBonds: 'Bonds', lbAtoms: 'At.', lbHbond: 'H-bond', lbHalogen: 'Halogen',
+lbChalcogen: 'Chalcogen', lbPnictogen: 'Pnictogen', lbRings: '⬡ Rings',
+optBallstick: 'Ball-and-stick', optVdw: 'van der Waals',
+optEllipsoid: 'Ellipsoids', optSticks: 'Sticks only',
+noStructures: '-- No structures --', dropH2: '📂 Drop files here',
+helpTitle: 'Help & user guide', helpClose: '✕ Close',
+energiesHead: 'Energies, kJ/mol', units: 'kJ/mol',
+energyNote: 'H-bonds — Gasteiger electrostatics + dispersion; σ-holes and π-stacking — empirical geometric model; accuracy ±40%',
+qWeakF: 'weak', qMedF: 'medium', qStrongF: 'strong',
+qWeakM: 'weak', qMedM: 'medium', qStrongM: 'strong',
+found: 'Found', cntH: 'H-bonds', cntHal: 'halogen',
+cntCha: 'chalcogen', cntPni: 'pnictogen', cntStack: 'π-stacking',
+noneFound: 'No noncovalent interactions found',
+selectedAtoms: 'Atoms selected', alertLoadFirst: 'Load a structure first',
+alertClickAtom: 'First click any atom of the desired molecule',
+alertFormats: 'Supported: .xyz, .cif, .pdb, .mol, .sdf',
+alertNoStruct: 'No structures found in', exampleName: 'Example', loadError: 'File load error: ', atomsWord: 'atom(s)', structureWord: 'Structure',
+help: `<h2>SigmaLens — User Guide</h2>
+<div class="sub">3D viewer of molecular structures with measurements and noncovalent interaction analysis</div>
+<h3>📂 Loading structures</h3><ul>
+<li>“Load” button or drag & drop a file into the window: .xyz, .cif, .pdb, .mol, .sdf (multiple files allowed).</li>
+<li>Switch between loaded structures via the dropdown under the load button.</li>
+<li>For .cif the unit cell and symmetry are taken into account — contacts with neighboring molecules are also searched.</li></ul>
+<h3>🖱️ Camera & navigation</h3><ul>
+<li>Left mouse — rotate, wheel — zoom, right mouse — pan.</li>
+<li>Touch: 1 finger — rotate, pinch — zoom, 3 fingers — pan.</li>
+<li>The round joystick in the panel pans the camera in four directions.</li></ul>
+<h3>📏 Measurements — click atoms in sequence</h3><ul>
+<li><b>2 atoms</b> → distance (bond length).</li>
+<li><b>3 atoms</b> → angle (the middle atom is the vertex).</li>
+<li><b>4 atoms</b> → torsion angle.</li>
+<li><b>Important:</b> you have ~1 second to click the next atom. A pause finalizes the measurement and starts a new one. Clicking empty space cancels the current selection.</li>
+<li>Result labels can be <b>dragged</b>; a pointer line appears when moved away.</li>
+<li>Click a label to select the measurement; 🗑️ deletes it.</li>
+<li>📥 — export all measurements to CSV.</li></ul>
+<h3>🧩 Panel buttons</h3><ul>
+<li>🔤 — show/hide atom labels.</li>
+<li>📋 — export the noncovalent contact table to CSV (IUCr format).</li>
+<li>⛶ <b>Fragment</b> — click an atom, then press the button: only that molecule remains. 👁 <b>All</b> — restore everything.</li>
+<li><b>Shift + click</b> atoms from different molecules to multi-select them (orange highlight). Then press "Fragment" to keep all molecules containing the selected atoms. Shift+click the same atom again to deselect; Shift+click empty space clears all.</li>
+<li>A translucent sphere marks a hidden partner atom; clicking it reveals that fragment.</li>
+<li>“View” and “Color” sections — background, display style, label font and line colors.</li></ul>
+<h3>⚛️ Noncovalent interactions</h3><ul>
+<li><b>σ-holes</b> — H-bonds (blue) and halogen/chalcogen/pnictogen bonds (violet/yellow/orange): dashed lines with distance and angle.</li>
+<li><b>π-stacking</b> — stacking of aromatic rings (green); sp³ rings (e.g. cyclohexyl) are not counted.</li>
+<li>The “exclude hyperconjugation” checkbox removes intramolecular contacts of chain-close atoms.</li>
+<li>“Energies” box (top right): per-contact energy and total Σ (kJ/mol); accuracy ±40%.</li></ul>`
+},
+pt: {
+branding: 'Desenvolvido por BOLLAB', hidePanel: 'Ocultar painel', load: '📂 Carregar',
+labelsTitle: 'Rótulos de átomos', exportTitle: 'Exportar medições CSV',
+contactsTitle: 'Tabela de contatos (IUCr)', deleteTitle: 'Excluir seleção',
+fragment: '⛶ Fragmento', showAll: '👁 Tudo', sigmaBtn: 'buracos σ',
+sigmaTitle: 'Ligações de H e interações de buraco σ', stackBtn: 'π-empilhamento',
+stackTitle: 'Interações de π-empilhamento', chk14: 'excluir hiperconjugação em conformações escalonadas',
+secView: 'Visualização', secColor: 'Cor', lbBg: 'Fundo', lbStyle: 'Estilo', lbFont: 'Fonte',
+lbBonds: 'Ligações', lbAtoms: 'Át.', lbHbond: 'Ligação H', lbHalogen: 'Halogênio',
+lbChalcogen: 'Calcogênio', lbPnictogen: 'Pnictogênio', lbRings: '⬡ Anéis',
+optBallstick: 'Bolas e varetas', optVdw: 'van der Waals',
+optEllipsoid: 'Elipsoides', optSticks: 'Somente ligações',
+noStructures: '-- Sem estruturas --', dropH2: '📂 Solte os arquivos aqui',
+helpTitle: 'Ajuda e guia do usuário', helpClose: '✕ Fechar',
+energiesHead: 'Energias, kJ/mol', units: 'kJ/mol',
+energyNote: 'Ligações H — eletrostática de Gasteiger + dispersão; buracos σ e π-empilhamento — modelo geométrico empírico; precisão ±40%',
+qWeakF: 'fraca', qMedF: 'média', qStrongF: 'forte',
+qWeakM: 'fraco', qMedM: 'médio', qStrongM: 'forte',
+found: 'Encontrado', cntH: 'ligações H', cntHal: 'halogênio',
+cntCha: 'calcogênio', cntPni: 'pnictogênio', cntStack: 'π-empilhamento',
+noneFound: 'Nenhuma interação não covalente encontrada',
+selectedAtoms: 'Átomos selecionados', alertLoadFirst: 'Carregue uma estrutura primeiro',
+alertClickAtom: 'Primeiro clique em qualquer átomo da molécula desejada',
+alertFormats: 'Suportados: .xyz, .cif, .pdb, .mol, .sdf',
+alertNoStruct: 'Estruturas não encontradas em', exampleName: 'Exemplo', loadError: 'Erro ao carregar arquivo: ', atomsWord: 'átomo(s)', structureWord: 'Estrutura',
+help: `<h2>SigmaLens — Guia do usuário</h2>
+<div class="sub">Visualizador 3D de estruturas moleculares com medições e análise de interações não covalentes</div>
+<h3>📂 Carregamento de estruturas</h3><ul>
+<li>Botão «Carregar» ou arraste o arquivo para a janela: .xyz, .cif, .pdb, .mol, .sdf (vários arquivos).</li>
+<li>Troque entre estruturas carregadas pela lista suspensa sob o botão de carregamento.</li>
+<li>Para .cif, a célula unitária e a simetria são consideradas — contatos com moléculas vizinhas também são pesquisados.</li></ul>
+<h3>🖱️ Câmera e navegação</h3><ul>
+<li>Botão esquerdo — rotação, roda — zoom, botão direito — deslocamento.</li>
+<li>Toque: 1 dedo — rotação, pinça — zoom, 3 dedos — deslocamento.</li>
+<li>O joystick redondo no painel desloca a câmera em quatro direções.</li></ul>
+<h3>📏 Medições — clique nos átomos em sequência</h3><ul>
+<li><b>2 átomos</b> → distância (comprimento da ligação).</li>
+<li><b>3 átomos</b> → ângulo (o átomo do meio é o vértice).</li>
+<li><b>4 átomos</b> → ângulo de torção.</li>
+<li><b>Importante:</b> você tem ~1 segundo para clicar no próximo átomo. Uma pausa finaliza a medição e inicia uma nova. Clicar no vazio cancela a seleção atual.</li>
+<li>Os rótulos com resultados podem ser <b>arrastados</b>; ao afastá-los, aparece uma linha apontadora.</li>
+<li>Clique no rótulo para selecionar a medição; 🗑️ a exclui.</li>
+<li>📥 — exporta todas as medições para CSV.</li></ul>
+<h3>🧩 Botões do painel</h3><ul>
+<li>🔤 — mostrar/ocultar rótulos de átomos.</li>
+<li>📋 — exporta a tabela de contatos não covalentes para CSV (formato IUCr).</li>
+<li>⛶ <b>Fragmento</b> — clique num átomo e pressione o botão: só essa molécula permanece. 👁 <b>Tudo</b> — restaura tudo.</li>
+<li><b>Shift + clique</b> em átomos de moléculas diferentes para seleção múltipla (destaque laranja). Depois pressione «Fragmento» para manter todas as moléculas que contêm os átomos selecionados. Shift+clique no mesmo átomo remove a seleção; Shift+clique no vazio limpa tudo.</li>
+<li>Uma esfera translúcida marca um átomo parceiro oculto; clicar nela revela aquele fragmento.</li>
+<li>Seções «Visualização» e «Cor» — fundo, estilo de exibição, fonte dos rótulos e cores das linhas.</li></ul>
+<h3>⚛️ Interações não covalentes</h3><ul>
+<li><b>Buracos σ</b> — ligações H (azuis) e ligações de halogênio/calcogênio/pnictogênio (violeta/amarelo/laranja): tracejado com distância e ângulo.</li>
+<li><b>π-empilhamento</b> — empilhamento de anéis aromáticos (verde); anéis sp³ (ex.: ciclo-hexil) não contam.</li>
+<li>A caixa «excluir hiperconjugação» remove contatos intramoleculares de átomos próximos na cadeia.</li>
+<li>Janela «Energias» no alto à direita: energia de cada contato e a soma Σ (kJ/mol); precisão ±40%.</li></ul>`
+}
+};
+function currentLang() { return I18N[AppState.lang]; }
+// ============================================================
+// UTILS
+// ============================================================
+const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+const getCovalentRadius = (element) => COVALENT_RADII[element] || 1.0;
+const getVdwRadius = (element) => VDW_RADII[element] || 1.7;
+function atomColor(element, scheme) {
+if (METALS.has(element)) return new THREE.Color(METAL_GRAY);
+return new THREE.Color(scheme[element] || scheme.default);
+}
+function angleBetween(a, b, c) {
+const v1 = new THREE.Vector3().subVectors(a, b);
+const v2 = new THREE.Vector3().subVectors(c, b);
+return v1.angleTo(v2) * 180 / Math.PI;
+}
+function formatSymmetry(dx, dy, dz) {
+return ['x', 'y', 'z'].map((coord, i) => {
+const delta = [dx, dy, dz][i];
+if (delta === 0) return coord;
+return coord + (delta > 0 ? '+' + delta : delta);
+}).join(',');
+}
+// ============================================================
+// TEXTURE LRU CACHE
+// ============================================================
+const textureCache = new Map();
+function getLabelTexture(text, color) {
+const key = `${text}|${color}`;
+if (textureCache.has(key)) {
+const texture = textureCache.get(key);
+// Move to the end as most recently used
+textureCache.delete(key);
+textureCache.set(key, texture);
+return texture;
+}
+const canvas = document.createElement('canvas');
+canvas.width = 512;
+canvas.height = 128;
+const ctx = canvas.getContext('2d');
+ctx.font = 'Bold 44px Manrope, Arial';
+ctx.fillStyle = color;
+ctx.textAlign = 'center';
+ctx.textBaseline = 'middle';
+const lines = text.split('\n');
+if (lines.length === 1) {
+ctx.fillText(lines[0], 256, 64);
+} else {
+ctx.fillText(lines[0], 256, 38);
+ctx.fillText(lines[1], 256, 90);
+}
+const texture = new THREE.CanvasTexture(canvas);
+texture.minFilter = THREE.LinearFilter;
+// LRU eviction on overflow
+if (textureCache.size >= CONSTANTS.TEXTURE_CACHE_MAX_SIZE) {
+const oldestKey = textureCache.keys().next().value;
+const oldTexture = textureCache.get(oldestKey);
+if (oldTexture?.dispose) oldTexture.dispose();
+textureCache.delete(oldestKey);
+}
+textureCache.set(key, texture);
+return texture;
+}
+function clearTextureCache() {
+textureCache.forEach(texture => { if (texture?.dispose) texture.dispose(); });
+textureCache.clear();
+}
+// ============================================================
+// SPRITES AND GEOMETRY
+// ============================================================
+function createTextSprite(text, position, color, scale) {
+const material = new THREE.SpriteMaterial({
+map: getLabelTexture(text, color),
+transparent: true,
+depthTest: false,
+depthWrite: false
+});
+const sprite = new THREE.Sprite(material);
+sprite.position.copy(position);
+sprite.scale.set(scale * 4, scale, 1);
+return sprite;
+}
+function updateSpriteAppearance(sprite, text, color, scale) {
+sprite.material.map = getLabelTexture(text, color);
+sprite.material.needsUpdate = true;
+sprite.scale.set(scale * 4, scale, 1);
+}
+function disposeGroup(group) {
+group.traverse(object => {
+if (object.geometry) object.geometry.dispose();
+if (object.material) {
+const materials = Array.isArray(object.material) ? object.material : [object.material];
+materials.forEach(m => m.dispose());
+}
+});
+while (group.children.length) group.remove(group.children[0]);
+}
+function createFatDashedLine(p1, p2, color, widthPx) {
+const geometry = new LineGeometry();
+geometry.setPositions([p1.x, p1.y, p1.z, p2.x, p2.y, p2.z]);
+const material = new LineMaterial({
+color: new THREE.Color(color).getHex(),
+linewidth: widthPx,
+dashed: true,
+dashSize: 0.15,
+gapSize: 0.1
+});
+material.resolution.set(window.innerWidth, window.innerHeight);
+const line = new Line2(geometry, material);
+line.computeLineDistances();
+return line;
+}
+/**
+* Creates a translucent ghost sphere to indicate a hidden partner atom
+* in a noncovalent interaction.
+*/
+function createGhostSphere(position, color, fragmentStartIndex, offset) {
+const { RADIUS, SEGMENTS_W, SEGMENTS_H, OPACITY, EMISSIVE_INTENSITY } = CONSTANTS.GHOST_SPHERE;
+const material = new THREE.MeshStandardMaterial({
+color: color,
+transparent: true,
+opacity: OPACITY,
+emissive: color,
+emissiveIntensity: EMISSIVE_INTENSITY
+});
+const sphere = new THREE.Mesh(
+new THREE.SphereGeometry(RADIUS, SEGMENTS_W, SEGMENTS_H),
+material
+);
+sphere.position.copy(position);
+sphere.userData = {
+isGhostAtom: true,
+fragmentStartIndex: fragmentStartIndex,
+offset: offset ? offset.clone() : new THREE.Vector3()
+};
+return sphere;
+}
+// ============================================================
+// MATH: 3x3 MATRICES
+// ============================================================
+function multiplyMatrices3(A, B) {
+const C = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
+for (let i = 0; i < 3; i++) {
+for (let j = 0; j < 3; j++) {
+let sum = 0;
+for (let k = 0; k < 3; k++) sum += A[i][k] * B[k][j];
+C[i][j] = sum;
+}
+}
+return C;
+}
+function transposeMatrix3(A) {
+return [
+[A[0][0], A[1][0], A[2][0]],
+[A[0][1], A[1][1], A[2][1]],
+[A[0][2], A[1][2], A[2][2]]
+];
+}
+/**
+* Diagonalizes a symmetric 3x3 matrix using the Jacobi method.
+* Returns {val: [λ1,λ2,λ3], vec: [v1,v2,v3]}.
+*/
+function diagonalize3(A) {
+const a = A.map(row => row.slice());
+const V = [[1, 0, 0], [0, 1, 0], [0, 0, 1]];
+for (let iter = 0; iter < CONSTANTS.EIGENVALUE_MAX_ITERATIONS; iter++) {
+let p = 0, q = 1, maxAbs = Math.abs(a[0][1]);
+if (Math.abs(a[0][2]) > maxAbs) { maxAbs = Math.abs(a[0][2]); p = 0; q = 2; }
+if (Math.abs(a[1][2]) > maxAbs) { maxAbs = Math.abs(a[1][2]); p = 1; q = 2; }
+if (maxAbs < CONSTANTS.EIGENVALUE_CONVERGENCE) break;
+const app = a[p][p], aqq = a[q][q], apq = a[p][q];
+const theta = (aqq - app) / (2 * apq);
+const t = Math.sign(theta || 1) / (Math.abs(theta) + Math.sqrt(theta * theta + 1));
+const c = 1 / Math.sqrt(t * t + 1);
+const s = t * c;
+// Rotate rows
+for (let k = 0; k < 3; k++) {
+const x = a[k][p], y = a[k][q];
+a[k][p] = c * x - s * y;
+a[k][q] = s * x + c * y;
+}
+// Rotate columns
+for (let k = 0; k < 3; k++) {
+const x = a[p][k], y = a[q][k];
+a[p][k] = c * x - s * y;
+a[q][k] = s * x + c * y;
+}
+// Accumulate transformations
+for (let k = 0; k < 3; k++) {
+const x = V[k][p], y = V[k][q];
+V[k][p] = c * x - s * y;
+V[k][q] = s * x + c * y;
+}
+}
+return {
+val: [a[0][0], a[1][1], a[2][2]],
+vec: V
+};
+}
+// ============================================================
+// FILE PARSERS
+// ============================================================
+function parseXYZ(text) {
+try {
+const lines = text.split(/\r?\n/).filter(l => l.trim() !== '');
+const frames = [];
+const normalizeElement = (raw) => {
+const clean = String(raw).replace(/[^A-Za-z]/g, '');
+if (!clean) return String(raw);
+return clean.charAt(0).toUpperCase() + clean.slice(1).toLowerCase();
+};
+const parseAtomLine = (line) => {
+const parts = line.trim().split(/\s+/);
+// Standard XYZ: Element x y z
+if (parts.length >= 4) {
+const x1 = parseFloat(parts[1]);
+const y1 = parseFloat(parts[2]);
+const z1 = parseFloat(parts[3]);
+if (/^[A-Za-z]{1,2}$/.test(parts[0]) && isFinite(x1) && isFinite(y1) && isFinite(z1)) {
+return { element: normalizeElement(parts[0]), x: x1, y: y1, z: z1 };
+}
+}
+// Chem3D XYZ: atom number, Element, x, y, z, extra columns
+if (parts.length >= 5) {
+const x2 = parseFloat(parts[2]);
+const y2 = parseFloat(parts[3]);
+const z2 = parseFloat(parts[4]);
+if (/^\d+$/.test(parts[0]) && /^[A-Za-z]{1,2}$/.test(parts[1]) && isFinite(x2) && isFinite(y2) && isFinite(z2)) {
+return { element: normalizeElement(parts[1]), x: x2, y: y2, z: z2 };
+}
+}
+return null;
+};
+let i = 0;
+while (i < lines.length) {
+const atomCount = parseInt(lines[i], 10);
+if (isNaN(atomCount)) break;
+let comment = `Frame ${frames.length + 1}`;
+let start = i + 1;
+const first = lines[i + 1];
+const firstAtom = first !== undefined ? parseAtomLine(first) : null;
+// If an atom line follows the atom count immediately, there is no comment line
+if (!firstAtom) {
+comment = first?.trim() || comment;
+start = i + 2;
+}
+const atoms = [];
+let j = start;
+while (atoms.length < atomCount && j < lines.length) {
+const atom = parseAtomLine(lines[j]);
+if (atom) atoms.push(atom);
+j++;
+}
+if (atoms.length) frames.push({ name: comment, atoms });
+i = j;
+}
+return frames;
+} catch (err) {
+console.error('XYZ parse error:', err);
+return [];
+}
+}
+function tokenizeCIF(line) {
+const tokens = [];
+const regex = /('[^']*'|"[^"]*"|\S+)/g;
+let match;
+while ((match = regex.exec(line))) tokens.push(match[1]);
+return tokens;
+}
+function stripQuotes(str) {
+return String(str).replace(/^['"]/,'').replace(/['"]$/, '').trim();
+}
+function parseArithmeticExpression(raw) {
+let i = 0;
+const n = raw.length;
+const skipWs = () => { while (i < n && /\s/.test(raw[i])) i++; };
+
+function parseFactor() {
+skipWs();
+if (i >= n) throw new Error('Unexpected end');
+const ch = raw[i];
+if (ch === '+') { i++; return parseFactor(); }
+if (ch === '-') {
+i++;
+const inner = parseFactor();
+return (x, y, z) => -inner(x, y, z);
+}
+if (ch === '(') {
+i++;
+const inner = parseExpression();
+skipWs();
+if (raw[i] !== ')') throw new Error('Expected )');
+i++;
+return inner;
+}
+if (ch === 'x' || ch === 'y' || ch === 'z') {
+i++;
+if (ch === 'x') return (x) => x;
+if (ch === 'y') return (x, y) => y;
+return (x, y, z) => z;
+}
+if (/[0-9.]/.test(ch)) {
+let numStr = '';
+while (i < n && /[0-9.]/.test(raw[i])) { numStr += raw[i]; i++; }
+if (!/^(\d+\.?\d*|\.\d+)$/.test(numStr)) throw new Error('Bad number');
+const value = parseFloat(numStr);
+return () => value;
+}
+throw new Error('Unexpected char: ' + ch);
+}
+
+function parseTerm() {
+let node = parseFactor();
+skipWs();
+while (i < n && (raw[i] === '*' || raw[i] === '/')) {
+const op = raw[i];
+i++;
+const left = node;
+const right = parseFactor();
+node = op === '*'
+? (x, y, z) => left(x, y, z) * right(x, y, z)
+: (x, y, z) => left(x, y, z) / right(x, y, z);
+skipWs();
+}
+return node;
+}
+
+function parseExpression() {
+let node = parseTerm();
+skipWs();
+while (i < n && (raw[i] === '+' || raw[i] === '-')) {
+const op = raw[i];
+i++;
+const left = node;
+const right = parseTerm();
+node = op === '+'
+? (x, y, z) => left(x, y, z) + right(x, y, z)
+: (x, y, z) => left(x, y, z) - right(x, y, z);
+skipWs();
+}
+return node;
+}
+
+skipWs();
+const result = parseExpression();
+skipWs();
+if (i < n) throw new Error('Trailing characters');
+return result;
+}
+
+function compileSymmetryOperation(operation) {
+const parts = String(operation).split(',').map(s => s.trim());
+if (parts.length !== 3) return null;
+const functions = [];
+for (const raw of parts) {
+const expr = raw.replace(/(\d+)\s*\/\s*(\d+)/g, '($1/$2)');
+if (!/^[0-9xyz+\-*/().\s]+$/.test(expr)) return null;
+try {
+functions.push(parseArithmeticExpression(expr));
+} catch (err) {
+return null;
+}
+}
+return (x, y, z) => {
+const result = [functions[0](x, y, z), functions[1](x, y, z), functions[2](x, y, z)];
+return result.every(Number.isFinite) ? result : null;
+};
+}
+function parseCIF(text) {
+try {
+const blocks = [];
+const sections = text.split(/^data_/gm);
+const normTag = (tag) => String(tag).replace(/\./g, '_');
+for (const section of sections) {
+if (!section.trim()) continue;
+const lines = section.split(/\r?\n/);
+const blockName = lines[0].trim();
+const block = { name: blockName || 'crystal', atoms: [], cell: null, symOps: [], aniso: {} };
+let inLoop = false, loopTags = [], inTextBlock = false, loopTokens = [];
+const keyValue = {};
+for (let i = 0; i < lines.length; i++) {
+const line = lines[i].trim();
+if (inTextBlock) {
+if (line.startsWith(';')) inTextBlock = false;
+continue;
+}
+if (line.startsWith(';')) {
+inTextBlock = true;
+continue;
+}
+if (line === '' || line.startsWith('#')) continue;
+if (line.toLowerCase().startsWith('loop_')) {
+inLoop = true;
+loopTags = [];
+loopTokens = [];
+continue;
+}
+if (line.startsWith('_')) {
+const tokens = tokenizeCIF(line);
+if (inLoop && tokens.length === 1) {
+loopTags.push(tokens[0].toLowerCase());
+continue;
+}
+inLoop = false;
+loopTags = [];
+loopTokens = [];
+const key = tokens[0].toLowerCase();
+const value = tokens.slice(1).map(stripQuotes).join(' ');
+keyValue[key] = value;
+keyValue[normTag(key)] = value;
+continue;
+}
+if (inLoop) {
+const normalizedLoopTags = loopTags.map(normTag);
+const isAtom = normalizedLoopTags.some(t => t.startsWith('_atom_site_') && !t.startsWith('_atom_site_aniso'));
+const isAniso = normalizedLoopTags.some(t => t.startsWith('_atom_site_aniso'));
+const isSym = normalizedLoopTags.some(t => t === '_symmetry_equiv_pos_as_xyz' || t === '_space_group_symop_operation_xyz');
+if (isSym) {
+const op = stripQuotes(line);
+if (op) block.symOps.push(op);
+continue;
+}
+if (!loopTags.length) continue;
+loopTokens.push(...tokenizeCIF(line));
+while (loopTags.length && loopTokens.length >= loopTags.length) {
+const rowTokens = loopTokens.splice(0, loopTags.length);
+const record = {};
+loopTags.forEach((tag, idx) => {
+const val = stripQuotes(rowTokens[idx] || '');
+record[tag] = val;
+record[normTag(tag)] = val;
+});
+if (isAtom) {
+block.atoms.push(record);
+} else if (isAniso) {
+const label = (record['_atom_site_aniso_label'] || '').toLowerCase();
+if (label) {
+const getNum = (key) => {
+const v = parseFloat(record[key]);
+return isNaN(v) ? 0 : v;
+};
+let U = [
+getNum('_atom_site_aniso_u_11'), getNum('_atom_site_aniso_u_22'),
+getNum('_atom_site_aniso_u_33'), getNum('_atom_site_aniso_u_23'),
+getNum('_atom_site_aniso_u_13'), getNum('_atom_site_aniso_u_12')
+];
+if (record['_atom_site_aniso_b_11'] !== undefined) {
+const k = 1 / (8 * Math.PI * Math.PI);
+U = U.map(v => v * k);
+}
+block.aniso[label] = U;
+}
+}
+}
+continue;
+}
+}
+if (!block.symOps.length) {
+const k = keyValue['_symmetry_equiv_pos_as_xyz'] || keyValue['_space_group_symop_operation_xyz'];
+if (k) block.symOps.push(k);
+}
+const a = parseFloat(keyValue['_cell_length_a']) || 0;
+const b = parseFloat(keyValue['_cell_length_b']) || 0;
+const c = parseFloat(keyValue['_cell_length_c']) || 0;
+if (a > 0 && b > 0 && c > 0) {
+block.cell = {
+a, b, c,
+alpha: parseFloat(keyValue['_cell_angle_alpha']) || 90,
+beta: parseFloat(keyValue['_cell_angle_beta']) || 90,
+gamma: parseFloat(keyValue['_cell_angle_gamma']) || 90
+};
+}
+let operations = block.symOps.map(compileSymmetryOperation).filter(Boolean);
+if (!operations.length) operations = [(x, y, z) => [x, y, z]];
+let orthoMatrix = null;
+if (block.cell) {
+const rad = Math.PI / 180;
+const al = block.cell.alpha * rad;
+const be = block.cell.beta * rad;
+const ga = block.cell.gamma * rad;
+const ca = Math.cos(al), cb = Math.cos(be), cg = Math.cos(ga), sg = Math.sin(ga);
+const volume = block.cell.a * block.cell.b * block.cell.c * Math.sqrt(
+Math.max(0, 1 - ca * ca - cb * cb - cg * cg + 2 * ca * cb * cg)
+);
+if (volume > 0 && sg !== 0) {
+orthoMatrix = [
+[block.cell.a, block.cell.b * cg, block.cell.c * cb],
+[0, block.cell.b * sg, block.cell.c * (ca - cb * cg) / sg],
+[0, 0, volume / (block.cell.a * block.cell.b * sg)]
+];
+block.orthoM = orthoMatrix;
+}
+}
+const seen = new Set();
+const atomsOut = [];
+// Fractional coordinates → Cartesian
+const fracToCart = (fx, fy, fz) => {
+if (orthoMatrix) {
+return [
+orthoMatrix[0][0] * fx + orthoMatrix[0][1] * fy + orthoMatrix[0][2] * fz,
+orthoMatrix[1][1] * fy + orthoMatrix[1][2] * fz,
+orthoMatrix[2][2] * fz
+];
+}
+return [fx, fy, fz];
+};
+// Identify the identity operation (x,y,z → x,y,z)
+const isIdentityOp = (op) => {
+const r = op(0.1, 0.2, 0.3);
+return r && Math.abs(r[0] - 0.1) < 1e-6 &&
+Math.abs(r[1] - 0.2) < 1e-6 &&
+Math.abs(r[2] - 0.3) < 1e-6;
+};
+const identityOps = operations.filter(isIdentityOp);
+const otherOps = operations.filter(op => !isIdentityOp(op));
+if (!identityOps.length) identityOps.push((x, y, z) => [x, y, z]);
+const placed = [];
+const pushAtom = (element, x, y, z, label, U) => {
+const key = `${element}:${x.toFixed(3)},${y.toFixed(3)},${z.toFixed(3)}`;
+if (seen.has(key)) return;
+seen.add(key);
+atomsOut.push({ element, x, y, z, label, U });
+placed.push({ x, y, z, r: getCovalentRadius(element) });
+};
+const bondTol = CONSTANTS.BOND_DETECTION.TOLERANCE;
+// Lattice translations: −1…1 for internal gluing, −2…2 for placement
+const INNER_DELTAS = [], PLACE_DELTAS = [];
+for (let dx = -1; dx <= 1; dx++)
+for (let dy = -1; dy <= 1; dy++)
+for (let dz = -1; dz <= 1; dz++)
+INNER_DELTAS.push([dx, dy, dz, fracToCart(dx, dy, dz)]);
+for (let dx = -2; dx <= 2; dx++)
+for (let dy = -2; dy <= 2; dy++)
+for (let dz = -2; dz <= 2; dz++)
+PLACE_DELTAS.push([dx, dy, dz, fracToCart(dx, dy, dz)]);
+// Parse the asymmetric unit
+const asuAtoms = [];
+for (const atom of block.atoms) {
+const occupancy = parseFloat(atom['_atom_site_occupancy']);
+if (!isNaN(occupancy) && occupancy < 0.5) continue;
+let element = 'C';
+const elementSource =
+atom['_atom_site_type_symbol'] ||
+atom['_atom_site_label'] ||
+atom['_atom_site_label_atom_id'] || '';
+const elementMatch = String(elementSource).match(/^[A-Za-z]+/);
+if (elementMatch) {
+let e = elementMatch[0];
+e = e[0].toUpperCase() + e.slice(1).toLowerCase();
+if (e.length > 2) e = e.slice(0, 2);
+element = e;
+}
+const atomLabel = atom['_atom_site_label'] || atom['_atom_site_label_atom_id'];
+const fx = parseFloat(atom['_atom_site_fract_x']);
+const fy = parseFloat(atom['_atom_site_fract_y']);
+const fz = parseFloat(atom['_atom_site_fract_z']);
+const U = block.aniso[(atomLabel || '').toLowerCase()];
+if (isFinite(fx) && isFinite(fy) && isFinite(fz)) {
+asuAtoms.push({ element, fx, fy, fz, label: atomLabel, U });
+continue;
+}
+const cx = parseFloat(atom['_atom_site_cartn_x']);
+const cy = parseFloat(atom['_atom_site_cartn_y']);
+const cz = parseFloat(atom['_atom_site_cartn_z']);
+if (isFinite(cx) && isFinite(cy) && isFinite(cz)) {
+pushAtom(element, cx, cy, cz, atomLabel, U);
+}
+}
+// Builds a copy for the operation and splits it into connected components.
+// Pieces of a component broken by the cell boundary (center on a face/edge/
+// corner) are glued via covalent bonds across lattice translations —
+// each component becomes internally whole.
+const buildComponents = (op) => {
+const atoms = [];
+for (const a of asuAtoms) {
+const r = op(a.fx, a.fy, a.fz);
+if (!r) continue;
+const [x, y, z] = fracToCart(r[0], r[1], r[2]);
+if (!isFinite(x) || !isFinite(y) || !isFinite(z)) continue;
+atoms.push({
+element: a.element, label: a.label, U: a.U,
+fx: r[0], fy: r[1], fz: r[2], x, y, z,
+cr: getCovalentRadius(a.element)
+});
+}
+const n = atoms.length;
+if (!n) return [];
+// Internal bonds accounting for lattice translations
+const adj = Array.from({ length: n }, () => []);
+for (let i = 0; i < n; i++) {
+for (let j = i + 1; j < n; j++) {
+const thr = atoms[i].cr + atoms[j].cr + bondTol;
+let best = null, bestD = Infinity;
+for (const [dx, dy, dz, off] of INNER_DELTAS) {
+const dX = atoms[i].x + off[0] - atoms[j].x;
+if (dX > thr || dX < -thr) continue;
+const dY = atoms[i].y + off[1] - atoms[j].y;
+if (dY > thr || dY < -thr) continue;
+const dZ = atoms[i].z + off[2] - atoms[j].z;
+if (dZ > thr || dZ < -thr) continue;
+const d2 = dX * dX + dY * dY + dZ * dZ;
+if (d2 < thr * thr && d2 > 0.16 && d2 < bestD) {
+bestD = d2;
+best = [dx, dy, dz];
+}
+}
+if (!best) continue;
+// atom i + best is covalently bonded to atom j
+adj[j].push({ other: i, dAdd: best });
+adj[i].push({ other: j, dAdd: [-best[0], -best[1], -best[2]] });
+}
+}
+// BFS over internal bonds: components + per-atom offsets
+const compOf = new Array(n).fill(-1);
+const offset = new Array(n);
+const components = [];
+for (let s = 0; s < n; s++) {
+if (compOf[s] !== -1) continue;
+const list = [];
+compOf[s] = components.length;
+offset[s] = [0, 0, 0];
+const queue = [s];
+for (let h = 0; h < queue.length; h++) {
+const cur = queue[h];
+for (const { other, dAdd } of adj[cur]) {
+if (compOf[other] !== -1) continue;
+compOf[other] = compOf[s];
+offset[other] = [
+offset[cur][0] + dAdd[0],
+offset[cur][1] + dAdd[1],
+offset[cur][2] + dAdd[2]
+];
+queue.push(other);
+}
+list.push(cur);
+}
+const comp = [];
+for (const idx of list) {
+const o = offset[idx];
+const [ox, oy, oz] = fracToCart(o[0], o[1], o[2]);
+const a = atoms[idx];
+comp.push({
+element: a.element, label: a.label, U: a.U, cr: a.cr,
+fx: a.fx + o[0], fy: a.fy + o[1], fz: a.fz + o[2],
+x: a.x + ox, y: a.y + oy, z: a.z + oz
+});
+}
+components.push(comp);
+}
+return components;
+};
+// Wrap the whole component back into the unit cell
+const wrapComponent = (comp) => {
+let gx = 0, gy = 0, gz = 0;
+for (const a of comp) { gx += a.fx; gy += a.fy; gz += a.fz; }
+gx = -Math.floor(gx / comp.length);
+gy = -Math.floor(gy / comp.length);
+gz = -Math.floor(gz / comp.length);
+const [ox, oy, oz] = fracToCart(gx, gy, gz);
+for (const a of comp) {
+a.fx += gx; a.fy += gy; a.fz += gz;
+a.x += ox; a.y += oy; a.z += oz;
+}
+};
+// Places a component: if under some translation it forms covalent bonds
+// with already placed atoms, it extends the molecule and is pulled in;
+// otherwise it is a neighboring molecule and is simply wrapped whole
+// into the unit cell.
+const placeComponent = (comp) => {
+let bestBonds = 0, bestDist = Infinity, bestOff = null;
+for (const [, , , off] of PLACE_DELTAS) {
+let bonds = 0, minD = Infinity;
+for (const c of comp) {
+const cx2 = c.x + off[0], cy2 = c.y + off[1], cz2 = c.z + off[2];
+for (const p of placed) {
+const thr = c.cr + p.r + bondTol;
+const dX = cx2 - p.x;
+if (dX > thr || dX < -thr) continue;
+const dY = cy2 - p.y;
+if (dY > thr || dY < -thr) continue;
+const dZ = cz2 - p.z;
+if (dZ > thr || dZ < -thr) continue;
+const d2 = dX * dX + dY * dY + dZ * dZ;
+if (d2 < thr * thr && d2 > 0.16) {
+bonds++;
+if (d2 < minD) minD = d2;
+}
+}
+}
+if (bonds > bestBonds || (bonds > 0 && bonds === bestBonds && minD < bestDist)) {
+bestBonds = bonds;
+bestDist = minD;
+bestOff = off;
+}
+}
+if (bestBonds > 0 && bestOff) {
+for (const a of comp) { a.x += bestOff[0]; a.y += bestOff[1]; a.z += bestOff[2]; }
+} else {
+wrapComponent(comp);
+}
+for (const a of comp) pushAtom(a.element, a.x, a.y, a.z, a.label, a.U);
+};
+// 1. Identity operations: components are glued and placed into the cell
+for (const op of identityOps) {
+for (const comp of buildComponents(op)) {
+wrapComponent(comp);
+for (const a of comp) pushAtom(a.element, a.x, a.y, a.z, a.label, a.U);
+}
+}
+// 2. Other operations: components either extend the molecule or remain as neighbors
+for (const op of otherOps) {
+for (const comp of buildComponents(op)) placeComponent(comp);
+}
+if (atomsOut.length) {
+blocks.push({
+name: block.name,
+atoms: atomsOut,
+cell: block.cell,
+orthoM: block.orthoM,
+aniso: block.aniso
+});
+}
+}
+return blocks;
+} catch (err) {
+console.error('CIF parse error:', err);
+return [];
+}
+}
+function parsePDB(text) {
+try {
+const atoms = [];
+for (const line of text.split(/\r?\n/)) {
+if (line.startsWith('ATOM') || line.startsWith('HETATM')) {
+const x = parseFloat(line.substring(30, 38));
+const y = parseFloat(line.substring(38, 46));
+const z = parseFloat(line.substring(46, 54));
+const element = line.substring(76, 78).trim() || line.substring(12, 16).trim().charAt(0);
+if (isFinite(x) && element) atoms.push({ element, x, y, z });
+}
+}
+return atoms.length ? [{ name: 'PDB structure', atoms }] : [];
+} catch (err) {
+console.error('PDB parse error:', err);
+return [];
+}
+}
+function parseMOL(text) {
+try {
+const lines = text.split(/\r?\n/);
+if (lines.length < 4) return [];
+const name = lines[0].trim() || 'MOL structure';
+const atomCount = parseInt(lines[3].substring(0, 3));
+if (isNaN(atomCount) || lines.length < 4 + atomCount) return [];
+const atoms = [];
+for (let i = 0; i < atomCount; i++) {
+const line = lines[4 + i];
+const x = parseFloat(line.substring(0, 10));
+const y = parseFloat(line.substring(10, 20));
+const z = parseFloat(line.substring(20, 30));
+const element = line.substring(31, 34).trim();
+if (isFinite(x) && element) atoms.push({ element, x, y, z });
+}
+return atoms.length ? [{ name, atoms }] : [];
+} catch (err) {
+console.error('MOL parse error:', err);
+return [];
+}
+}
+function parseSDF(text) {
+try {
+const results = [];
+for (const block of text.split('$$$$').filter(x => x.trim())) {
+results.push(...parseMOL(block));
+}
+return results;
+} catch (err) {
+console.error('SDF parse error:', err);
+return [];
+}
+}
+// ============================================================
+// PEOE CHARGE CALCULATION (GASTEIGER)
+// ============================================================
+function getPEOEKey(element, degree) {
+if (element === 'H') return 'H';
+if (element === 'C') return degree >= 4 ? 'C3' : (degree === 3 ? 'C2' : 'C1');
+if (element === 'N') return degree >= 3 ? 'N3' : 'N2';
+if (element === 'O') return degree >= 2 ? 'O3' : 'O2';
+if (element === 'S' || element === 'Se' || element === 'Te') return 'S';
+if (element === 'P' || element === 'As' || element === 'Sb') return 'P';
+if (element === 'F' || element === 'Cl' || element === 'Br' || element === 'I') return element;
+return null;
+}
+function computeCharges(structure) {
+const atoms = structure.centeredAtoms;
+const bonds = structure.bonds;
+const n = atoms.length;
+// Neighbor list for each atom
+const neighbors = atoms.map(() => []);
+bonds.forEach(bond => {
+neighbors[bond.i].push(bond.j);
+neighbors[bond.j].push(bond.i);
+});
+const charges = new Array(n).fill(0);
+const keys = atoms.map((atom, i) => getPEOEKey(atom.element, neighbors[i].length));
+const electronegativity = (key, q) => {
+const p = PEOE_PARAMS[key];
+if (!p) return 0;
+return p[0] + p[1] * q + p[2] * q * q;
+};
+for (let iter = 0; iter < CONSTANTS.PEOE_ITERATIONS; iter++) {
+const damping = Math.pow(0.5, iter + 1);
+for (const bond of bonds) {
+const keyA = keys[bond.i], keyB = keys[bond.j];
+if (!keyA || !keyB) continue;
+const deltaChi = electronegativity(keyA, charges[bond.i]) - electronegativity(keyB, charges[bond.j]);
+const denominator = PEOE_PARAMS[keyA][1] + PEOE_PARAMS[keyB][1];
+const transfer = (deltaChi / denominator) * damping;
+charges[bond.i] -= transfer;
+charges[bond.j] += transfer;
+}
+}
+return charges;
+}
+// ============================================================
+// NONCOVALENT INTERACTION ENERGY CALCULATION
+// ============================================================
+function dispersionEnergy(elementA, elementB, distance) {
+const paramsA = LJ_PARAMS[elementA] || DEFAULT_LJ;
+const paramsB = LJ_PARAMS[elementB] || DEFAULT_LJ;
+const epsilon = Math.sqrt(paramsA[0] * paramsB[0]);
+const sigma = paramsA[1] + paramsB[1];
+const t = clamp(sigma / distance, 0.5, 1.6);
+const energy = epsilon * (Math.pow(t, 12) - 2 * Math.pow(t, 6));
+return clamp(
+energy,
+-epsilon * CONSTANTS.ENERGY_LIMITS.DISPERSION_CLAMP_LOW,
+CONSTANTS.ENERGY_LIMITS.DISPERSION_MAX
+);
+}
+function estimateContactEnergy(contact, charges) {
+const dispersionContribution = Math.abs(dispersionEnergy(contact.elX, contact.elA, contact.distance));
+let totalEnergy;
+if (contact.type === 'hbond') {
+const angleFactor = 0.4 + 0.6 * clamp((contact.angle - 90) / 90, 0, 1);
+let qH = charges ? charges[contact.iX] : 0;
+let qA = charges ? charges[contact.iA] : 0;
+if (!qH && !qA) {
+qH = CONSTANTS.HYDROGEN_BOND.DEFAULT_H_CHARGE;
+qA = CONSTANTS.HYDROGEN_BOND.DEFAULT_ACCEPTOR_CHARGE;
+}
+const electrostatics = Math.abs(1389 * qH * qA / (4 * contact.distance));
+totalEnergy = clamp(electrostatics * angleFactor + dispersionContribution, 1, CONSTANTS.ENERGY_LIMITS.CONTACT_MAX);
+} else {
+// Sigma-hole
+const donorInfo = SIGMA_HOLE_DONORS[contact.elX];
+const intrinsicEnergy = donorInfo?.energy || 30;
+const minAngle = donorInfo?.angleMin || 140;
+const angleWidth = CONSTANTS.SIGMA_HOLE.OPTIMAL_ANGLE - minAngle;
+let angleFactor = 0;
+if (contact.angle >= minAngle) {
+const deviation = Math.abs(contact.angle - CONSTANTS.SIGMA_HOLE.OPTIMAL_ANGLE) / angleWidth;
+angleFactor = Math.exp(-CONSTANTS.SIGMA_HOLE.ANGULAR_DECAY * deviation * deviation);
+}
+const rho = contact.distance / (getVdwRadius(contact.elX) + getVdwRadius(contact.elA));
+const radialFactor = rho < CONSTANTS.SIGMA_HOLE.OPTIMAL_RHO
+? intrinsicEnergy
+: intrinsicEnergy * Math.exp(-CONSTANTS.SIGMA_HOLE.RADIAL_DECAY * (rho - CONSTANTS.SIGMA_HOLE.OPTIMAL_RHO));
+totalEnergy = clamp(
+radialFactor * angleFactor + dispersionContribution,
+0,
+intrinsicEnergy * CONSTANTS.ENERGY_LIMITS.CONTACT_SIGMA_LIMIT_FACTOR
+);
+}
+return totalEnergy;
+}
+function estimateStackingEnergy(stack) {
+const sizeFactor = clamp((stack.n1 + stack.n2) / 12, 0.5, 2);
+const distanceFactor = Math.exp(-Math.pow(stack.distance - 3.5, 2) / 0.8);
+const orientationFactor = Math.max(0, 1 - stack.pa / 60) * Math.max(0, 1 - stack.slip / 60);
+return clamp(
+4 * sizeFactor * distanceFactor * (0.4 + 0.6 * orientationFactor),
+0,
+CONSTANTS.ENERGY_LIMITS.STACKING_MAX
+);
+}
+function contactQuality(energy) {
+const { WEAK, MEDIUM } = CONSTANTS.ENERGY_QUALITY.CONTACT;
+if (energy < WEAK) return currentLang().qWeakF;
+if (energy < MEDIUM) return currentLang().qMedF;
+return currentLang().qStrongF;
+}
+function stackingQuality(energy) {
+const { WEAK, MEDIUM } = CONSTANTS.ENERGY_QUALITY.STACKING;
+if (energy < WEAK) return currentLang().qWeakM;
+if (energy < MEDIUM) return currentLang().qMedM;
+return currentLang().qStrongM;
+}
+// ============================================================
+// MOLECULAR GEOMETRY: BONDS, RINGS, ELLIPSOIDS
+// ============================================================
+function computeBonds(atoms) {
+const bonds = [];
+const { TOLERANCE, CELL_SIZE } = CONSTANTS.BOND_DETECTION;
+const grid = new Map();
+const cellKey = (x, y, z) => `${x},${y},${z}`;
+// Spatial partitioning
+atoms.forEach((atom, i) => {
+const key = cellKey(
+Math.floor(atom.x / CELL_SIZE),
+Math.floor(atom.y / CELL_SIZE),
+Math.floor(atom.z / CELL_SIZE)
+);
+if (!grid.has(key)) grid.set(key, []);
+grid.get(key).push(i);
+});
+// Search bonds only among neighbors
+atoms.forEach((atom, i) => {
+const cx = Math.floor(atom.x / CELL_SIZE);
+const cy = Math.floor(atom.y / CELL_SIZE);
+const cz = Math.floor(atom.z / CELL_SIZE);
+const radiusI = getCovalentRadius(atom.element);
+for (let dx = -1; dx <= 1; dx++) {
+for (let dy = -1; dy <= 1; dy++) {
+for (let dz = -1; dz <= 1; dz++) {
+const cell = grid.get(cellKey(cx + dx, cy + dy, cz + dz));
+if (!cell) continue;
+for (const j of cell) {
+if (j <= i) continue;
+const other = atoms[j];
+const maxDistance = radiusI + getCovalentRadius(other.element) + TOLERANCE;
+const distanceSquared = (atom.x - other.x) ** 2 + (atom.y - other.y) ** 2 + (atom.z - other.z) ** 2;
+if (distanceSquared < maxDistance * maxDistance) {
+bonds.push({ i, j });
+}
+}
+}
+}
+}
+});
+return bonds;
+}
+function bfsDistances(from, adjacency, n) {
+const distances = new Array(n).fill(1e9);
+distances[from] = 0;
+const queue = [from];
+for (let head = 0; head < queue.length; head++) {
+const current = queue[head];
+for (const next of adjacency[current]) {
+if (distances[next] > distances[current] + 1) {
+distances[next] = distances[current] + 1;
+queue.push(next);
+}
+}
+}
+return distances;
+}
+function findRings(atoms, bonds) {
+const adjacency = atoms.map(() => []);
+bonds.forEach(bond => {
+adjacency[bond.i].push(bond.j);
+adjacency[bond.j].push(bond.i);
+});
+const rings = [];
+const seen = new Set();
+for (let start = 0; start < atoms.length; start++) {
+if (atoms[start].element === 'H') continue;
+const visited = new Set([start]);
+const path = [start];
+const dfs = (current) => {
+if (path.length > CONSTANTS.RING_DETECTION.MAX_SIZE) return;
+for (const next of adjacency[current]) {
+if (next === start && path.length >= CONSTANTS.RING_DETECTION.MIN_SIZE) {
+const key = [...path].sort((a, b) => a - b).join(',');
+if (!seen.has(key)) {
+seen.add(key);
+rings.push([...path]);
+}
+continue;
+}
+if (next > start && !visited.has(next) && atoms[next].element !== 'H' &&
+path.length < CONSTANTS.RING_DETECTION.MAX_SIZE) {
+visited.add(next);
+path.push(next);
+dfs(next);
+path.pop();
+visited.delete(next);
+}
+}
+};
+dfs(start);
+}
+return rings.map(ring => {
+// Centroid
+let cx = 0, cy = 0, cz = 0;
+ring.forEach(i => {
+cx += atoms[i].x;
+cy += atoms[i].y;
+cz += atoms[i].z;
+});
+cx /= ring.length;
+cy /= ring.length;
+cz /= ring.length;
+// Normal from the sum of cross products
+let nx = 0, ny = 0, nz = 0;
+for (let i = 0; i < ring.length; i++) {
+const p = atoms[ring[i]], q = atoms[ring[(i + 1) % ring.length]];
+nx += (p.y - q.y) * (p.z + q.z);
+ny += (p.z - q.z) * (p.x + q.x);
+nz += (p.x - q.x) * (p.y + q.y);
+}
+const normalLength = Math.hypot(nx, ny, nz) || 1;
+return {
+atoms: ring,
+centroid: new THREE.Vector3(cx, cy, cz),
+normal: new THREE.Vector3(nx / normalLength, ny / normalLength, nz / normalLength)
+};
+});
+}
+function createEllipsoid(U, color, structure) {
+const M = structure.orthoM;
+if (!M || !U) return null;
+// U tensor (symmetric 3x3)
+const F = [
+[U[0], U[5], U[4]],
+[U[5], U[1], U[3]],
+[U[4], U[3], U[2]]
+];
+const { val, vec } = diagonalize3(multiplyMatrices3(multiplyMatrices3(M, F), transposeMatrix3(M)));
+const mesh = new THREE.Mesh(
+new THREE.SphereGeometry(1, CONSTANTS.ATOM_SPHERE_SEGMENTS.W, CONSTANTS.ATOM_SPHERE_SEGMENTS.H),
+new THREE.MeshStandardMaterial({ color, roughness: 0.3, transparent: true, opacity: 0.9 })
+);
+mesh.scale.set(
+Math.min(3, Math.sqrt(Math.max(val[0], 1e-6)) * 1.547),
+Math.min(3, Math.sqrt(Math.max(val[1], 1e-6)) * 1.547),
+Math.min(3, Math.sqrt(Math.max(val[2], 1e-6)) * 1.547)
+);
+const e0 = new THREE.Vector3(vec[0][0], vec[1][0], vec[2][0]);
+const e1 = new THREE.Vector3(vec[0][1], vec[1][1], vec[2][1]);
+const e2 = new THREE.Vector3(vec[0][2], vec[1][2], vec[2][2]);
+mesh.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(e0, e1, e2));
+return mesh;
+}
+// ============================================================
+// MOLECULE GROUP CREATION
+// ============================================================
+function addLabelIf(structure, group, atom, index, radius) {
+if (!settings.showLabels) return;
+if (structure.visibleAtoms && !structure.visibleAtoms.has(index)) return;
+const label = createTextSprite(
+atom.element,
+new THREE.Vector3(atom.x, atom.y + radius + 0.35, atom.z),
+settings.labelColor,
+settings.fontSize
+);
+label.userData = {
+text: atom.element,
+atomIndex: index,
+anchorPos: new THREE.Vector3(atom.x, atom.y, atom.z),
+lineToLabel: null,
+isAtomLabel: true,
+wasDragged: false,
+color: settings.labelColor
+};
+group.add(label);
+structure.atomLabels.push(label);
+}
+function syncLabels(structure) {
+if (!structure || !structure.centeredAtoms) return;
+const existing = new Set();
+(structure.atomLabels || []).forEach(label => {
+const atomIndex = label.userData.atomIndex;
+if (atomIndex !== undefined) existing.add(atomIndex);
+const visible = !structure.visibleAtoms || structure.visibleAtoms.has(atomIndex);
+label.visible = visible;
+if (label.userData.lineToLabel) label.userData.lineToLabel.visible = visible;
+});
+if (settings.showLabels) {
+const radiusFn = labelRadiusFn();
+structure.centeredAtoms.forEach((atom, index) => {
+if (existing.has(index)) return;
+addLabelIf(structure, modelGroup, atom, index, radiusFn(atom.element));
+});
+}
+}
+function labelRadiusFn() {
+if (settings.atomStyle === 'vdw') return getVdwRadius;
+if (settings.atomStyle === 'sticks') return () => 0.12;
+if (settings.atomStyle === 'ellipsoid') return () => 0.4;
+return (element) => Math.min(0.4, getCovalentRadius(element) * 0.7);
+}
+function createMoleculeGroup(structure, options = {}) {
+  const group = new THREE.Group();
+  const sourceAtoms = structure.atoms;
+  const n = sourceAtoms.length;
+
+  let baseCx = 0, baseCy = 0, baseCz = 0;
+  sourceAtoms.forEach(a => { baseCx += a.x; baseCy += a.y; baseCz += a.z; });
+  if (n) {
+    baseCx /= n;
+    baseCy /= n;
+    baseCz /= n;
+  }
+
+  let centered;
+
+  if (options.reuseGeometry && Array.isArray(structure.centeredAtoms) && structure.centeredAtoms.length === n) {
+    centered = structure.centeredAtoms;
+
+    if (!Array.isArray(structure.bonds)) {
+      structure.bonds = computeBonds(centered);
+    }
+
+    if (!Array.isArray(structure.charges)) {
+      structure.charges = computeCharges(structure);
+    }
+  } else {
+    centered = sourceAtoms.map(a => ({
+      ...a,
+      x: a.x - baseCx,
+      y: a.y - baseCy,
+      z: a.z - baseCz
+    }));
+
+    structure.centeredAtoms = centered;
+    structure.bonds = computeBonds(centered);
+    structure.charges = computeCharges(structure);
+  }
+  const colorScheme = ATOM_COLOR_SCHEMES[settings.atomScheme] || ATOM_COLOR_SCHEMES.default;
+structure.pickables = [];
+structure.pickMap = [];
+structure.atomLabels = [];
+structure.junctionMesh = null;
+if (settings.atomStyle === 'ellipsoid') {
+addEllipsoids(group, centered, structure, colorScheme);
+} else if (settings.atomStyle === 'sticks') {
+addStickStyle(group, centered, structure, colorScheme);
+} else {
+addBallStickStyle(group, centered, structure, colorScheme);
+}
+if (structure.cell) {
+const cellGroup = createUnitCell(structure.cell);
+cellGroup.userData.isUnitCell = true;
+cellGroup.position.set(-baseCx, -baseCy, -baseCz);
+group.add(cellGroup);
+}
+return group;
+}
+function addEllipsoids(group, atoms, structure, colorScheme) {
+atoms.forEach((atom, idx) => {
+const color = atomColor(atom.element, colorScheme);
+let mesh = atom.U ? createEllipsoid(atom.U, color.getHex(), structure) : null;
+if (!mesh) {
+mesh = new THREE.Mesh(
+new THREE.SphereGeometry(0.3, CONSTANTS.ATOM_SPHERE_SEGMENTS.W, CONSTANTS.ATOM_SPHERE_SEGMENTS.H),
+new THREE.MeshStandardMaterial({ color, roughness: 0.4 })
+);
+}
+mesh.position.set(atom.x, atom.y, atom.z);
+mesh.userData.atomIndex = idx;
+group.add(mesh);
+structure.pickables.push(mesh);
+structure.pickMap[idx] = { mesh, li: -1, base: color.clone() };
+addLabelIf(structure, group, atom, idx, 0.4);
+});
+}
+function addStickStyle(group, atoms, structure, colorScheme) {
+const bondRadius = 0.12;
+const allIndices = atoms.map((_, i) => i);
+const M4 = new THREE.Matrix4();
+// Junction spheres
+const junctionMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.6 });
+const junctionMesh = new THREE.InstancedMesh(
+new THREE.SphereGeometry(bondRadius, CONSTANTS.JUNCTION_SPHERE_SEGMENTS.W, CONSTANTS.JUNCTION_SPHERE_SEGMENTS.H),
+junctionMaterial,
+allIndices.length
+);
+allIndices.forEach((atomIndex, listIndex) => {
+const atom = atoms[atomIndex];
+const atomColorValue = atomColor(atom.element, colorScheme);
+M4.identity().setPosition(atom.x, atom.y, atom.z);
+junctionMesh.setMatrixAt(listIndex, M4);
+junctionMesh.setColorAt(listIndex, atomColorValue);
+structure.pickMap[atomIndex] = { mesh: junctionMesh, li: listIndex, base: atomColorValue.clone() };
+});
+junctionMesh.instanceMatrix.needsUpdate = true;
+if (junctionMesh.instanceColor) junctionMesh.instanceColor.needsUpdate = true;
+junctionMesh.userData.indices = allIndices;
+group.add(junctionMesh);
+structure.pickables.push(junctionMesh);
+structure.junctionMesh = junctionMesh;
+// Bond cylinders
+if (structure.bonds.length) {
+const bondMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.6 });
+const bondMesh = new THREE.InstancedMesh(
+new THREE.CylinderGeometry(bondRadius, bondRadius, 1, CONSTANTS.STICK_CYLINDER_SEGMENTS),
+bondMaterial,
+structure.bonds.length * 2
+);
+const up = new THREE.Vector3(0, 1, 0);
+const quaternion = new THREE.Quaternion();
+const scale = new THREE.Vector3();
+structure.bonds.forEach((bond, i) => {
+const p1 = atoms[bond.i], p2 = atoms[bond.j];
+const v = new THREE.Vector3(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z);
+const length = v.length();
+quaternion.setFromUnitVectors(up, v.clone().normalize());
+const mx = (p1.x + p2.x) / 2, my = (p1.y + p2.y) / 2, mz = (p1.z + p2.z) / 2;
+M4.compose(new THREE.Vector3((p1.x + mx) / 2, (p1.y + my) / 2, (p1.z + mz) / 2), quaternion, scale.set(1, length / 2, 1));
+bondMesh.setMatrixAt(i * 2, M4);
+M4.compose(new THREE.Vector3((p2.x + mx) / 2, (p2.y + my) / 2, (p2.z + mz) / 2), quaternion, scale.set(1, length / 2, 1));
+bondMesh.setMatrixAt(i * 2 + 1, M4);
+bondMesh.setColorAt(i * 2, atomColor(p1.element, colorScheme));
+bondMesh.setColorAt(i * 2 + 1, atomColor(p2.element, colorScheme));
+});
+bondMesh.instanceMatrix.needsUpdate = true;
+if (bondMesh.instanceColor) bondMesh.instanceColor.needsUpdate = true;
+group.add(bondMesh);
+structure.bondMesh = bondMesh;
+}
+atoms.forEach((atom, idx) => addLabelIf(structure, group, atom, idx, bondRadius));
+}
+function addBallStickStyle(group, atoms, structure, colorScheme) {
+const radiusFn = labelRadiusFn();
+const M4 = new THREE.Matrix4();
+// Group atoms by element for InstancedMesh
+const byElement = {};
+atoms.forEach((atom, idx) => {
+if (!byElement[atom.element]) byElement[atom.element] = [];
+byElement[atom.element].push(idx);
+});
+for (const element in byElement) {
+const indices = byElement[element];
+const color = atomColor(element, colorScheme);
+const instanceMesh = new THREE.InstancedMesh(
+new THREE.SphereGeometry(radiusFn(element), CONSTANTS.ATOM_SPHERE_SEGMENTS.W, CONSTANTS.ATOM_SPHERE_SEGMENTS.H),
+new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4 }),
+indices.length
+);
+indices.forEach((atomIndex, listIndex) => {
+const atom = atoms[atomIndex];
+M4.identity().setPosition(atom.x, atom.y, atom.z);
+instanceMesh.setMatrixAt(listIndex, M4);
+instanceMesh.setColorAt(listIndex, color);
+structure.pickMap[atomIndex] = { mesh: instanceMesh, li: listIndex, base: color.clone() };
+});
+instanceMesh.instanceMatrix.needsUpdate = true;
+if (instanceMesh.instanceColor) instanceMesh.instanceColor.needsUpdate = true;
+instanceMesh.userData.indices = indices;
+group.add(instanceMesh);
+structure.pickables.push(instanceMesh);
+}
+// Bond cylinders
+if (structure.bonds.length) {
+const bondMesh = new THREE.InstancedMesh(
+new THREE.CylinderGeometry(0.08, 0.08, 1, CONSTANTS.BOND_CYLINDER_SEGMENTS),
+new THREE.MeshStandardMaterial({ color: settings.bondColor, roughness: 0.6 }),
+structure.bonds.length
+);
+const up = new THREE.Vector3(0, 1, 0);
+const quaternion = new THREE.Quaternion();
+const scale = new THREE.Vector3();
+structure.bonds.forEach((bond, i) => {
+const p1 = atoms[bond.i], p2 = atoms[bond.j];
+const v = new THREE.Vector3(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z);
+const length = v.length();
+quaternion.setFromUnitVectors(up, v.normalize());
+M4.compose(
+new THREE.Vector3((p1.x + p2.x) / 2, (p1.y + p2.y) / 2, (p1.z + p2.z) / 2),
+quaternion,
+scale.set(1, length, 1)
+);
+bondMesh.setMatrixAt(i, M4);
+});
+bondMesh.instanceMatrix.needsUpdate = true;
+group.add(bondMesh);
+structure.bondMesh = bondMesh;
+}
+atoms.forEach((atom, idx) => addLabelIf(structure, group, atom, idx, radiusFn(atom.element)));
+}
+function createUnitCell(cell) {
+const group = new THREE.Group();
+if (!cell) return group;
+const rad = Math.PI / 180;
+const al = cell.alpha * rad, be = cell.beta * rad, ga = cell.gamma * rad;
+const ca = Math.cos(al), cb = Math.cos(be), cg = Math.cos(ga), sg = Math.sin(ga);
+const volume = cell.a * cell.b * cell.c * Math.sqrt(Math.max(0, 1 - ca * ca - cb * cb - cg * cg + 2 * ca * cb * cg));
+const av = new THREE.Vector3(cell.a, 0, 0);
+const bv = new THREE.Vector3(cell.b * cg, cell.b * sg, 0);
+const cv = new THREE.Vector3(
+cell.c * cb,
+sg !== 0 ? cell.c * (ca - cb * cg) / sg : 0,
+sg !== 0 ? volume / (cell.a * cell.b * sg) : 0
+);
+const corners = [
+new THREE.Vector3(), av.clone(), bv.clone(),
+av.clone().add(bv), cv.clone(), av.clone().add(cv),
+bv.clone().add(cv), av.clone().add(bv).add(cv)
+];
+const lineMaterial = new THREE.LineBasicMaterial({ color: 0x888888 });
+const edges = [[0, 1], [0, 2], [0, 4], [1, 3], [1, 5], [2, 3], [2, 6], [3, 7], [4, 5], [4, 6], [5, 7], [6, 7]];
+edges.forEach(([i, j]) => {
+group.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([corners[i], corners[j]]), lineMaterial));
+});
+const axisColors = [0xff0000, 0x00ff00, 0x0000ff];
+const { LENGTH: headLen, WIDTH: headWid } = CONSTANTS.UNIT_CELL_ARROW_HEAD;
+[av, bv, cv].forEach((vector, i) => {
+group.add(new THREE.ArrowHelper(vector.clone().normalize(), new THREE.Vector3(), vector.length(), axisColors[i], headLen, headWid));
+});
+return group;
+}
+// ============================================================
+// CAMERA AND STRUCTURE LOADING
+// ============================================================
+function fitCameraToGroup(group) {
+const box = new THREE.Box3().setFromObject(group);
+if (box.isEmpty()) return;
+const center = box.getCenter(new THREE.Vector3());
+const size = box.getSize(new THREE.Vector3());
+const maxDimension = Math.max(size.x, size.y, size.z);
+const fov = camera.fov * Math.PI / 180;
+const distance = maxDimension / 2 / Math.tan(fov / 2) * CONSTANTS.CAMERA_FIT_PADDING;
+controls.target.copy(center);
+camera.position.set(center.x + distance * 0.7, center.y + distance * 0.5, center.z + distance * 0.7);
+controls.update();
+}
+function loadStructure(index, keepView = false, fresh = false) {
+  if (!AppState.structures.length || index < 0 || index >= AppState.structures.length) return;
+
+  const structure = AppState.structures[index];
+
+  const preserveState = !fresh;
+  const savedVisibleAtoms = preserveState ? (structure.visibleAtoms || null) : null;
+
+  AppState.currentSelectedAtomIndex = -1;
+  AppState.shiftSelectedAtoms.clear();
+
+  if (fresh) {
+    structure.visibleAtoms = null;
+    structure._inter = null;
+    structure._stack = null;
+    clearAllMeasurements();
+  }
+
+  const cameraPos = camera.position.clone();
+  const target = controls.target.clone();
+
+  disposeGroup(modelGroup);
+  disposeGroup(interactionGroup);
+  cancelMeasureSession();
+
+  const group = createMoleculeGroup(structure, { reuseGeometry: preserveState });
+  modelGroup.add(group);
+
+  if (savedVisibleAtoms) {
+    applyIsolation(structure, savedVisibleAtoms, { keepCamera: keepView });
+  }
+
+  if (keepView) {
+    camera.position.copy(cameraPos);
+    controls.target.copy(target);
+    controls.update();
+  } else if (!savedVisibleAtoms) {
+    fitCameraToGroup(group);
+  }
+
+  document.getElementById('structure-select').value = index;
+  drawContacts(structure);
+}
+function rebuildLabels() {
+const structure = AppState.structures[AppState.currentStructureIndex];
+if (!structure || !structure.centeredAtoms) return;
+(structure.atomLabels || []).forEach(label => {
+if (label.userData.lineToLabel) {
+const line = label.userData.lineToLabel;
+line.geometry.dispose();
+line.material.dispose();
+if (line.parent) line.parent.remove(line);
+}
+label.material.dispose();
+if (label.parent) label.parent.remove(label);
+});
+structure.atomLabels = [];
+syncLabels(structure);
+}
+// ============================================================
+// INTERACTION DETECTION
+// ============================================================
+function buildCopies(structure) {
+const result = [{ vec: new THREE.Vector3(), sym: 'x,y,z' }];
+const M = structure.orthoM;
+if (!M) return result;
+for (let dx = -1; dx <= 1; dx++) {
+for (let dy = -1; dy <= 1; dy++) {
+for (let dz = -1; dz <= 1; dz++) {
+if (!dx && !dy && !dz) continue;
+result.push({
+vec: new THREE.Vector3(
+M[0][0] * dx + M[0][1] * dy + M[0][2] * dz,
+M[1][1] * dy + M[1][2] * dz,
+M[2][2] * dz
+),
+sym: formatSymmetry(dx, dy, dz)
+});
+}
+}
+}
+return result;
+}
+function detectInteractions(structure) {
+if (structure._inter) return structure._inter;
+const atoms = structure.centeredAtoms;
+const bonds = structure.bonds;
+const interactions = [];
+const neighbors = atoms.map(() => []);
+bonds.forEach(bond => {
+neighbors[bond.i].push(bond.j);
+neighbors[bond.j].push(bond.i);
+});
+// List of all acceptors in all copies
+const acceptorList = [];
+buildCopies(structure).forEach(copy => {
+atoms.forEach((atom, j) => {
+acceptorList.push({
+j,
+sym: copy.sym,
+pos: new THREE.Vector3(atom.x + copy.vec.x, atom.y + copy.vec.y, atom.z + copy.vec.z)
+});
+});
+});
+const isSelfInteraction = (sym, j, excluded) => sym === 'x,y,z' && excluded.includes(j);
+atoms.forEach((atom, i) => {
+const positionX = new THREE.Vector3(atom.x, atom.y, atom.z);
+const distances = settings.exclude14 ? bfsDistances(i, neighbors, atoms.length) : null;
+const isClose = (j) => distances && distances[j] <= 3;
+// H-bonds
+if (atom.element === 'H') {
+const donorIndex = neighbors[i].find(n => HBOND_DONOR_ATOMS.has(atoms[n].element));
+if (donorIndex === undefined) return;
+const donor = atoms[donorIndex];
+const positionD = new THREE.Vector3(donor.x, donor.y, donor.z);
+const distDH = positionX.distanceTo(positionD);
+acceptorList.forEach(acceptor => {
+if (!ACCEPTORS.has(atoms[acceptor.j].element)) return;
+if (isSelfInteraction(acceptor.sym, acceptor.j, [i, donorIndex])) return;
+if (isClose(acceptor.j)) return;
+const distHA = positionX.distanceTo(acceptor.pos);
+const vdwSum = getVdwRadius('H') + getVdwRadius(atoms[acceptor.j].element);
+const angle = angleBetween(positionD, positionX, acceptor.pos);
+if (distHA < CONSTANTS.HYDROGEN_BOND.DISTANCE_FACTOR * vdwSum &&
+angle > CONSTANTS.HYDROGEN_BOND.MIN_ANGLE) {
+interactions.push({
+type: 'hbond',
+iD: donorIndex,
+iX: i,
+iA: acceptor.j,
+sym: acceptor.sym,
+from: positionX,
+to: acceptor.pos,
+distance: distHA,
+distDX: distDH,
+distDA: positionD.distanceTo(acceptor.pos),
+angle,
+elX: atom.element,
+elA: atoms[acceptor.j].element
+});
+}
+});
+return;
+}
+// Sigma-holes
+const donorInfo = SIGMA_HOLE_DONORS[atom.element];
+if (!donorInfo || !neighbors[i].length) return;
+neighbors[i].forEach(neighborIndex => {
+const R = atoms[neighborIndex];
+const positionR = new THREE.Vector3(R.x, R.y, R.z);
+const distRX = positionX.distanceTo(positionR);
+acceptorList.forEach(acceptor => {
+if (!ACCEPTORS.has(atoms[acceptor.j].element)) return;
+if (isSelfInteraction(acceptor.sym, acceptor.j, [i, neighborIndex])) return;
+if (isClose(acceptor.j)) return;
+const distXA = positionX.distanceTo(acceptor.pos);
+const angle = angleBetween(positionR, positionX, acceptor.pos);
+const vdwSum = getVdwRadius(atom.element) + getVdwRadius(atoms[acceptor.j].element);
+if (distXA < CONSTANTS.SIGMA_HOLE.DISTANCE_FACTOR * vdwSum &&
+angle > donorInfo.angleMin) {
+interactions.push({
+type: donorInfo.type,
+iD: neighborIndex,
+iX: i,
+iA: acceptor.j,
+sym: acceptor.sym,
+from: positionX,
+to: acceptor.pos,
+distance: distXA,
+distDX: distRX,
+distDA: positionR.distanceTo(acceptor.pos),
+angle,
+elX: atom.element,
+elA: atoms[acceptor.j].element
+});
+}
+});
+});
+});
+structure._inter = interactions;
+structure.lastInteractions = interactions;
+return interactions;
+}
+function detectStacking(structure) {
+if (structure._stack) return structure._stack;
+const atoms = structure.centeredAtoms;
+const bonds = structure.bonds;
+const degrees = new Array(atoms.length).fill(0);
+bonds.forEach(bond => { degrees[bond.i]++; degrees[bond.j]++; });
+const allRings = findRings(atoms, bonds);
+// Filter aromatic rings
+const rings = allRings.filter(ring => {
+for (const idx of ring.atoms) {
+if (degrees[idx] > CONSTANTS.RING_DETECTION.MAX_DEGREE_FOR_AROMATIC) return false;
+}
+const plane = new THREE.Plane().setFromNormalAndCoplanarPoint(ring.normal, ring.centroid);
+for (const idx of ring.atoms) {
+const point = new THREE.Vector3(atoms[idx].x, atoms[idx].y, atoms[idx].z);
+if (Math.abs(plane.distanceToPoint(point)) > CONSTANTS.PI_STACKING.RING_COPLANARITY_TOLERANCE) return false;
+}
+return true;
+});
+const copies = buildCopies(structure);
+const rawStacks = [];
+for (let i = 0; i < rings.length; i++) {
+for (const copy of copies) {
+for (let j = 0; j < rings.length; j++) {
+if (copy.sym === 'x,y,z' && j <= i) continue;
+const ring1 = rings[i], ring2 = rings[j];
+if (copy.sym === 'x,y,z' && ring1.atoms.some(a => ring2.atoms.includes(a))) continue;
+const centroid2 = ring2.centroid.clone().add(copy.vec);
+const vector = centroid2.clone().sub(ring1.centroid);
+const distance = vector.length();
+if (distance < CONSTANTS.PI_STACKING.MIN_DISTANCE ||
+distance > CONSTANTS.PI_STACKING.MAX_DISTANCE) continue;
+let planarityAngle = ring1.normal.angleTo(ring2.normal) * 180 / Math.PI;
+planarityAngle = Math.min(planarityAngle, 180 - planarityAngle);
+if (planarityAngle > CONSTANTS.PI_STACKING.MAX_PLANARITY_ANGLE) continue;
+const slipAngle = Math.acos(Math.min(1, Math.abs(vector.dot(ring1.normal)) / distance)) * 180 / Math.PI;
+if (slipAngle > CONSTANTS.PI_STACKING.MAX_SLIP_ANGLE) continue;
+rawStacks.push({
+from: ring1.centroid,
+to: centroid2,
+distance,
+pa: planarityAngle,
+slip: slipAngle,
+n1: ring1.atoms.length,
+n2: ring2.atoms.length,
+a1: ring1.atoms,
+a2: ring2.atoms,
+sym: copy.sym,
+copyVec: copy.vec.clone()
+});
+}
+}
+}
+// Deduplication
+const seen = new Set();
+const stacks = [];
+rawStacks.forEach(stack => {
+const key1 = [stack.from.x, stack.from.y, stack.from.z, stack.to.x, stack.to.y, stack.to.z].map(v => v.toFixed(2)).join(',');
+const key2 = [stack.to.x, stack.to.y, stack.to.z, stack.from.x, stack.from.y, stack.from.z].map(v => v.toFixed(2)).join(',');
+if (seen.has(key1) || seen.has(key2)) return;
+seen.add(key1);
+stacks.push(stack);
+});
+stacks.forEach((stack, i) => stack.idx = i + 1);
+structure._stack = { rings, stacks };
+return structure._stack;
+}
+function updateNcStatus(structure) {
+const element = document.getElementById('nc-status');
+if (!structure) {
+element.textContent = '';
+return;
+}
+const interactions = detectInteractions(structure);
+const { stacks } = detectStacking(structure);
+const visible = structure.visibleAtoms;
+const counts = {};
+interactions.forEach(x => {
+const visibleI = !visible || visible.has(x.iX);
+const visibleA = !visible || (visible.has(x.iA) && x.sym === 'x,y,z');
+if (!visibleI && !visibleA) return;
+counts[x.type] = (counts[x.type] || 0) + 1;
+});
+const stackCount = stacks.filter(s => {
+const vis1 = !visible || s.a1.some(i => visible.has(i));
+const vis2 = !visible || (s.sym === 'x,y,z' && s.a2.some(i => visible.has(i)));
+return vis1 || vis2;
+}).length;
+const lang = currentLang();
+const parts = [];
+if (counts.hbond) parts.push(counts.hbond + ' ' + lang.cntH);
+if (counts.halogen) parts.push(counts.halogen + ' ' + lang.cntHal);
+if (counts.chalcogen) parts.push(counts.chalcogen + ' ' + lang.cntCha);
+if (counts.pnictogen) parts.push(counts.pnictogen + ' ' + lang.cntPni);
+if (stackCount) parts.push(stackCount + ' ' + lang.cntStack);
+element.textContent = parts.length
+? lang.found + ': ' + parts.join(', ')
+: lang.noneFound;
+}
+// ============================================================
+// CONTACT RENDERING
+// ============================================================
+function makeInteractionLabel(text, from, to, color) {
+const anchor = from.clone().add(to).multiplyScalar(0.5);
+const sprite = createTextSprite(text, anchor.clone().add(new THREE.Vector3(0, 0.15, 0)), color, settings.fontSize);
+sprite.userData = {
+text,
+anchorPos: anchor,
+lineToLabel: null,
+isInteraction: true,
+wasDragged: false,
+color
+};
+interactionGroup.add(sprite);
+}
+// Adds a ghost sphere for a hidden partner atom, computing the offset
+// between the rendered contact position and the atom's home position.
+function addPartnerGhost(structure, position, color, atomIndex) {
+const atom = structure.centeredAtoms[atomIndex];
+const offset = new THREE.Vector3(position.x - atom.x, position.y - atom.y, position.z - atom.z);
+interactionGroup.add(createGhostSphere(position, color, atomIndex, offset));
+}
+function drawContacts(structure) {
+disposeGroup(interactionGroup);
+const energyRows = [];
+let totalEnergy = 0;
+if (structure && settings.showNoncovalent) {
+const colorMap = {
+hbond: settings.hbondColor,
+halogen: settings.halogenColor,
+chalcogen: settings.chalcogenColor,
+pnictogen: settings.pnictogenColor
+};
+const typeCounters = { hbond: 0, halogen: 0, chalcogen: 0, pnictogen: 0 };
+detectInteractions(structure).forEach(x => {
+const visibleI = !structure.visibleAtoms || structure.visibleAtoms.has(x.iX);
+const visibleA = !structure.visibleAtoms || (structure.visibleAtoms.has(x.iA) && x.sym === 'x,y,z');
+if (!visibleI && !visibleA) return;
+typeCounters[x.type]++;
+const tag = TYPE_LETTER[x.type] + sub(typeCounters[x.type]);
+const color = colorMap[x.type] || '#888888';
+interactionGroup.add(createFatDashedLine(x.from, x.to, color, 3));
+makeInteractionLabel(`${tag} ${x.distance.toFixed(2)} Å\n∠${x.angle.toFixed(0)}°`, x.from, x.to, color);
+// Ghost spheres for hidden partners
+if (visibleI && !visibleA) {
+addPartnerGhost(structure, x.to, color, x.iA);
+} else if (!visibleI && visibleA) {
+addPartnerGhost(structure, x.from, color, x.iX);
+} else if (!structure.visibleAtoms && x.sym !== 'x,y,z') {
+// "All" mode: ghost at the symmetry copy end
+addPartnerGhost(structure, x.to, color, x.iA);
+}
+const energy = estimateContactEnergy(x, structure.charges);
+totalEnergy += energy;
+energyRows.push({
+t: tag,
+color,
+label: `${structure.centeredAtoms[x.iX].element}···${structure.centeredAtoms[x.iA].element}`,
+E: energy,
+q: contactQuality(energy)
+});
+});
+}
+if (structure && settings.showStacking) {
+const { rings, stacks } = detectStacking(structure);
+const ringVisible = (ring) => !structure.visibleAtoms || ring.atoms.some(i => structure.visibleAtoms.has(i));
+rings.forEach(ring => {
+if (!ringVisible(ring)) return;
+const mesh = new THREE.Mesh(
+new THREE.SphereGeometry(CONSTANTS.RING_CENTROID_SPHERE.RADIUS, CONSTANTS.RING_CENTROID_SPHERE.SEGMENTS_W, CONSTANTS.RING_CENTROID_SPHERE.SEGMENTS_H),
+new THREE.MeshStandardMaterial({ color: settings.ringColor })
+);
+mesh.position.copy(ring.centroid);
+interactionGroup.add(mesh);
+});
+stacks.forEach(s => {
+const vis1 = !structure.visibleAtoms || s.a1.some(i => structure.visibleAtoms.has(i));
+const vis2 = !structure.visibleAtoms || (s.sym === 'x,y,z' && s.a2.some(i => structure.visibleAtoms.has(i)));
+if (!vis1 && !vis2) return;
+interactionGroup.add(createFatDashedLine(s.from, s.to, settings.ringColor, 3));
+makeInteractionLabel(`π${sub(s.idx)} ${s.distance.toFixed(2)} Å`, s.from, s.to, settings.ringColor);
+if (vis1 && !vis2) {
+interactionGroup.add(createGhostSphere(s.to, settings.ringColor, s.a2[0], s.copyVec));
+} else if (!vis1 && vis2) {
+interactionGroup.add(createGhostSphere(s.from, settings.ringColor, s.a1[0], s.copyVec));
+} else if (!structure.visibleAtoms && s.sym !== 'x,y,z') {
+// "All" mode: ghost at the symmetry copy end
+interactionGroup.add(createGhostSphere(s.to, settings.ringColor, s.a2[0], s.copyVec))
+}
+const energy = estimateStackingEnergy(s);
+totalEnergy += energy;
+energyRows.push({
+t: 'π' + sub(s.idx),
+color: settings.ringColor,
+label: `(${s.n1}/${s.n2})`,
+E: energy,
+q: stackingQuality(energy)
+});
+});
+}
+updateNcStatus(structure);
+updateEnergyBox(structure, energyRows, totalEnergy);
+}
+function updateEnergyBox(structure, rows, totalEnergy) {
+const box = document.getElementById('energy-box');
+if (!structure || !rows.length) {
+box.style.display = 'none';
+return;
+}
+box.style.display = 'block';
+const lang = currentLang();
+const body = AppState.energyCollapsed ? '' :
+rows.map(r => `<div class="e-row"><span class="e-dot" style="background:${r.color}"></span><span class="e-t">${r.t}</span>${r.label} — <b>${r.E.toFixed(0)}</b> (${r.q})</div>`).join('') +
+`<div class="e-total">Σ ≈ ${totalEnergy.toFixed(0)} ${lang.units}</div>` +
+`<div class="e-note">${lang.energyNote}</div>`;
+box.innerHTML = `<div class="e-head"><b class="h">${lang.energiesHead}</b><button id="e-collapse">${AppState.energyCollapsed ? '▸' : '▾'}</button></div>` + body;
+}
+// ============================================================
+// MEASUREMENTS
+// ============================================================
+function clearAllMeasurements() {
+disposeGroup(measurementGroup);
+AppState.persistentMeasurements = [];
+AppState.selectedMeasurement = null;
+document.getElementById('delete-selected-btn').classList.remove('show');
+}
+function cancelMeasureSession() {
+if (AppState.measureSession.timer) clearTimeout(AppState.measureSession.timer);
+AppState.measureSession.tempLines.forEach(line => {
+line.geometry.dispose();
+line.material.dispose();
+measurementGroup.remove(line);
+});
+if (AppState.measureSession.tempSprite) measurementGroup.remove(AppState.measureSession.tempSprite);
+AppState.measureSession = { atoms: [], tempLines: [], tempSprite: null, timer: null };
+resetAtomHighlights();
+}
+function highlightSessionAtoms() {
+highlightShiftSelection();
+}
+function resetAtomHighlights() { highlightSessionAtoms(); }
+function highlightShiftSelection() {
+const structure = AppState.structures[AppState.currentStructureIndex];
+if (!structure || !structure.pickMap) return;
+const shiftColor = new THREE.Color(0xff8c00);
+const highlightColor = new THREE.Color(0xffff66);
+structure.pickMap.forEach((entry, atomIndex) => {
+if (!entry) return;
+const isShift = AppState.shiftSelectedAtoms.has(atomIndex);
+const isSession = AppState.measureSession.atoms.some(a => a.index === atomIndex);
+if (entry.li >= 0) {
+let color = entry.base;
+if (isShift) color = shiftColor;
+else if (isSession) color = highlightColor;
+entry.mesh.setColorAt(entry.li, color);
+if (entry.mesh.instanceColor) entry.mesh.instanceColor.needsUpdate = true;
+} else if (entry.mesh.material.emissive) {
+if (isShift) entry.mesh.material.emissive.setHex(0x663300);
+else if (isSession) entry.mesh.material.emissive.setHex(0x444400);
+else entry.mesh.material.emissive.setHex(0);
+}
+});
+}
+function clearShiftSelection() {
+AppState.shiftSelectedAtoms.clear();
+highlightShiftSelection();
+document.getElementById('status-msg').textContent = '';
+}
+function getMeasurementType(atomCount) {
+if (atomCount === 2) return 'distance';
+if (atomCount === 3) return 'angle';
+return 'torsion';
+}
+function getColorForMeasurementType(type) {
+if (type === 'distance') return settings.distColor;
+if (type === 'angle') return settings.angleColor;
+return settings.torsionColor;
+}
+function createTempMeasurement() {
+// Clean up previous temporary objects
+AppState.measureSession.tempLines.forEach(line => {
+line.geometry.dispose();
+line.material.dispose();
+measurementGroup.remove(line);
+});
+if (AppState.measureSession.tempSprite) measurementGroup.remove(AppState.measureSession.tempSprite);
+AppState.measureSession.tempLines = [];
+AppState.measureSession.tempSprite = null;
+const indices = AppState.measureSession.atoms.map(a => a.index);
+if (indices.length < 2) return;
+const structure = AppState.structures[AppState.currentStructureIndex];
+if (!structure?.centeredAtoms) return;
+const points = indices.map(i => new THREE.Vector3(
+structure.centeredAtoms[i].x,
+structure.centeredAtoms[i].y,
+structure.centeredAtoms[i].z
+));
+const type = getMeasurementType(indices.length);
+let labelText = '';
+const anchorPos = new THREE.Vector3();
+const lineMaterial = new THREE.LineBasicMaterial({ color: 0xff6600 });
+for (let i = 0; i < points.length - 1; i++) {
+const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints([points[i], points[i + 1]]), lineMaterial);
+measurementGroup.add(line);
+AppState.measureSession.tempLines.push(line);
+}
+if (type === 'distance') {
+labelText = points[0].distanceTo(points[1]).toFixed(2) + ' Å';
+anchorPos.addVectors(points[0], points[1]).multiplyScalar(0.5);
+} else if (type === 'angle') {
+const v1 = new THREE.Vector3().subVectors(points[0], points[1]);
+const v2 = new THREE.Vector3().subVectors(points[2], points[1]);
+labelText = (v1.angleTo(v2) * 180 / Math.PI).toFixed(1) + '°';
+anchorPos.copy(points[1]);
+} else {
+const b1 = points[1].clone().sub(points[0]);
+const b2 = points[2].clone().sub(points[1]);
+const b3 = points[3].clone().sub(points[2]);
+const n1 = b1.clone().cross(b2).normalize();
+const n2 = b2.clone().cross(b3).normalize();
+const m1 = n1.clone().cross(b2.clone().normalize());
+labelText = (Math.atan2(m1.dot(n2), n1.dot(n2)) * 180 / Math.PI).toFixed(1) + '°';
+anchorPos.addVectors(points[1], points[2]).multiplyScalar(0.5);
+}
+const color = getColorForMeasurementType(type);
+const sprite = createTextSprite(
+labelText,
+anchorPos.clone().add(new THREE.Vector3(0, 0.25, 0)),
+color,
+settings.fontSize
+);
+sprite.userData = {
+text: labelText,
+anchorPos: anchorPos.clone(),
+lineToLabel: null,
+type,
+isMeasurement: true,
+wasDragged: false,
+color
+};
+measurementGroup.add(sprite);
+AppState.measureSession.tempSprite = sprite;
+}
+function finalizeMeasurement() {
+if (AppState.measureSession.atoms.length < 2) return;
+AppState.persistentMeasurements.push({
+type: getMeasurementType(AppState.measureSession.atoms.length),
+atoms: AppState.measureSession.atoms.map(a => a.index),
+lines: [...AppState.measureSession.tempLines],
+sprite: AppState.measureSession.tempSprite,
+anchorPos: AppState.measureSession.tempSprite.userData.anchorPos.clone(),
+timestamp: new Date().toISOString(),
+structureName: AppState.structures[AppState.currentStructureIndex]?.name || 'unknown'
+});
+if (AppState.measureSession.timer) clearTimeout(AppState.measureSession.timer);
+AppState.measureSession = { atoms: [], tempLines: [], tempSprite: null, timer: null };
+resetAtomHighlights();
+document.getElementById('status-msg').textContent = '';
+}
+function startMeasureTimeout() {
+if (AppState.measureSession.timer) clearTimeout(AppState.measureSession.timer);
+AppState.measureSession.timer = setTimeout(finalizeMeasurement, CONSTANTS.MEASUREMENT_TIMEOUT_MS);
+}
+function addAtomToSession(index, position) {
+if (AppState.measureSession.atoms.some(a => a.index === index)) return;
+AppState.measureSession.atoms.push({ index, position: position.clone() });
+if (AppState.measureSession.atoms.length > 4) {
+cancelMeasureSession();
+return;
+}
+highlightSessionAtoms();
+createTempMeasurement();
+if (AppState.measureSession.atoms.length >= 2) startMeasureTimeout();
+}
+// ============================================================
+// INPUT HANDLING
+// ============================================================
+function pickDraggableSprite(clientX, clientY) {
+let best = null;
+let bestDistance = 1e9;
+const consider = (sprite, threshold) => {
+const projected = sprite.position.clone().project(camera);
+if (projected.z > 1 || projected.z < -1) return;
+const screenX = (projected.x + 1) / 2 * window.innerWidth;
+const screenY = (-projected.y + 1) / 2 * window.innerHeight;
+const distance = Math.hypot(screenX - clientX, screenY - clientY);
+if (distance < threshold && distance < bestDistance) {
+bestDistance = distance;
+best = sprite;
+}
+};
+AppState.persistentMeasurements.forEach(m => { if (m.sprite) consider(m.sprite, CONSTANTS.SPRITE_HIT_THRESHOLD); });
+interactionGroup.children.forEach(obj => {
+if (obj.isSprite && obj.userData && obj.userData.anchorPos) consider(obj, CONSTANTS.SPRITE_HIT_THRESHOLD);
+});
+const structure = AppState.structures[AppState.currentStructureIndex];
+if (structure && structure.atomLabels) {
+structure.atomLabels.forEach(label => { if (label.visible) consider(label, CONSTANTS.ATOM_LABEL_HIT_THRESHOLD); });
+}
+return best;
+}
+function onPointerDown(event) {
+AppState.activePointers.set(event.pointerId, { clientX: event.clientX, clientY: event.clientY });
+if (AppState.activePointers.size === 3) {
+event.preventDefault();
+const points = [...AppState.activePointers.values()];
+AppState.panStartPos.set(
+points.reduce((s, p) => s + p.clientX, 0) / 3,
+points.reduce((s, p) => s + p.clientY, 0) / 3
+);
+AppState.panStartTarget.copy(controls.target);
+AppState.isThreeFingerPan = true;
+controls.enabled = false;
+return;
+}
+if (AppState.activePointers.size > 1) return;
+const sprite = pickDraggableSprite(event.clientX, event.clientY);
+if (sprite) {
+AppState.selectedMeasurement = AppState.persistentMeasurements.find(m => m.sprite === sprite) || null;
+document.getElementById('delete-selected-btn').classList.toggle('show', !!AppState.selectedMeasurement);
+controls.enabled = false;
+AppState.draggedObject = sprite;
+const rect = renderer.domElement.getBoundingClientRect();
+const mouse = new THREE.Vector2(
+((event.clientX - rect.left) / rect.width) * 2 - 1,
+-((event.clientY - rect.top) / rect.height) * 2 + 1
+);
+const raycaster = new THREE.Raycaster();
+raycaster.setFromCamera(mouse, camera);
+AppState.dragPlane.setFromNormalAndCoplanarPoint(camera.getWorldDirection(new THREE.Vector3()), sprite.position);
+const intersection = new THREE.Vector3();
+raycaster.ray.intersectPlane(AppState.dragPlane, intersection);
+AppState.dragOffset.copy(sprite.position).sub(intersection);
+return;
+}
+AppState.selectedMeasurement = null;
+document.getElementById('delete-selected-btn').classList.remove('show');
+}
+function onPointerMove(event) {
+if (!AppState.activePointers.has(event.pointerId)) return;
+AppState.activePointers.set(event.pointerId, { clientX: event.clientX, clientY: event.clientY });
+if (AppState.activePointers.size === 3 && AppState.isThreeFingerPan) {
+event.preventDefault();
+const points = [...AppState.activePointers.values()];
+const averageX = points.reduce((s, p) => s + p.clientX, 0) / 3;
+const averageY = points.reduce((s, p) => s + p.clientY, 0) / 3;
+const newTarget = AppState.panStartTarget.clone().add(
+new THREE.Vector3(-(averageX - AppState.panStartPos.x) * 0.015, (averageY - AppState.panStartPos.y) * 0.015, 0)
+);
+const delta = newTarget.clone().sub(controls.target);
+controls.target.copy(newTarget);
+camera.position.add(delta);
+return;
+}
+if (AppState.draggedObject) {
+event.preventDefault();
+const rect = renderer.domElement.getBoundingClientRect();
+const mouse = new THREE.Vector2(
+((event.clientX - rect.left) / rect.width) * 2 - 1,
+-((event.clientY - rect.top) / rect.height) * 2 + 1
+);
+const raycaster = new THREE.Raycaster();
+raycaster.setFromCamera(mouse, camera);
+const intersection = new THREE.Vector3();
+if (raycaster.ray.intersectPlane(AppState.dragPlane, intersection)) {
+AppState.draggedObject.position.copy(intersection.add(AppState.dragOffset));
+AppState.draggedObject.userData.wasDragged = true;
+updateLabelLine(AppState.draggedObject);
+}
+}
+}
+function onPointerUp(event) {
+AppState.activePointers.delete(event.pointerId);
+if (AppState.activePointers.size < 3 && AppState.isThreeFingerPan) {
+AppState.isThreeFingerPan = false;
+controls.enabled = true;
+return;
+}
+if (AppState.draggedObject) {
+AppState.draggedObject = null;
+controls.enabled = true;
+return;
+}
+if (AppState.activePointers.size === 0) {
+const rect = renderer.domElement.getBoundingClientRect();
+const mouse = new THREE.Vector2(
+((event.clientX - rect.left) / rect.width) * 2 - 1,
+-((event.clientY - rect.top) / rect.height) * 2 + 1
+);
+const raycaster = new THREE.Raycaster();
+raycaster.setFromCamera(mouse, camera);
+// Click on a ghost sphere
+const ghostHits = raycaster.intersectObjects(interactionGroup.children.filter(o => o.userData?.isGhostAtom));
+if (ghostHits.length > 0) {
+const ghost = ghostHits[0].object;
+revealFragmentByGhost(ghost.userData.fragmentStartIndex, ghost.userData.offset);
+return;
+}
+// Click on an atom
+const structure = AppState.structures[AppState.currentStructureIndex];
+if (structure?.pickables) {
+const hits = raycaster.intersectObjects(structure.pickables);
+if (hits.length) {
+const hit = hits[0];
+const atomIndex = hit.object.userData.indices
+? hit.object.userData.indices[hit.instanceId]
+: hit.object.userData.atomIndex;
+const atom = structure.centeredAtoms[atomIndex];
+if (event.shiftKey) {
+// If there was a normal click before Shift — move that atom into the shift selection
+if (AppState.currentSelectedAtomIndex >= 0 &&
+!AppState.shiftSelectedAtoms.has(AppState.currentSelectedAtomIndex)) {
+AppState.shiftSelectedAtoms.add(AppState.currentSelectedAtomIndex);
+}
+// Cancel the measurement session so it does not interfere
+if (AppState.measureSession.atoms.length > 0) {
+cancelMeasureSession();
+}
+// Now handle the current Shift+click
+if (AppState.shiftSelectedAtoms.has(atomIndex)) {
+AppState.shiftSelectedAtoms.delete(atomIndex);
+} else {
+AppState.shiftSelectedAtoms.add(atomIndex);
+}
+AppState.currentSelectedAtomIndex = atomIndex;
+highlightShiftSelection();
+const count = AppState.shiftSelectedAtoms.size;
+document.getElementById('status-msg').textContent =
+count > 0 ? 'Shift: ' + count + ' ' + currentLang().atomsWord : '';
+} else {
+// Normal click: measurement
+AppState.currentSelectedAtomIndex = atomIndex;
+addAtomToSession(atomIndex, new THREE.Vector3(atom.x, atom.y, atom.z));
+document.getElementById('status-msg').textContent =
+currentLang().selectedAtoms + ': ' + AppState.measureSession.atoms.length;
+}
+} else {
+// Click on empty space
+if (event.shiftKey) {
+clearShiftSelection();
+} else {
+cancelMeasureSession();
+document.getElementById('status-msg').textContent = '';
+}
+}
+}
+}
+}
+function updateLabelLine(object) {
+if (!object?.userData.anchorPos) return;
+if (object.userData.lineToLabel) {
+object.userData.lineToLabel.geometry.dispose();
+object.userData.lineToLabel.material.dispose();
+if (object.userData.lineToLabel.parent) object.userData.lineToLabel.parent.remove(object.userData.lineToLabel);
+object.userData.lineToLabel = null;
+}
+if (!object.userData.wasDragged) return;
+if (object.userData.anchorPos.distanceTo(object.position) > CONSTANTS.LABEL_LINE_DISTANCE_THRESHOLD) {
+const line = new THREE.Line(
+new THREE.BufferGeometry().setFromPoints([object.userData.anchorPos, object.position]),
+new THREE.LineBasicMaterial({ color: 0xaaaaaa })
+);
+const targetGroup = object.userData.isAtomLabel
+? modelGroup
+: (object.userData.isInteraction ? interactionGroup : measurementGroup);
+targetGroup.add(line);
+object.userData.lineToLabel = line;
+}
+}
+// ============================================================
+// CAMERA PANNING
+// ============================================================
+function panCameraRight(step) {
+const direction = new THREE.Vector3();
+camera.getWorldDirection(direction);
+const right = new THREE.Vector3().crossVectors(direction, camera.up).normalize();
+controls.target.addScaledVector(right, step);
+camera.position.addScaledVector(right, step);
+}
+function panCameraUp(step) {
+const up = new THREE.Vector3(0, 1, 0).applyQuaternion(camera.quaternion);
+controls.target.addScaledVector(up, step);
+camera.position.addScaledVector(up, step);
+}
+// ============================================================
+// FILE LOADING
+// ============================================================
+async function loadFile(file) {
+try {
+const text = await file.text();
+const ext = file.name.split('.').pop().toLowerCase();
+let parsed = [];
+if (ext === 'xyz') parsed = parseXYZ(text);
+else if (ext === 'cif') parsed = parseCIF(text);
+else if (ext === 'pdb') parsed = parsePDB(text);
+else if (ext === 'mol') parsed = parseMOL(text);
+else if (ext === 'sdf') parsed = parseSDF(text);
+// If the extension is not recognized or the first parser did not read the file,
+// try to detect the format from the content.
+if (!parsed.length) {
+parsed = parseXYZ(text);
+if (!parsed.length) parsed = parseCIF(text);
+if (!parsed.length) parsed = parsePDB(text);
+if (!parsed.length) parsed = parseMOL(text);
+if (!parsed.length) parsed = parseSDF(text);
+}
+if (!parsed.length) {
+alert(currentLang().alertFormats);
+return;
+}
+parsed.forEach(s => {
+s.atoms = (s.atoms || []).filter(a => isFinite(a.x) && isFinite(a.y) && isFinite(a.z));
+});
+parsed = parsed.filter(s => s.atoms.length);
+const baseName = file.name.replace(/\.[^.]+$/, '');
+parsed.forEach((s, i) => {
+if (ext === 'xyz') {
+s.name = parsed.length > 1 ? `${baseName} #${i + 1}` : baseName;
+} else if (parsed.length > 1) {
+s.name = `${baseName} · ${s.name || i + 1}`;
+} else if (!s.name || s.name.includes('')) {
+s.name = baseName;
+}
+});
+if (!parsed.length) {
+alert(currentLang().alertNoStruct + ' ' + file.name);
+return;
+}
+const startIndex = AppState.structures.length;
+AppState.structures.push(...parsed);
+const select = document.getElementById('structure-select');
+select.innerHTML = '';
+AppState.structures.forEach((s, i) => {
+const option = document.createElement('option');
+option.value = i;
+option.textContent = s.name || (currentLang().structureWord + ' ' + (i + 1));
+select.appendChild(option);
+});
+select.value = startIndex;
+AppState.currentStructureIndex = startIndex;
+loadStructure(startIndex, false, true);
+} catch (err) {
+console.error('File load error:', err);
+alert(currentLang().loadError + err.message);
+}
+}
+// ============================================================
+// FRAGMENT ISOLATION
+// ============================================================
+function findFragmentAtoms(structure, startIndex) {
+const visible = new Set();
+const queue = [startIndex];
+visible.add(startIndex);
+const adjacency = structure.atoms.map(() => []);
+structure.bonds.forEach(bond => {
+adjacency[bond.i].push(bond.j);
+adjacency[bond.j].push(bond.i);
+});
+while (queue.length > 0) {
+const current = queue.shift();
+for (const neighbor of adjacency[current]) {
+if (!visible.has(neighbor)) {
+visible.add(neighbor);
+queue.push(neighbor);
+}
+}
+}
+return visible;
+}
+function applyIsolation(structure, visibleSet, options = {}) {
+if (!structure) return;
+structure.visibleAtoms = visibleSet;
+const dummyMatrix = new THREE.Matrix4();
+const zeroScaleMatrix = new THREE.Matrix4().makeScale(0, 0, 0);
+modelGroup.traverse(obj => {
+if (obj.userData && obj.userData.isUnitCell) obj.visible = !visibleSet;
+});
+structure.pickMap.forEach((info, atomIndex) => {
+if (!info) return;
+const { mesh, li } = info;
+if (li === -1) return;
+if (visibleSet && !visibleSet.has(atomIndex)) {
+mesh.setMatrixAt(li, zeroScaleMatrix);
+} else {
+const atom = structure.centeredAtoms[atomIndex];
+dummyMatrix.identity().setPosition(atom.x, atom.y, atom.z);
+mesh.setMatrixAt(li, dummyMatrix);
+}
+});
+modelGroup.traverse(obj => {
+if (obj.isMesh && obj.userData.atomIndex !== undefined) {
+const atomIndex = obj.userData.atomIndex;
+if (visibleSet && !visibleSet.has(atomIndex)) {
+obj.scale.set(0, 0, 0);
+} else {
+const atom = structure.centeredAtoms[atomIndex];
+obj.position.set(atom.x, atom.y, atom.z);
+obj.scale.set(1, 1, 1);
+}
+}
+});
+if (structure.bondMesh) {
+const bim = structure.bondMesh;
+const instancesPerBond = (bim.count === structure.bonds.length * 2) ? 2 : 1;
+structure.bonds.forEach((bond, i) => {
+const visibleI = !visibleSet || visibleSet.has(bond.i);
+const visibleJ = !visibleSet || visibleSet.has(bond.j);
+if (visibleI && visibleJ) {
+const p1 = structure.centeredAtoms[bond.i];
+const p2 = structure.centeredAtoms[bond.j];
+const v = new THREE.Vector3(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z);
+const length = v.length();
+const quaternion = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), v.normalize());
+if (instancesPerBond === 2) {
+const mx = (p1.x + p2.x) / 2, my = (p1.y + p2.y) / 2, mz = (p1.z + p2.z) / 2;
+dummyMatrix.compose(new THREE.Vector3((p1.x + mx) / 2, (p1.y + my) / 2, (p1.z + mz) / 2), quaternion, new THREE.Vector3(1, length / 2, 1));
+bim.setMatrixAt(i * 2, dummyMatrix);
+dummyMatrix.compose(new THREE.Vector3((p2.x + mx) / 2, (p2.y + my) / 2, (p2.z + mz) / 2), quaternion, new THREE.Vector3(1, length / 2, 1));
+bim.setMatrixAt(i * 2 + 1, dummyMatrix);
+} else {
+dummyMatrix.compose(new THREE.Vector3((p1.x + p2.x) / 2, (p1.y + p2.y) / 2, (p1.z + p2.z) / 2), quaternion, new THREE.Vector3(1, length, 1));
+bim.setMatrixAt(i, dummyMatrix);
+}
+} else {
+if (instancesPerBond === 2) {
+bim.setMatrixAt(i * 2, zeroScaleMatrix);
+bim.setMatrixAt(i * 2 + 1, zeroScaleMatrix);
+} else {
+bim.setMatrixAt(i, zeroScaleMatrix);
+}
+}
+});
+bim.instanceMatrix.needsUpdate = true;
+}
+if (structure.junctionMesh) {
+const jm = structure.junctionMesh;
+structure.centeredAtoms.forEach((atom, idx) => {
+if (visibleSet && !visibleSet.has(idx)) {
+jm.setMatrixAt(idx, zeroScaleMatrix);
+} else {
+dummyMatrix.identity().setPosition(atom.x, atom.y, atom.z);
+jm.setMatrixAt(idx, dummyMatrix);
+}
+});
+jm.instanceMatrix.needsUpdate = true;
+}
+modelGroup.traverse(obj => {
+if (obj.isInstancedMesh && obj.instanceMatrix) obj.instanceMatrix.needsUpdate = true;
+});
+syncLabels(structure);
+if (!options.keepCamera) {
+  if (visibleSet && visibleSet.size > 0) {
+    let cx = 0, cy = 0, cz = 0;
+    visibleSet.forEach(idx => {
+      const atom = structure.centeredAtoms[idx];
+      cx += atom.x; cy += atom.y; cz += atom.z;
+    });
+    cx /= visibleSet.size;
+    cy /= visibleSet.size;
+    cz /= visibleSet.size;
+    controls.target.set(cx, cy, cz);
+    controls.update();
+  } else if (!visibleSet) {
+    let cx = 0, cy = 0, cz = 0;
+    structure.centeredAtoms.forEach(atom => {
+      cx += atom.x; cy += atom.y; cz += atom.z;
+    });
+    cx /= structure.centeredAtoms.length;
+    cy /= structure.centeredAtoms.length;
+    cz /= structure.centeredAtoms.length;
+    controls.target.set(cx, cy, cz);
+    controls.update();
+  }
+}
+}
+function revealFragmentByGhost(fragmentStartIndex, offset) {
+const structure = AppState.structures[AppState.currentStructureIndex];
+if (!structure) return;
+const fragmentAtoms = findFragmentAtoms(structure, fragmentStartIndex);
+if (!structure.visibleAtoms) structure.visibleAtoms = new Set();
+fragmentAtoms.forEach(idx => structure.visibleAtoms.add(idx));
+// Apply the offset to the fragment atoms so it appears exactly at the ghost sphere position
+if (offset && (offset.x !== 0 || offset.y !== 0 || offset.z !== 0)) {
+fragmentAtoms.forEach(idx => {
+structure.centeredAtoms[idx].x += offset.x;
+structure.centeredAtoms[idx].y += offset.y;
+structure.centeredAtoms[idx].z += offset.z;
+});
+// Remove old atom labels so they are recreated at the new positions
+(structure.atomLabels || []).forEach(label => {
+if (label.userData.lineToLabel) {
+label.userData.lineToLabel.geometry.dispose();
+label.userData.lineToLabel.material.dispose();
+if (label.userData.lineToLabel.parent) label.userData.lineToLabel.parent.remove(label.userData.lineToLabel);
+}
+label.material.dispose();
+if (label.parent) label.parent.remove(label);
+});
+structure.atomLabels = [];
+}
+structure._inter = null;
+structure._stack = null;
+applyIsolation(structure, structure.visibleAtoms);
+drawContacts(structure);
+}
+// ============================================================
+// UI SETUP
+// ============================================================
+function applyLang() {
+const lang = currentLang();
+document.querySelectorAll('[data-i18n]').forEach(el => {
+const key = el.dataset.i18n;
+if (lang[key] !== undefined) el.textContent = lang[key];
+});
+document.querySelectorAll('[data-i18n-title]').forEach(el => {
+const key = el.dataset.i18nTitle;
+if (lang[key] !== undefined) el.title = lang[key];
+});
+document.getElementById('btn-noncovalent').title = lang.sigmaTitle;
+document.getElementById('btn-stacking').title = lang.stackTitle;
+AppState.structures.forEach(s => { if (s.isExample) s.name = lang.exampleName; });
+const select = document.getElementById('structure-select');
+const currentValue = select.value;
+[...select.options].forEach((option, i) => {
+if (AppState.structures[i] && AppState.structures[i].isExample) {
+option.textContent = lang.exampleName;
+}
+});
+select.value = currentValue;
+document.getElementById('help-window-content').innerHTML = lang.help;
+document.querySelectorAll('.flag-btn').forEach(button => {
+button.classList.toggle('active', button.dataset.lang === AppState.lang);
+});
+document.documentElement.lang = AppState.lang;
+drawContacts(AppState.structures[AppState.currentStructureIndex]);
+}
+function setupUI() {
+document.getElementById('file-input').addEventListener('change', async event => {
+for (const file of [...event.target.files]) await loadFile(file);
+event.target.value = '';
+});
+const overlay = document.getElementById('drop-overlay');
+let dragCounter = 0;
+window.addEventListener('dragenter', e => { e.preventDefault(); dragCounter++; overlay.classList.add('show'); });
+window.addEventListener('dragleave', e => { e.preventDefault(); dragCounter--; if (dragCounter <= 0) { dragCounter = 0; overlay.classList.remove('show'); } });
+window.addEventListener('dragover', e => e.preventDefault());
+window.addEventListener('drop', async e => {
+e.preventDefault();
+dragCounter = 0;
+overlay.classList.remove('show');
+for (const file of e.dataTransfer.files) await loadFile(file);
+});
+document.getElementById('btn-hide').addEventListener('click', () => {
+document.getElementById('left-panel').classList.add('hidden');
+document.getElementById('btn-show').style.display = 'inline-block';
+});
+document.getElementById('btn-show').addEventListener('click', () => {
+document.getElementById('left-panel').classList.remove('hidden');
+document.getElementById('btn-show').style.display = 'none';
+});
+document.getElementById('btn-help').addEventListener('click', () => {
+document.getElementById('help-overlay').classList.add('show');
+});
+document.getElementById('help-close').addEventListener('click', () => {
+document.getElementById('help-overlay').classList.remove('show');
+});
+document.getElementById('help-overlay').addEventListener('click', e => {
+if (e.target.id === 'help-overlay') e.target.classList.remove('show');
+});
+window.addEventListener('keydown', e => {
+if (e.key === 'Escape') document.getElementById('help-overlay').classList.remove('show');
+});
+document.querySelectorAll('.flag-btn').forEach(button => {
+button.addEventListener('click', () => {
+AppState.lang = button.dataset.lang;
+applyLang();
+});
+});
+document.querySelectorAll('.section-divider').forEach(divider => {
+divider.addEventListener('click', () => {
+divider.classList.toggle('open');
+document.getElementById(divider.dataset.sec).classList.toggle('open');
+});
+});
+document.getElementById('structure-select').addEventListener('change', event => {
+const index = parseInt(event.target.value);
+if (!isNaN(index) && index >= 0 && index < AppState.structures.length) {
+AppState.currentStructureIndex = index;
+loadStructure(index, false, true);
+}
+});
+document.getElementById('btn-export').addEventListener('click', () => {
+let csv = ['#', 'Type', 'Atoms', 'Value', 'Structure', 'Timestamp'].join(',') + '\n';
+AppState.persistentMeasurements.forEach((m, i) => {
+csv += [
+i + 1,
+m.type,
+m.atoms.map(a => a + 1).join('-'),
+'"' + (m.sprite?.userData?.text || '').replace(/\n/g, ' ') + '"',
+'"' + (m.structureName || 'unknown') + '"',
+m.timestamp
+].join(',') + '\n';
+});
+const anchor = document.createElement('a');
+anchor.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+anchor.download = 'measurements.csv';
+anchor.click();
+});
+document.getElementById('btn-contacts').addEventListener('click', () => {
+const structure = AppState.structures[AppState.currentStructureIndex];
+if (!structure) return;
+const interactions = detectInteractions(structure);
+const labelFn = i => {
+const atom = structure.centeredAtoms[i];
+return atom.element + (i + 1);
+};
+let csv = ['Type', 'R', 'X', 'A', 'R-X(A)', 'X...A(A)', 'R...A(A)', 'angle(deg)', 'symmetry', 'E(kJ/mol)'].join(',') + '\n';
+interactions.forEach(x => {
+const energy = estimateContactEnergy(x, structure.charges);
+csv += [
+x.type,
+labelFn(x.iD),
+labelFn(x.iX),
+labelFn(x.iA),
+x.distDX.toFixed(3),
+x.distance.toFixed(3),
+x.distDA.toFixed(3),
+x.angle.toFixed(1),
+'"' + x.sym + '"',
+energy.toFixed(1)
+].join(',') + '\n';
+});
+const anchor = document.createElement('a');
+anchor.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+anchor.download = 'contacts_iucr.csv';
+anchor.click();
+});
+document.getElementById('btn-noncovalent').addEventListener('click', () => {
+settings.showNoncovalent = !settings.showNoncovalent;
+document.getElementById('btn-noncovalent').classList.toggle('active', settings.showNoncovalent);
+drawContacts(AppState.structures[AppState.currentStructureIndex]);
+});
+document.getElementById('btn-stacking').addEventListener('click', () => {
+settings.showStacking = !settings.showStacking;
+document.getElementById('btn-stacking').classList.toggle('active', settings.showStacking);
+drawContacts(AppState.structures[AppState.currentStructureIndex]);
+});
+document.getElementById('delete-selected-btn').addEventListener('click', () => {
+if (!AppState.selectedMeasurement) return;
+const m = AppState.selectedMeasurement;
+m.lines.forEach(line => {
+line.geometry.dispose();
+line.material.dispose();
+measurementGroup.remove(line);
+});
+if (m.sprite) {
+if (m.sprite.userData.lineToLabel) {
+m.sprite.userData.lineToLabel.geometry.dispose();
+m.sprite.userData.lineToLabel.material.dispose();
+measurementGroup.remove(m.sprite.userData.lineToLabel);
+}
+measurementGroup.remove(m.sprite);
+}
+AppState.persistentMeasurements = AppState.persistentMeasurements.filter(x => x !== m);
+AppState.selectedMeasurement = null;
+document.getElementById('delete-selected-btn').classList.remove('show');
+});
+document.getElementById('btn-isolate').addEventListener('click', () => {
+const structure = AppState.structures[AppState.currentStructureIndex];
+if (!structure) { alert(currentLang().alertLoadFirst); return; }
+let startAtoms = [];
+if (AppState.shiftSelectedAtoms.size > 0) {
+startAtoms = [...AppState.shiftSelectedAtoms];
+} else if (AppState.currentSelectedAtomIndex >= 0) {
+startAtoms = [AppState.currentSelectedAtomIndex];
+}
+if (startAtoms.length === 0) { alert(currentLang().alertClickAtom); return; }
+const unionSet = new Set();
+for (const idx of startAtoms) {
+const frag = findFragmentAtoms(structure, idx);
+frag.forEach(a => unionSet.add(a));
+}
+applyIsolation(structure, unionSet);
+drawContacts(structure);
+AppState.shiftSelectedAtoms.clear();
+highlightShiftSelection();
+document.getElementById('status-msg').textContent = '';
+});
+document.getElementById('btn-show-all').addEventListener('click', () => {
+const structure = AppState.structures[AppState.currentStructureIndex];
+if (!structure) return;
+applyIsolation(structure, null);
+drawContacts(structure);
+});
+document.getElementById('btn-labels').addEventListener('click', () => {
+settings.showLabels = !settings.showLabels;
+rebuildLabels();
+});
+document.getElementById('bg-color').addEventListener('input', e => {
+settings.bgColor = e.target.value;
+scene.background = new THREE.Color(settings.bgColor);
+});
+document.getElementById('atom-style').addEventListener('change', e => {
+settings.atomStyle = e.target.value;
+loadStructure(AppState.currentStructureIndex, true, false);
+});
+document.getElementById('bond-color').addEventListener('input', e => {
+settings.bondColor = e.target.value;
+const structure = AppState.structures[AppState.currentStructureIndex];
+if (structure && structure.bondMesh && settings.atomStyle !== 'sticks') {
+structure.bondMesh.material.color.set(e.target.value);
+}
+});
+let spriteRefreshTimeout = null;
+const debouncedRefresh = () => {
+if (spriteRefreshTimeout) clearTimeout(spriteRefreshTimeout);
+spriteRefreshTimeout = setTimeout(refreshAllSprites, 100);
+};
+document.getElementById('font-size').addEventListener('input', e => {
+settings.fontSize = parseFloat(e.target.value);
+debouncedRefresh();
+});
+document.getElementById('dist-color').addEventListener('input', e => {
+settings.distColor = e.target.value;
+debouncedRefresh();
+});
+document.getElementById('angle-color').addEventListener('input', e => {
+settings.angleColor = e.target.value;
+debouncedRefresh();
+});
+document.getElementById('torsion-color').addEventListener('input', e => {
+settings.torsionColor = e.target.value;
+debouncedRefresh();
+});
+document.getElementById('label-color').addEventListener('input', e => {
+settings.labelColor = e.target.value;
+debouncedRefresh();
+});
+const colorBindings = [
+['hbond-color', 'hbondColor'],
+['halogen-color', 'halogenColor'],
+['chalcogen-color', 'chalcogenColor'],
+['pnictogen-color', 'pnictogenColor'],
+['ring-color', 'ringColor']
+];
+colorBindings.forEach(([id, key]) => {
+document.getElementById(id).addEventListener('input', e => {
+settings[key] = e.target.value;
+drawContacts(AppState.structures[AppState.currentStructureIndex]);
+});
+});
+document.addEventListener('change', e => {
+if (e.target && e.target.id === 'chk-14') {
+settings.exclude14 = e.target.checked;
+AppState.structures.forEach(s => s._inter = null);
+drawContacts(AppState.structures[AppState.currentStructureIndex]);
+}
+});
+document.addEventListener('click', e => {
+if (e.target && e.target.id === 'e-collapse') {
+AppState.energyCollapsed = !AppState.energyCollapsed;
+drawContacts(AppState.structures[AppState.currentStructureIndex]);
+}
+});
+document.getElementById('pad-left').addEventListener('click', () => panCameraRight(1));
+document.getElementById('pad-right').addEventListener('click', () => panCameraRight(-1));
+document.getElementById('pad-up').addEventListener('click', () => panCameraUp(-1));
+document.getElementById('pad-down').addEventListener('click', () => panCameraUp(1));
+}
+function refreshAllSprites() {
+AppState.persistentMeasurements.forEach(m => {
+if (m.sprite) {
+updateSpriteAppearance(m.sprite, m.sprite.userData.text, getColorForMeasurementType(m.type), settings.fontSize);
+updateLabelLine(m.sprite);
+}
+});
+AppState.structures.forEach(s => {
+if (s.atomLabels) {
+s.atomLabels.forEach(label => {
+updateSpriteAppearance(label, label.userData.text, settings.labelColor, settings.fontSize);
+updateLabelLine(label);
+});
+}
+});
+interactionGroup.children.forEach(obj => {
+if (obj.isSprite && obj.userData && obj.userData.isInteraction) {
+updateSpriteAppearance(obj, obj.userData.text, obj.userData.color, settings.fontSize);
+updateLabelLine(obj);
+}
+});
+if (settings.showNoncovalent || settings.showStacking) {
+drawContacts(AppState.structures[AppState.currentStructureIndex]);
+}
+}
+// ============================================================
+// SCENE INITIALIZATION
+// ============================================================
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xffffff);
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 500);
+camera.position.set(8, 5, 12);
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+document.body.appendChild(renderer.domElement);
+renderer.domElement.style.touchAction = 'none';
+const controls = new TrackballControls(camera, renderer.domElement);
+controls.rotateSpeed = 2.5;
+controls.zoomSpeed = 1.2;
+controls.panSpeed = 0.8;
+controls.staticMoving = false;
+controls.dynamicDampingFactor = 0.12;
+controls.update();
+scene.add(new THREE.AmbientLight(0xffffff, 0.45));
+const keyLight = new THREE.DirectionalLight(0xffffff, 1.0);
+keyLight.position.set(6, 10, 12);
+camera.add(keyLight);
+camera.add(keyLight.target);
+const fillLight = new THREE.DirectionalLight(0xccddff, 0.3);
+fillLight.position.set(-8, -4, 10);
+camera.add(fillLight);
+camera.add(fillLight.target);
+scene.add(camera);
+const modelGroup = new THREE.Group();
+const measurementGroup = new THREE.Group();
+const interactionGroup = new THREE.Group();
+scene.add(modelGroup, measurementGroup, interactionGroup);
+// Input events
+renderer.domElement.addEventListener('pointerdown', onPointerDown);
+renderer.domElement.addEventListener('pointermove', onPointerMove);
+renderer.domElement.addEventListener('pointerup', onPointerUp);
+renderer.domElement.addEventListener('pointerleave', onPointerUp);
+renderer.domElement.addEventListener('pointercancel', onPointerUp);
+window.addEventListener('touchstart', e => {
+if (e.target === renderer.domElement) e.preventDefault();
+}, { passive: false });
+window.addEventListener('gesturestart', e => e.preventDefault());
+window.addEventListener('resize', () => {
+camera.aspect = window.innerWidth / window.innerHeight;
+camera.updateProjectionMatrix();
+renderer.setSize(window.innerWidth, window.innerHeight);
+controls.handleResize();
+interactionGroup.traverse(obj => {
+if (obj.material && obj.material.resolution) {
+obj.material.resolution.set(window.innerWidth, window.innerHeight);
+}
+});
+});
+if (document.fonts && document.fonts.ready) {
+document.fonts.ready.then(() => {
+clearTextureCache();
+refreshAllSprites();
+});
+}
+function animate() {
+requestAnimationFrame(animate);
+controls.update();
+renderer.render(scene, camera);
+}
+setupUI();
+applyLang();
+animate();
+// Load a demo structure if nothing is loaded
+setTimeout(() => {
+if (!AppState.structures.length) {
+AppState.structures = [{
+name: currentLang().exampleName,
+isExample: true,
+atoms: [
+{ element: 'I', x: -2.4526, y: 1.1615, z: -0.4372 }, { element: 'S', x: -6.1481, y: 3.1498, z: -1.0225 },
+{ element: 'F', x: -5.5448, y: 4.4235, z: -3.2362 }, { element: 'F', x: -3.8551, y: 3.9554, z: -1.9958 },
+{ element: 'O', x: -5.5052, y: 2.0364, z: -0.3611 }, { element: 'O', x: -6.1338, y: 4.3817, z: -0.2843 },
+{ element: 'F', x: -4.7984, y: 2.416, z: -3.1502 }, { element: 'O', x: -7.3932, y: 2.8495, z: -1.6627 },
+{ element: 'N', x: 1.1716, y: -0.7598, z: 0.4728 }, { element: 'N', x: 1.2905, y: -0.6975, z: -0.8887 },
+{ element: 'C', x: -0.5927, y: 0.2695, z: -0.3193 }, { element: 'C', x: 2.2364, y: -2.7057, z: 1.4928 },
+{ element: 'H', x: 1.6243, y: -3.2768, z: 1.044 }, { element: 'C', x: 2.1883, y: -1.3305, z: 1.3153 },
+{ element: 'C', x: 0.0183, y: -0.161, z: 0.8393 }, { element: 'C', x: 4.0826, y: -2.3778, z: 2.994 },
+{ element: 'H', x: 4.7321, y: -2.7402, z: 3.5853 }, { element: 'C', x: 3.2014, y: -3.2247, z: 2.3394 },
+{ element: 'H', x: 3.2594, y: -4.1632, z: 2.4719 }, { element: 'C', x: -0.4072, y: -0.0925, z: 2.2608 },
+{ element: 'H', x: -0.7216, y: -0.9747, z: 2.5499 }, { element: 'H', x: -1.1334, y: 0.5601, z: 2.3536 },
+{ element: 'H', x: 0.3516, y: 0.1835, z: 2.8157 }, { element: 'C', x: 4.027, y: -1.0058, z: 2.7958 },
+{ element: 'H', x: 4.6363, y: -0.4338, z: 3.2471 }, { element: 'C', x: 0.2242, y: -0.0773, z: -1.3963 },
+{ element: 'C', x: 3.0777, y: -0.4731, z: 1.937 }, { element: 'H', x: 3.0398, y: 0.4624, z: 1.7789 },
+{ element: 'C', x: 2.4238, y: -1.3088, z: -1.5697 }, { element: 'H', x: 3.2584, y: -0.9747, z: -1.1786 },
+{ element: 'H', x: 2.395, y: -1.0795, z: -2.5216 }, { element: 'H', x: 2.3807, y: -2.2815, z: -1.4667 },
+{ element: 'C', x: 0.0514, y: 0.1585, z: -2.8557 }, { element: 'H', x: 0.8803, y: 0.5275, z: -3.2273 },
+{ element: 'H', x: -0.682, y: 0.7923, z: -2.999 }, { element: 'H', x: -0.1574, y: -0.6887, z: -3.301 },
+{ element: 'C', x: -5.0274, y: 3.5015, z: -2.4195 }
+]
+}];
+const select = document.getElementById('structure-select');
+select.innerHTML = '<option value="0">' + currentLang().exampleName + '</option>';
+select.value = '0';
+AppState.currentStructureIndex = 0;
+loadStructure(0);
+}
+}, 100);
+</script>
+</body>
+</html>
