@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![GitHub release](https://img.shields.io/github/v/release/Dmitrii-Bolotin/SigmaLens)](https://github.com/Dmitrii-Bolotin/SigmaLens/releases)
-[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.21889631-blue)](https://doi.org/10.5281/zenodo.21889631)
+[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.21889631-blue)](https://doi.org/10.5281/zenodo.21894729)
 [![Live demo](https://img.shields.io/badge/Demo-Live-blue?logo=github)](https://dmitrii-bolotin.github.io/SigmaLens/)
 
 
