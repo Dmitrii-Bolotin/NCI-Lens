@@ -107,6 +107,6 @@ If you use SigmaLens in academic work, please cite:
   publisher = {GitHub},
   url     = {https://github.com/Dmitrii-Bolotin/SigmaLens},
   doi     = {10.5281/zenodo.21889631},
-  version = {2.2.2}
+  version = {3.3}
 }
 ```
