@@ -2,8 +2,8 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![GitHub release](https://img.shields.io/github/v/release/Dmitrii-Bolotin/SigmaLens)](https://github.com/Dmitrii-Bolotin/SigmaLens/releases)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXXX.svg)](https://doi.org/10.5281/zenodo.XXXXXXX)
-[![Open in GitHub Pages](https://img.shields.io/badge/Demo-Live-blue?logo=github)](https://Dmitrii-Bolotin.github.io/SigmaLens/)
+[![Live demo](https://img.shields.io/badge/Demo-Live-blue?logo=github)](https://dmitrii-bolotin.github.io/SigmaLens/)
+![screenshot](screenshot.png)
 
 **A browser-based 3D molecular structure viewer with built-in analysis of hydrogen bonds, σ-hole interactions, and π-stacking in crystal structures.**
 
