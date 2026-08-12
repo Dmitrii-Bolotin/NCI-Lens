@@ -75,8 +75,6 @@ $$E_\text{total} = E_\text{electrostatic} + E_\text{dispersion} + E_\text{geomet
 
 All energies are reported in **kJ/mol** with qualitative labels (*weak / medium / strong*).
 
-See the [theory notes](docs/THEORY.md) for full formulas and parameter tables.
-
 ## 🛠️ For developers
 
 The entire application is a single HTML file using [Three.js r157](https://threejs.org/) with:
