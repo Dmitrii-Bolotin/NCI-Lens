@@ -23,13 +23,13 @@
 | Type | Description | Visual |
 | :--- | :--- | :--- |
 | **H-bond** | Classic D–H···A electrostatic + dispersion | Blue dashed |
+| **Aerogen** | σ-hole on Kr, Xe, Rn | Teal dashed |
 | **Halogen** | σ-hole on Cl, Br, I | Violet dashed |
 | **Chalcogen** | σ-hole on S, Se, Te, Po | Yellow dashed |
 | **Pnictogen** | σ-hole on P, As, Sb, Bi | Orange dashed |
 | **Tetrel** | σ-hole on C (activated), Si, Ge, Sn, Pb | Green dashed |
-| **Aerogen** | σ-hole on Kr, Xe, Rn | Teal dashed |
-| **π-hole** | Carbonyls, CO₂, NO₂, perfluorinated rings | Magenta dashed |
 | **Triel** | Electron deficiency on Boron | Pink dashed |
+| **π-hole** | Carbonyls, CO₂, NO₂, perfluorinated rings | Magenta dashed |
 | **π-stack** | Aromatic ring stacking (excluding sp³) | Green centroid lines |
 
 ## 📂 Supported File Formats
