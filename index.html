@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>SigmaLens</title>
+<title>NCI-Lens</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cline x1='9' y1='22' x2='23' y2='10' stroke='%23999999' stroke-width='2.5'/%3E%3Ccircle cx='9' cy='22' r='6' fill='%232c5f8a'/%3E%3Ccircle cx='23' cy='10' r='5' fill='%2300b3b3'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -21,6 +22,7 @@ top: 20px;
 left: 20px;
 width: 290px;
 background: rgba(255, 255, 255, 0.95);
+-webkit-backdrop-filter: blur(15px);
 backdrop-filter: blur(15px);
 border-radius: 16px;
 box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
@@ -51,21 +53,27 @@ scrollbar-color: #ccc transparent;
 position: absolute;
 top: 20px;
 right: 20px;
-width: 300px;
+width: 290px;
 background: rgba(255, 255, 255, 0.95);
+-webkit-backdrop-filter: blur(15px);
 backdrop-filter: blur(15px);
 border-radius: 16px;
 box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
 border: 1px solid #ddd;
-padding: 14px 16px;
+padding: 16px;
 z-index: 9;
 display: none;
-max-height: 50vh;
+max-height: calc(100vh - 100px);
 overflow-y: auto;
 box-sizing: border-box;
-font-size: 12px;
+font-size: 13px;
 color: #333;
+scrollbar-width: thin;
+scrollbar-color: #ccc transparent;
 }
+#energy-box::-webkit-scrollbar { width: 6px; }
+#energy-box::-webkit-scrollbar-track { background: transparent; }
+#energy-box::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
 .e-head {
 display: flex;
 justify-content: space-between;
@@ -73,8 +81,8 @@ align-items: center;
 margin-bottom: 6px;
 gap: 6px;
 }
-#energy-box b.h { font-size: 13px; color: #0a2f44; }
-#e-collapse, .p-collapse {
+#energy-box b.h { font-size: 14px; color: #0a2f44; }
+#e-collapse {
 background: #f4f4f4;
 border: 1px solid #ccc;
 border-radius: 8px;
@@ -82,7 +90,7 @@ padding: 2px 8px;
 cursor: pointer;
 font-size: 11px;
 }
-.e-row { display: flex; align-items: center; gap: 6px; margin: 3px 0; }
+.e-row { display: flex; align-items: center; gap: 6px; margin: 4px 0; }
 .e-dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
 .e-t { font-weight: 700; color: #0a2f44; min-width: 26px; }
 .e-total {
@@ -92,12 +100,20 @@ padding-top: 6px;
 font-weight: 700;
 color: #0a2f44;
 }
-.e-note { color: #999; font-size: 10px; margin-top: 6px; }
+.e-hidden {
+border-top: 1px solid #eee;
+margin-top: 6px;
+padding-top: 6px;
+color: #999;
+font-size: 11px;
+font-style: italic;
+}
+.e-note { color: #999; font-size: 11px; margin-top: 6px; }
 #branding h1 { font-weight: 800; font-size: 22px; margin: 0; color: #0a2f44; letter-spacing: -0.5px; }
 #branding p { font-weight: 600; font-size: 12px; margin: 2px 0 0; color: #2c5f8a; }
 .control-row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
 .control-row.center { justify-content: center; flex-wrap: nowrap; }
-.control-row.center > button {
+button.round-btn {
 width: 44px;
 height: 44px;
 padding: 0;
@@ -105,7 +121,60 @@ border-radius: 50%;
 display: flex;
 align-items: center;
 justify-content: center;
+font-size: 21px;
+line-height: 1;
 }
+button.round-btn.active-green {
+background: #d9f2d9;
+border-color: #8fbf8f;
+color: #1e5b1e;
+}
+button.round-btn.txt {
+font-size: 12px;
+font-weight: 800;
+letter-spacing: 0.2px;
+}
+#status-msg:empty { display: none; }
+.int-header {
+display: flex;
+align-items: center;
+gap: 8px;
+margin-top: 4px;
+font-size: 12px;
+font-weight: 800;
+color: #0a2f44;
+white-space: nowrap;
+}
+.int-header::before, .int-header::after { content: ''; flex: 1; height: 1px; background: #d5d5d5; }
+.int-grid {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 5px;
+padding-bottom: 10px;
+border-bottom: 1px solid #d5d5d5;
+}
+.int-col { display: flex; flex-direction: column; gap: 5px; }
+button.int-btn {
+border-radius: 12px;
+height: 34px;
+padding: 0 4px;
+font-weight: 700;
+font-size: 12px;
+}
+button.int-btn.active { background: #d9f2d9; border-color: #8fbf8f; color: #1e5b1e; }
+button.int-master {
+height: 114px;
+border-radius: 12px;
+background: #f4f4f4;
+border: 2px solid #777;
+color: #222;
+font-weight: 800;
+font-size: 13px;
+line-height: 1.2;
+padding: 0 6px;
+white-space: normal;
+}
+button.int-master:hover { background: #e0e0e0; border-color: #555; }
 button, select, .file-label {
 background: #f4f4f4;
 border: 1px solid #ccc;
@@ -146,16 +215,6 @@ padding: 10px 6px;
 font-weight: 700;
 font-size: 13px;
 }
-.chk {
-display: flex;
-align-items: center;
-gap: 6px;
-font-size: 12px;
-color: #555;
-font-weight: 600;
-justify-content: center;
-}
-.chk input { accent-color: #2c5f8a; }
 .setting-group {
 display: flex;
 align-items: center;
@@ -183,7 +242,7 @@ cursor: pointer;
 .setting-group input[type="range"] { width: 60px; margin: 0 5px; }
 .setting-group select { min-width: 70px; font-size: 12px; padding: 4px; }
 #delete-selected-btn { background: #ffd6d6; border-color: #cc6666; display: none; }
-#delete-selected-btn.show { display: inline-block; }
+#delete-selected-btn.show { display: flex; }
 #nc-status {
 font-size: 12px;
 color: #555;
@@ -201,6 +260,7 @@ font-weight: 500;
 position: fixed;
 inset: 0;
 background: rgba(44, 95, 138, 0.15);
+-webkit-backdrop-filter: blur(8px);
 backdrop-filter: blur(8px);
 z-index: 100;
 display: none;
@@ -318,6 +378,7 @@ transition: transform 0.15s;
 position: fixed;
 inset: 0;
 background: rgba(10, 47, 68, 0.45);
+-webkit-backdrop-filter: blur(4px);
 backdrop-filter: blur(4px);
 z-index: 200;
 display: none;
@@ -366,19 +427,69 @@ z-index: 1;
 <div id="energy-box"></div>
 <div id="left-panel"><div id="panel-scroll">
 <div id="branding" style="display:flex;align-items:flex-start">
-<div><h1>SigmaLens</h1><p data-i18n="branding">Разработка BOLLAB</p></div>
-<button id="btn-hide" style="margin-left:auto" title="Скрыть панель" data-i18n-title="hidePanel">⬅</button>
+<div><h1>NCI-Lens</h1><p data-i18n="branding">Developed by BOLLAB</p></div>
+<button id="btn-hide" style="margin-left:auto" title="Hide panel" data-i18n-title="hidePanel">⬅</button>
 </div>
 <div class="control-row">
-<label for="file-input" class="file-label" data-i18n="load">📂 Загрузить</label>
+<label for="file-input" class="file-label" data-i18n="load">📂 Load</label>
 <input type="file" id="file-input" accept=".xyz,.cif,.txt,.pdb,.mol,.sdf" multiple>
 </div>
-<select id="structure-select"><option value="" data-i18n="noStructures">-- Нет структур --</option></select>
+<select id="structure-select"><option value="" data-i18n="noStructures">-- No structures --</option></select>
+<div class="control-row">
+<button id="btn-isolate" class="wide-btn" title="Keep only this molecule" data-i18n-title="isolateTitle" data-i18n="fragment">⛶ Fragment</button>
+<button id="btn-show-all" class="wide-btn" title="Show everything again" data-i18n-title="showAllTitle" data-i18n="showAll">👁 All</button>
+</div>
+<div class="int-header" data-i18n="secInter">🔗 Noncovalent interactions</div>
+<div id="nc-status"></div>
+<div class="int-grid">
+<div class="int-col">
+<button id="btn-int-aerogen" class="int-btn" data-type="aerogen" data-i18n="tAerogen">Aerogen</button>
+<button id="btn-int-halogen" class="int-btn" data-type="halogen" data-i18n="tHalogen">Halogen</button>
+<button id="btn-int-chalcogen" class="int-btn" data-type="chalcogen" data-i18n="tChalcogen">Chalcogen</button>
+<button id="btn-int-pnictogen" class="int-btn" data-type="pnictogen" data-i18n="tPnictogen">Pnictogen</button>
+<button id="btn-int-tetrel" class="int-btn" data-type="tetrel" data-i18n="tTetrel">Tetrel</button>
+<button id="btn-int-triel" class="int-btn" data-type="triel" data-i18n="tTriel">Triel</button>
+</div>
+<div class="int-col">
+<button id="btn-inter-all" class="int-master">Show all</button>
+<button id="btn-int-hbond" class="int-btn" data-type="hbond" data-i18n="tHbond">H-bond</button>
+<button id="btn-int-pihole" class="int-btn" data-type="pihole" data-i18n="tPihole">π-hole</button>
+<button id="btn-int-stacking" class="int-btn" data-type="stacking" data-i18n="tStacking">π-stack</button>
+</div>
+</div>
+<div class="setting-group">
+<label data-i18n="lbStyle">Style</label>
+<select id="atom-style">
+<option value="ballstick" data-i18n="optBallstick">Ball-and-stick</option>
+<option value="vdw" data-i18n="optVdw">van der Waals</option>
+<option value="ellipsoid" data-i18n="optEllipsoid">Ellipsoids</option>
+<option value="sticks" data-i18n="optSticks">Sticks only</option>
+</select>
+</div>
+<div class="setting-group"><label data-i18n="lbFont">Font</label><input type="range" id="font-size" min="0.5" max="3" step="0.1" value="1.5"></div>
+<div class="section-divider" data-sec="sec-color"><span data-i18n="secColor">Color</span><span class="caret">▸</span></div>
+<div class="section-body" id="sec-color">
+<div class="setting-group"><label data-i18n="lbBg">Background</label><input type="color" id="bg-color" value="#ffffff"></div>
+<div class="setting-group"><label data-i18n="lbBonds">Bonds</label><input type="color" id="bond-color" value="#333333"></div>
+<div class="setting-group"><label>📏</label><input type="color" id="dist-color" value="#0078A0"></div>
+<div class="setting-group"><label>📐</label><input type="color" id="angle-color" value="#006400"></div>
+<div class="setting-group"><label>🌀</label><input type="color" id="torsion-color" value="#800020"></div>
+<div class="setting-group"><label data-i18n="lbAtoms">Labels</label><input type="color" id="label-color" value="#000000"></div>
+<div class="setting-group"><label data-i18n="lbHbond">H-bond</label><input type="color" id="hbond-color" value="#4488ff"></div>
+<div class="setting-group"><label data-i18n="lbHalogen">Halogen</label><input type="color" id="halogen-color" value="#9944ff"></div>
+<div class="setting-group"><label data-i18n="lbChalcogen">Chalcogen</label><input type="color" id="chalcogen-color" value="#ffcc00"></div>
+<div class="setting-group"><label data-i18n="lbPnictogen">Pnictogen</label><input type="color" id="pnictogen-color" value="#ff8800"></div>
+<div class="setting-group"><label data-i18n="lbTetrel">Tetrel</label><input type="color" id="tetrel-color" value="#44bb44"></div>
+<div class="setting-group"><label data-i18n="lbAerogen">Aerogen</label><input type="color" id="aerogen-color" value="#00b3b3"></div>
+<div class="setting-group"><label data-i18n="lbPihole">π-hole</label><input type="color" id="pihole-color" value="#cc44cc"></div>
+<div class="setting-group"><label data-i18n="lbTriel">Triel</label><input type="color" id="triel-color" value="#cc3366"></div>
+<div class="setting-group"><label data-i18n="lbRings">⬡ Rings</label><input type="color" id="ring-color" value="#00aa88"></div>
+</div>
 <div class="control-row center">
-<button id="btn-labels" title="Подписи атомов" data-i18n-title="labelsTitle">🔤</button>
-<button id="btn-export" title="Экспорт измерений CSV" data-i18n-title="exportTitle">📥</button>
-<button id="btn-contacts" title="Таблица контактов (IUCr)" data-i18n-title="contactsTitle">📋</button>
-<button id="delete-selected-btn" title="Удалить выбранное" data-i18n-title="deleteTitle">🗑️</button>
+<button id="btn-labels" class="round-btn" title="Atom labels" data-i18n-title="labelsTitle">🏷️</button>
+<button id="btn-export" class="round-btn txt" title="Export measurements CSV" data-i18n-title="exportTitle">CSV</button>
+<button id="btn-contacts" class="round-btn txt" title="Contact table (IUCr)" data-i18n-title="contactsTitle">IUCr</button>
+<button id="delete-selected-btn" class="round-btn" title="Delete selected" data-i18n-title="deleteTitle">🗑️</button>
 <div id="joystick">
 <button id="pad-up" class="pad" style="clip-path:polygon(50% 50%,14.6% 14.6%,50% 0,85.4% 14.6%)"><span>▲</span></button>
 <button id="pad-right" class="pad" style="clip-path:polygon(50% 50%,85.4% 14.6%,100% 50%,85.4% 85.4%)"><span>▶</span></button>
@@ -386,58 +497,18 @@ z-index: 1;
 <button id="pad-left" class="pad" style="clip-path:polygon(50% 50%,14.6% 85.4%,0 50%,14.6% 14.6%)"><span>◀</span></button>
 </div>
 </div>
-<div class="control-row">
-<button id="btn-isolate" class="wide-btn" title="Оставить только эту молекулу" data-i18n="fragment">⛶ Фрагмент</button>
-<button id="btn-show-all" class="wide-btn" title="Показать всё обратно" data-i18n="showAll">👁 Всё</button>
-</div>
-<div class="control-row">
-<button id="btn-noncovalent" class="wide-btn" title="H-связи и σ-дырочные взаимодействия" data-i18n="sigmaBtn">σ-дырки</button>
-<button id="btn-stacking" class="wide-btn" title="π-стэкинг взаимодействий" data-i18n="stackBtn">π-стэкинг</button>
-</div>
-<label class="chk">
-<input type="checkbox" id="chk-14" checked>
-<span data-i18n="chk14">исключать гиперконъюгацию в заторможенных конформациях</span>
-</label>
-<div id="nc-status"></div>
-<div class="section-divider" data-sec="sec-view"><span data-i18n="secView">Вид</span><span class="caret">▸</span></div>
-<div class="section-body" id="sec-view">
-<div class="setting-group"><label data-i18n="lbBg">Фон</label><input type="color" id="bg-color" value="#ffffff"></div>
-<div class="setting-group">
-<label data-i18n="lbStyle">Стиль</label>
-<select id="atom-style">
-<option value="ballstick" data-i18n="optBallstick">Шаро-стержни</option>
-<option value="vdw" data-i18n="optVdw">Ван-дер-Ваальс</option>
-<option value="ellipsoid" data-i18n="optEllipsoid">Эллипсоиды</option>
-<option value="sticks" data-i18n="optSticks">Только связи</option>
-</select>
-</div>
-<div class="setting-group"><label data-i18n="lbFont">Шрифт</label><input type="range" id="font-size" min="0.5" max="3" step="0.1" value="1.5"></div>
-</div>
-<div class="section-divider" data-sec="sec-color"><span data-i18n="secColor">Цвет</span><span class="caret">▸</span></div>
-<div class="section-body" id="sec-color">
-<div class="setting-group"><label data-i18n="lbBonds">Связи</label><input type="color" id="bond-color" value="#333333"></div>
-<div class="setting-group"><label>📏</label><input type="color" id="dist-color" value="#14337f"></div>
-<div class="setting-group"><label>📐</label><input type="color" id="angle-color" value="#006400"></div>
-<div class="setting-group"><label>🌀</label><input type="color" id="torsion-color" value="#800020"></div>
-<div class="setting-group"><label data-i18n="lbAtoms">Ат.</label><input type="color" id="label-color" value="#000000"></div>
-<div class="setting-group"><label data-i18n="lbHbond">H-связь</label><input type="color" id="hbond-color" value="#4488ff"></div>
-<div class="setting-group"><label data-i18n="lbHalogen">Галоген</label><input type="color" id="halogen-color" value="#9944ff"></div>
-<div class="setting-group"><label data-i18n="lbChalcogen">Халькоген</label><input type="color" id="chalcogen-color" value="#ffcc00"></div>
-<div class="setting-group"><label data-i18n="lbPnictogen">Пниктоген</label><input type="color" id="pnictogen-color" value="#ff8800"></div>
-<div class="setting-group"><label data-i18n="lbRings">⬡ Кольца</label><input type="color" id="ring-color" value="#00aa88"></div>
-</div>
 <div id="status-msg"></div>
 </div></div>
-<div id="drop-overlay"><div class="inner"><h2 data-i18n="dropH2">📂 Бросьте файлы сюда</h2><p>.xyz .cif .pdb .mol .sdf</p></div></div>
+<div id="drop-overlay"><div class="inner"><h2 data-i18n="dropH2">📂 Drop files here</h2><p>.xyz .cif .pdb .mol .sdf</p></div></div>
 <div id="bottom-bar">
-<button id="btn-help" title="Справка и руководство пользователя" data-i18n-title="helpTitle">?</button>
+<button id="btn-help" title="Help & user guide" data-i18n-title="helpTitle">?</button>
 <button class="flag-btn" data-lang="ru" title="Русский"><svg viewBox="0 0 24 24"><rect width="24" height="8" fill="#ffffff"/><rect y="8" width="24" height="8" fill="#0039a6"/><rect y="16" width="24" height="8" fill="#d52b1e"/></svg></button>
 <button class="flag-btn" data-lang="pt" title="Português (Brasil)"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#009c3b"/><polygon points="12,3 21,12 12,21 3,12" fill="#ffdf00"/><circle cx="12" cy="12" r="4.2" fill="#002776"/></svg></button>
 <button class="flag-btn" data-lang="en" title="English (US)"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#b22234"/><g fill="#ffffff"><rect y="2" width="24" height="2"/><rect y="6" width="24" height="2"/><rect y="10" width="24" height="2"/><rect y="14" width="24" height="2"/><rect y="18" width="24" height="2"/><rect y="22" width="24" height="2"/></g><rect width="10" height="12" fill="#3c3b6e"/></svg></button>
 </div>
 <div id="help-overlay">
 <div id="help-window">
-<button id="help-close" data-i18n="helpClose">✕ Закрыть</button>
+<button id="help-close" data-i18n="helpClose">✕ Close</button>
 <div id="help-window-content"></div>
 </div>
 </div>
@@ -451,7 +522,7 @@ z-index: 1;
 </script>
 <script type="module">
 /**
-* SigmaLens — 3D molecular structure viewer
+* NCI-Lens — 3D molecular structure viewer
 * with measurements and noncovalent interaction analysis.
 */
 import * as THREE from 'three';
@@ -466,7 +537,7 @@ const CONSTANTS = {
 // Geometric thresholds
 BOND_DETECTION: {
 TOLERANCE: 0.45,         // angstrom — covalent bond detection tolerance
-CELL_SIZE: 5.0           // spatial grid cell size for neighbor search
+CELL_SIZE: 6.0           // must be >= max possible bond threshold (Cs-Cs ~ 5.33 A)
 },
 HYDROGEN_BOND: {
 DISTANCE_FACTOR: 0.95,   // factor of the sum of vdW radii
@@ -475,21 +546,41 @@ DEFAULT_H_CHARGE: 0.35,
 DEFAULT_ACCEPTOR_CHARGE: -0.45
 },
 SIGMA_HOLE: {
-    DISTANCE_FACTOR: 0.95,
-    OPTIMAL_ANGLE: 175,
-    ANGULAR_DECAY: 2.2,
-    RADIAL_DECAY: 6.0,
-    OPTIMAL_RHO: 0.75,
-
-    // Empirical substituent correction
-    SUBSTITUENT_BASE: 0.30,
-    SUBSTITUENT_OPPOSITE: 0.58,
-    SUBSTITUENT_INDUCTIVE: 0.15,
-    SUBSTITUENT_CAP: 1.25,
-
-    // Short-range charge-transfer-like bonus
-    SHORT_RANGE_RHO: 0.72,
-    SHORT_RANGE_BONUS: 0.18
+DISTANCE_FACTOR: 0.95,
+OPTIMAL_ANGLE: 175,
+ANGULAR_DECAY: 1.8,
+RADIAL_DECAY: 3.0,
+OPTIMAL_RHO: 0.78,
+SUBSTITUENT_BASE: 0.40,
+SUBSTITUENT_OPPOSITE: 0.55,
+SUBSTITUENT_INDUCTIVE: 0.25,
+SUBSTITUENT_CAP: 2.00,
+SHORT_RANGE_RHO: 0.72,
+SHORT_RANGE_BONUS: 0.12,
+COULOMB_FACTOR: 1389.0,
+METAL_ADDITIVE_BONUS: 3.0,
+SOFT_SOFT_FACTOR: 1.12,
+GLOBAL_CORE_SCALE: 0.85,
+CRYSTAL_SCREENING: 0.80,
+BFS_MAX_DEPTH: 3,
+BFS_DECAY: 0.40},
+PI_HOLE: {
+DISTANCE_FACTOR: 0.95,
+RING_DISTANCE_FACTOR: 1.0,
+MAX_TILT: 45,
+TILT_WIDTH: 40,
+RADIAL_DECAY: 3.0,
+OPTIMAL_RHO: 0.80,
+GLOBAL_SCALE: 0.85,
+ENERGY_CARBONYL: 6,
+ENERGY_CO2: 9,
+ENERGY_NITRO: 6,
+ENERGY_TRIEL: 12,
+ENERGY_AE_BELT: 40,
+ENERGY_AE_PLANE: 45,
+RING_BASE: 4,
+RING_PER_F: 2,
+ENERGY_TETREL_PI: 25
 },
 PI_STACKING: {
 MIN_DISTANCE: 3.0,
@@ -503,20 +594,26 @@ MIN_SIZE: 5,
 MAX_SIZE: 6,
 MAX_DEGREE_FOR_AROMATIC: 3
 },
+HYDRIDE: {
+DISTANCE_FACTOR: 1.10,
+RING_INTRINSIC: 4,
+RING_DISTANCE_BOOST: 1.15,
+TRIEL4_AXIS_MIN: 0.25
+},
 // Energy thresholds (kJ/mol)
 ENERGY_QUALITY: {
 CONTACT: { WEAK: 8, MEDIUM: 25 },
-STACKING: { WEAK: 5, MEDIUM: 15 }
+STACKING: { WEAK: 5, MEDIUM: 15 },
+MIN_DISPLAY: 2
 },
 // Energy limits
 ENERGY_LIMITS: {
-    CONTACT_MAX: 110,
-    CONTACT_SIGMA_LIMIT_FACTOR: 2.5,
-    STACKING_MAX: 15,
-    DISPERSION_MAX: 4.0,
-    DISPERSION_CLAMP_LOW: 1.2
+CONTACT_MAX: 450,
+CONTACT_SIGMA_LIMIT_FACTOR: 5.0,
+STACKING_MAX: 70,
+DISPERSION_CLAMP_LOW: 4.0,
+COVALENT_THRESHOLD: 150
 },
-PEOE_ITERATIONS: 6,
 MEASUREMENT_TIMEOUT_MS: 1000,
 TEXTURE_CACHE_MAX_SIZE: 200,
 SPRITE_HIT_THRESHOLD: 30,
@@ -570,9 +667,7 @@ Fr: 3.48, Ra: 2.83, Ac: 2.47, Th: 2.45, Pa: 2.43, U: 2.41, Np: 2.39, Pu: 2.43, A
 };
 // Atom color schemes
 const ATOM_COLOR_SCHEMES = {
-default: { H: 0xffffff, C: 0x909090, N: 0x3050F0, O: 0xFF0D0D, F: 0x90E050, S: 0xFFFF30, P: 0xFF8000, Cl: 0x1E7A1E, Br: 0x8B4A1A, I: 0x6A3AB2, Se: 0xFFA100, Te: 0xD47A00, Po: 0xAB5C00, default: 0xDD80DD },
-jmol:    { H: 0xFFFFFF, C: 0x909090, N: 0x3050F0, O: 0xFF0D0D, S: 0xC8C832, P: 0xFF8000, Cl: 0x1E7A1E, Br: 0x8B4A1A, I: 0x6A3AB2, Se: 0xFFA100, Te: 0xD47A00, Po: 0xAB5C00, default: 0xDD80DD },
-dark:    { H: 0xDDDDDD, C: 0x505050, N: 0x2030B0, O: 0xB01010, S: 0xB0B020, P: 0xB06000, Cl: 0x155a15, Br: 0x6a3814, I: 0x4a2a80, Se: 0xb07000, Te: 0x94560a, Po: 0x8a4a00, default: 0xAA66AA }
+default: { H: 0xffffff, C: 0x909090, N: 0x3050F0, O: 0xFF0D0D, F: 0x90E050, S: 0xFFFF30, P: 0xFF8000, Cl: 0x1E7A1E, Br: 0x8B4A1A, I: 0x6A3AB2, Se: 0xFFA100, Te: 0xD47A00, Po: 0xAB5C00, default: 0xDD80DD }
 };
 const METAL_GRAY = 0xbfc4c9;
 const METALS = new Set([
@@ -581,185 +676,101 @@ const METALS = new Set([
 'Mn', 'Tc', 'Re', 'Fe', 'Ru', 'Os', 'Co', 'Rh', 'Ir', 'Ni', 'Pd', 'Pt',
 'Cu', 'Ag', 'Au', 'Zn', 'Cd', 'Hg', 'Al', 'Ga', 'In', 'Tl', 'Sn', 'Pb', 'Bi'
 ]);
-// Sigma-hole donor parameters
-const SIGMA_HOLE_DONORS = {
-    Cl: {
-        type: 'halogen',
-        angleMin: 140,
-        angleOpt: 178,
-        energy: 22,
-        max: 45,
-        radialDecay: 6.0,
-        rhoOpt: 0.74
-    },
-    Br: {
-        type: 'halogen',
-        angleMin: 140,
-        angleOpt: 180,
-        energy: 55,
-        max: 90,
-        radialDecay: 5.5,
-        rhoOpt: 0.74
-    },
-    I: {
-        type: 'halogen',
-        angleMin: 140,
-        angleOpt: 180,
-        energy: 65,
-        max: 100,
-        radialDecay: 5.2,
-        rhoOpt: 0.74
-    },
-    S: {
-        type: 'chalcogen',
-        angleMin: 130,
-        angleOpt: 165,
-        energy: 26,
-        max: 50,
-        radialDecay: 6.0,
-        rhoOpt: 0.75
-    },
-    Se: {
-        type: 'chalcogen',
-        angleMin: 130,
-        angleOpt: 165,
-        energy: 42,
-        max: 75,
-        radialDecay: 6.0,
-        rhoOpt: 0.75
-    },
-    Te: {
-        type: 'chalcogen',
-        angleMin: 130,
-        angleOpt: 160,
-        energy: 48,
-        max: 85,
-        radialDecay: 5.6,
-        rhoOpt: 0.75
-    },
-    Po: {
-        type: 'chalcogen',
-        angleMin: 130,
-        angleOpt: 160,
-        energy: 55,
-        max: 90,
-        radialDecay: 5.3,
-        rhoOpt: 0.75
-    },
-    P: {
-        type: 'pnictogen',
-        angleMin: 120,
-        angleOpt: 165,
-        energy: 26,
-        max: 50,
-        radialDecay: 6.0,
-        rhoOpt: 0.75
-    },
-    As: {
-        type: 'pnictogen',
-        angleMin: 120,
-        angleOpt: 165,
-        energy: 38,
-        max: 70,
-        radialDecay: 5.7,
-        rhoOpt: 0.75
-    },
-    Sb: {
-        type: 'pnictogen',
-        angleMin: 120,
-        angleOpt: 160,
-        energy: 50,
-        max: 85,
-        radialDecay: 5.4,
-        rhoOpt: 0.75
-    },
-    Bi: {
-        type: 'pnictogen',
-        angleMin: 120,
-        angleOpt: 160,
-        energy: 60,
-        max: 95,
-        radialDecay: 5.2,
-        rhoOpt: 0.75
-    },
-    Kr: {
-        type: 'aerogen',
-        angleMin: 140,
-        angleOpt: 180,
-        energy: 25,
-        max: 45,
-        radialDecay: 6.0,
-        rhoOpt: 0.74
-    },
-    Xe: {
-        type: 'aerogen',
-        angleMin: 140,
-        angleOpt: 180,
-        energy: 60,
-        max: 100,
-        radialDecay: 5.2,
-        rhoOpt: 0.72
-    },
-    Rn: {
-        type: 'aerogen',
-        angleMin: 140,
-        angleOpt: 180,
-        energy: 70,
-        max: 110,
-        radialDecay: 5.0,
-        rhoOpt: 0.72
-    }
+
+// Pauling electronegativities of metals — used for the GENERAL metal activation.
+// Covers all metals in METALS; a fallback value of 1.5 is used for missing ones.
+const METAL_ELECTRONEGATIVITY = {
+Li: 0.98, Na: 0.93, K: 0.82, Rb: 0.82, Cs: 0.79, Fr: 0.70,
+Be: 1.57, Mg: 1.31, Ca: 1.00, Sr: 0.95, Ba: 0.89, Ra: 0.90,
+Sc: 1.36, Y: 1.22, La: 1.10,
+Ti: 1.54, Zr: 1.33, Hf: 1.30,
+V: 1.63, Nb: 1.60, Ta: 1.50,
+Cr: 1.66, Mo: 2.16, W: 2.36,
+Mn: 1.55, Tc: 1.90, Re: 1.90,
+Fe: 1.83, Ru: 2.20, Os: 2.20,
+Co: 1.88, Rh: 2.28, Ir: 2.20,
+Ni: 1.91, Pd: 2.20, Pt: 2.28,
+Cu: 1.90, Ag: 1.93, Au: 2.54,
+Zn: 1.65, Cd: 1.69, Hg: 2.00,
+Al: 1.61, Ga: 1.81, In: 1.78, Tl: 1.62,
+Sn: 1.96, Pb: 2.33, Bi: 2.02
 };
 
+// Sigma-hole donor parameters
+const SIGMA_HOLE_DONORS = {
+F: { type: 'halogen', angleMin: 150, angleOpt: 178, energy: 4, max: 15, radialDecay: 3.5, rhoOpt: 0.78 },
+Cl: { type: 'halogen', angleMin: 140, angleOpt: 178, energy: 14, max: 50, radialDecay: 3.2, rhoOpt: 0.74, beltAngleOpt: 90, beltWeight: 0.30 },
+Br: { type: 'halogen', angleMin: 140, angleOpt: 178, energy: 24, max: 80, radialDecay: 3.0, rhoOpt: 0.74, beltAngleOpt: 90, beltWeight: 0.35 },
+I:  { type: 'halogen', angleMin: 140, angleOpt: 178, energy: 28, max: 85, radialDecay: 2.8, rhoOpt: 0.74, beltAngleOpt: 90, beltWeight: 0.40 },
+S:  { type: 'chalcogen', angleMin: 130, angleOpt: 175, sideAngleOpt: 150, sideWeight: 0.45, energy: 14, max: 35, radialDecay: 3.2, rhoOpt: 0.75 },
+Se: { type: 'chalcogen', angleMin: 130, angleOpt: 175, sideAngleOpt: 155, sideWeight: 0.55, energy: 22, max: 60, radialDecay: 3.0, rhoOpt: 0.75, dispersionScale: 1.2 },
+Te: { type: 'chalcogen', angleMin: 130, angleOpt: 175, sideAngleOpt: 155, sideWeight: 0.55, energy: 26, max: 70, radialDecay: 2.8, rhoOpt: 0.75, dispersionScale: 1.4 },
+Po: { type: 'chalcogen', angleMin: 130, angleOpt: 175, sideAngleOpt: 155, sideWeight: 0.55, energy: 30, max: 78, radialDecay: 2.7, rhoOpt: 0.75, dispersionScale: 1.5 },
+P:  { type: 'pnictogen', angleMin: 120, angleOpt: 175, energy: 14, max: 35, radialDecay: 3.2, rhoOpt: 0.75, angleDecaySoft: true },
+As: { type: 'pnictogen', angleMin: 120, angleOpt: 175, energy: 20, max: 55, radialDecay: 3.0, rhoOpt: 0.75, angleDecaySoft: true },
+Sb: { type: 'pnictogen', angleMin: 120, angleOpt: 175, energy: 26, max: 75, radialDecay: 2.8, rhoOpt: 0.75, angleDecaySoft: true },
+Bi: { type: 'pnictogen', angleMin: 120, angleOpt: 175, energy: 32, max: 85, radialDecay: 2.7, rhoOpt: 0.75, angleDecaySoft: true },
+C:  { type: 'tetrel', angleMin: 150, angleOpt: 178, energy: 5, max: 20, radialDecay: 3.4, rhoOpt: 0.76 },
+Si: { type: 'tetrel', angleMin: 120, angleOpt: 175, energy: 12, max: 40, radialDecay: 3.2, rhoOpt: 0.76, deformationSensitive: true },
+Ge: { type: 'tetrel', angleMin: 120, angleOpt: 175, energy: 16, max: 50, radialDecay: 3.0, rhoOpt: 0.76, deformationSensitive: true },
+Sn: { type: 'tetrel', angleMin: 105, angleOpt: 155, energy: 20, max: 60, radialDecay: 2.9, rhoOpt: 0.76, angleDecaySoft: true },
+Pb: { type: 'tetrel', angleMin: 105, angleOpt: 150, energy: 22, max: 65, radialDecay: 2.8, rhoOpt: 0.76, angleDecaySoft: true },
+Kr: { type: 'aerogen', angleMin: 140, angleOpt: 178, energy: 14, max: 35, radialDecay: 3.2, rhoOpt: 0.74 },
+Xe: { type: 'aerogen', angleMin: 140, angleOpt: 178, energy: 34, max: 85, radialDecay: 2.8, rhoOpt: 0.72, geometryDependent: true },
+Rn: { type: 'aerogen', angleMin: 140, angleOpt: 178, energy: 40, max: 95, radialDecay: 2.6, rhoOpt: 0.72 }
+};
+const SIGMA_HOLE_RADII = {
+F: 1.35, Cl: 1.68, Br: 1.76, I: 1.89, S: 1.70, Se: 1.80, Te: 1.96, Po: 2.00,
+P: 1.72, As: 1.76, Sb: 1.96, Bi: 2.00,
+C: 1.70, Si: 2.10, Ge: 2.11, Sn: 2.17, Pb: 2.02,
+Kr: 1.85, Xe: 2.05, Rn: 2.10
+};
 const SIGMA_ACCEPTOR_FACTORS = {
-    N: 1.00,
-    O: 0.90,
-    S: 0.85,
-    Se: 0.88,
-    F: 0.70,
-    Cl: 0.78,
-    Br: 0.82,
-    I: 0.85
+H: 1.30, // hydridic H (B–H): anionic, strong nucleophile
+N: 1.00, O: 0.92, S: 1.10, Se: 1.20, Te: 1.25, Po: 1.30, F: 0.70, Cl: 0.85, Br: 0.92, I: 1.00,
+// Anionic acceptors (much stronger): multiply by 2.0 in energy calc when charged
+C: 0.75,  // isocyanide carbon (enhanced nucleophilicity per Smirnov et al. 2023)
+Pt: 1.45, Pd: 1.40, Au: 1.30, Ag: 1.15, Cu: 1.10, Ni: 1.05,
+Rh: 1.30, Ir: 1.30, Ru: 1.25, Os: 1.25, Fe: 1.05, Co: 1.05,
+Si: 0.80, Ge: 0.85, Sn: 0.90, Pb: 0.95,
+Kr: 0.60, Xe: 0.70, Rn: 0.75
 };
 
 const SIGMA_SUBSTITUENT_SCALE = {
-    H: 0.00,
-    C: 0.45,
-    N: 0.70,
-    O: 1.00,
-    F: 1.35,
-    Cl: 0.90,
-    Br: 0.70,
-    I: 0.60,
-    S: 0.40,
-    Se: 0.40,
-    Te: 0.30,
-    P: 0.30,
-    As: 0.30,
-    Sb: 0.30,
-    Bi: 0.30
-};
+    H: 0.00, C: 0.45, N: 0.70, O: 1.00, F: 3.50, Cl: 0.90, Br: 0.70, I: 0.60,
+    S: 0.40, Se: 0.40, Te: 0.30, P: 0.30, As: 0.30, Sb: 0.30, Bi: 0.30,
+    // Metals enhance sigma-hole on neighboring atoms (coordination activation)
+    Pt: 2.50, Pd: 2.40, Au: 2.20, Ag: 1.60, Cu: 1.40, Ni: 1.40,
+    Rh: 2.20, Ir: 2.20, Ru: 1.90, Os: 1.90, Fe: 1.50, Co: 1.50,
+    Hg: 1.60, Cd: 1.50, Zn: 1.30, Pb: 1.50, Sn: 1.40, Bi: 1.20};
 
 // H-bond donor/acceptor atoms
 const HBOND_DONOR_ATOMS = new Set(['N', 'O', 'S', 'F']);
+// Low-electronegativity atoms: a bonded H is hydridic (nucleophilic, δ–).
+const HYDRIDE_CENTER_ATOMS = new Set(['B', 'Al', 'Ga', 'In', 'Tl', 'Si', 'Ge', 'Sn', 'Li', 'Na', 'K', 'Mg', 'Ca', 'Zn']);
+// Basicity of the H-bond acceptor: covalently bound F (esp. perfluoroaryl)
+// is a very poor acceptor (Dunitz & Taylor; Scheiner benchmarks)
+const HBOND_ACCEPTOR_FACTORS = { O: 1.00, N: 1.00, S: 0.80, Se: 0.75, Te: 0.80, F: 0.18, Cl: 0.45, Br: 0.50, I: 0.55 };
 const ACCEPTORS = new Set(['N', 'O', 'S', 'Se', 'F', 'Cl', 'Br', 'I']);
+const SIGMA_ACCEPTORS = new Set(['N', 'O', 'S', 'Se', 'Te', 'F', 'Cl', 'Br', 'I', 'C',
+'Pt', 'Pd', 'Au', 'Ag', 'Cu', 'Ni', 'Rh', 'Ir', 'Ru', 'Os', 'Fe', 'Co',
+'Si', 'Ge', 'Sn', 'Pb']);
 // Lennard-Jones parameters [ε, σ]
 const LJ_PARAMS = {
 H: [0.6, 1.2], C: [2.0, 1.7], N: [1.6, 1.55], O: [1.4, 1.5], F: [1.0, 1.47],
 S: [2.6, 1.8], Cl: [2.2, 1.75], Br: [2.8, 1.85], I: [3.4, 1.98],
-Se: [3.0, 1.9], Te: [3.6, 2.1], P: [2.4, 1.8]
+Se: [3.0, 1.9], Te: [3.6, 2.1], P: [2.4, 1.8], As: [2.6, 1.85],
+Si: [2.0, 2.10], Ge: [2.4, 2.11], Sn: [2.8, 2.17], Pb: [3.0, 2.02]
 };
 const DEFAULT_LJ = [1.5, 1.7];
-// PEOE parameters (a, b, c for χ = a + b*q + c*q²)
-const PEOE_PARAMS = {
-H:  [7.17, 6.24, -0.56], C3: [7.98, 9.18, 1.88], C2: [8.79, 9.32, 1.51], C1: [10.39, 9.45, 0.73],
-N3: [11.54, 10.82, 1.36], N2: [12.87, 11.15, 0.85],
-O3: [14.18, 12.92, 1.39], O2: [17.07, 13.79, 0.47],
-S:  [10.76, 9.13, 1.38], P: [9.54, 8.2, 1.43],
-F:  [14.66, 13.85, 0.47], Cl: [11.0, 9.69, 1.35], Br: [10.08, 9.02, 1.25], I: [9.9, 8.57, 1.35]
+// Effective (in-molecule) atomic polarizabilities, a.u. — for the charge-induced dipole (polarization) term
+const ATOMIC_POLARIZABILITY = {
+H: 0.7, B: 8, C: 6, N: 7, O: 5, F: 4, Si: 10, P: 12, S: 18, Cl: 14,
+Ge: 12, As: 12, Se: 20, Br: 21, Sn: 14, Sb: 12, Te: 27, I: 32,
+Kr: 16, Xe: 27, Rn: 33, Pb: 14, Bi: 12, Po: 20
 };
 // Letter codes for interaction types in reports
-const TYPE_LETTER = { hbond: 'H', halogen: 'X', chalcogen: 'Ch', pnictogen: 'Pn', aerogen: 'Ae' };
+const TYPE_LETTER = { hbond: 'H', halogen: 'X', chalcogen: 'Ch', pnictogen: 'Pn', tetrel: 'Tt', aerogen: 'Ae', pihole: 'π', triel: 'Tr' };
 const SUBSCRIPT_DIGITS = ['₀','₁','₂','₃','₄','₅','₆','₇','₈','₉'];
 const sub = (n) => String(n).split('').map(d => SUBSCRIPT_DIGITS[+d] || d).join('');
 // ============================================================
@@ -781,26 +792,40 @@ isThreeFingerPan: false,
 energyCollapsed: false,
 currentSelectedAtomIndex: -1,
 shiftSelectedAtoms: new Set(),
+pointerDownPos: new THREE.Vector2(),
+pointerTravel: 0,
 lang: 'en'
 };
 const settings = {
 bgColor: '#ffffff',
-atomScheme: 'default',
 atomStyle: 'ballstick',
 bondColor: '#333333',
 fontSize: 1.5,
-distColor: '#14337f',
+distColor: '#0078A0',
 angleColor: '#006400',
 torsionColor: '#800020',
 labelColor: '#000000',
 showLabels: false,
-showNoncovalent: false,
-showStacking: false,
+interVisible: {
+hbond: true,
+halogen: true,
+chalcogen: true,
+pnictogen: true,
+tetrel: true,
+aerogen: true,
+pihole: true,
+triel: true,
+stacking: true
+},
 exclude14: true,
 hbondColor: '#4488ff',
 halogenColor: '#9944ff',
 chalcogenColor: '#ffcc00',
 pnictogenColor: '#ff8800',
+trielColor: '#cc3366',
+tetrelColor: '#44bb44',
+aerogenColor: '#00b3b3',
+piholeColor: '#cc44cc',
 ringColor: '#00aa88'
 };
 // ============================================================
@@ -811,28 +836,31 @@ ru: {
 branding: 'Разработка BOLLAB', hidePanel: 'Скрыть панель', load: '📂 Загрузить',
 labelsTitle: 'Подписи атомов', exportTitle: 'Экспорт измерений CSV',
 contactsTitle: 'Таблица контактов (IUCr)', deleteTitle: 'Удалить выбранное',
-fragment: '⛶ Фрагмент', showAll: '👁 Всё', sigmaBtn: 'σ-дырки',
-sigmaTitle: 'H-связи и σ-дырочные взаимодействия', stackBtn: 'π-стэкинг',
-stackTitle: 'π-стэкинг взаимодействий', chk14: 'исключать гиперконъюгацию в заторможенных конформациях',
-secView: 'Вид', secColor: 'Цвет', lbBg: 'Фон', lbStyle: 'Стиль', lbFont: 'Шрифт',
-lbBonds: 'Связи', lbAtoms: 'Ат.', lbHbond: 'H-связь', lbHalogen: 'Галоген',
-lbChalcogen: 'Халькоген', lbPnictogen: 'Пниктоген', lbRings: '⬡ Кольца',
+fragment: '⛶ Фрагмент', showAll: '👁 Всё',
+isolateTitle: 'Оставить только эту молекулу', showAllTitle: 'Показать всё обратно',
+showAllInter: 'Показать все', hideAllInter: 'Убрать все',
+tHbond: 'H-связь', tHalogen: 'Галоген', tChalcogen: 'Халькоген', tPnictogen: 'Пниктоген',
+tTetrel: 'Тетрел', tAerogen: 'Аэроген', tPihole: 'π-дырка', tTriel: 'Триел', tStacking: 'π-стэкинг',
+secColor: 'Цвет', secInter: '🔗 Нековалентные взаимодействия', lbBg: 'Фон', lbStyle: 'Стиль', lbFont: 'Шрифт',
+lbBonds: 'Связи', lbAtoms: 'Подписи', lbHbond: 'H-связь', lbHalogen: 'Галоген',
+lbChalcogen: 'Халькоген', lbPnictogen: 'Пниктоген', lbTetrel: 'Тетрел', lbAerogen: 'Аэроген', lbPihole: 'π-дырка', lbTriel: 'Триел', lbRings: '⬡ Кольца',
 optBallstick: 'Шаро-стержни', optVdw: 'Ван-дер-Ваальс',
 optEllipsoid: 'Эллипсоиды', optSticks: 'Только связи',
 noStructures: '-- Нет структур --', dropH2: '📂 Бросьте файлы сюда',
 helpTitle: 'Справка и руководство пользователя', helpClose: '✕ Закрыть',
 energiesHead: 'Энергии, кДж/моль', units: 'кДж/моль',
-energyNote: 'H-связи — электростатика по Гастайгеру + дисперсия; σ-дырки и π-стэкинг — эмпирическая геометрическая модель; точность ±40%',
-qWeakF: 'слабая', qMedF: 'средняя', qStrongF: 'прочная',
+energyNote: 'Заряды: выравнивание электроотрицательности (Сандерсон). H-связи — электростатика + дисперсия; σ/π-дырки — геометр. модель. Точность ~±10–15%.',
+weakNote: 'Скрыто ещё {n} (энергия ниже {e} кДж/моль)',
+qWeakF: 'слабая', qMedF: 'средняя', qStrongF: 'прочная', qCovalent: '⚠ ковалентная',
 qWeakM: 'слабый', qMedM: 'средний', qStrongM: 'прочный',
-found: 'Найдено', cntH: 'H-связи', cntHal: 'галогенных',
-cntCha: 'халькогенных', cntPni: 'пниктогенных', cntAer: 'аэрогенных', cntStack: 'π-стэкинга',
+found: 'Найдено', cntH: 'H-связь|H-связи|H-связей', cntHal: 'галогенная|галогенные|галогенных',
+cntCha: 'халькогенная|халькогенные|халькогенных', cntPni: 'пниктогенная|пниктогенные|пниктогенных', cntTet: 'тетрельная|тетрельные|тетрельных', cntAer: 'аэрогенная|аэрогенные|аэрогенных', cntPi: 'π-дырочная|π-дырочные|π-дырочных', cntTri: 'триельная|триельные|триельных', cntStack: 'π-стэкинг|π-стэкинга|π-стэкингов',
 noneFound: 'Нековалентных взаимодействий не найдено',
 selectedAtoms: 'Выбрано атомов', alertLoadFirst: 'Сначала загрузите структуру',
 alertClickAtom: 'Сначала кликните по любому атому нужной молекулы',
-alertFormats: 'Поддерживаются .xyz, .cif, .pdb, .mol, .sdf',
+alertFormats: 'Поддерживаются .xyz, .cif, .pdb, .mol, .sdf', largeFileWarning: 'В файле больше 10000 атомов. Расчёт взаимодействий может занять много времени. Продолжить?',
 alertNoStruct: 'Структуры не найдены в', exampleName: 'Пример', loadError: 'Ошибка загрузки файла: ', atomsWord: 'атом(ов)', structureWord: 'Структура',
-help: `<h2>SigmaLens — руководство пользователя</h2>
+help: `<h2>NCI-Lens — руководство пользователя</h2>
 <div class="sub">3D-просмотр молекулярных структур с измерениями и анализом нековалентных взаимодействий</div>
 <h3>📂 Загрузка структур</h3><ul>
 <li>Кнопка «Загрузить» или перетаскивание файла в окно: .xyz, .cif, .pdb, .mol, .sdf (можно несколько).</li>
@@ -849,46 +877,53 @@ help: `<h2>SigmaLens — руководство пользователя</h2>
 <li><b>Важно:</b> на клик следующего атома даётся ~1 секунда. Пауза — измерение фиксируется и начинается новое. Клик по пустому месту отменяет текущий набор.</li>
 <li>Числа с результатами можно <b>перетаскивать</b>; при отдалении появляется линия-указатель.</li>
 <li>Клик по числу выделяет измерение, кнопка 🗑️ удаляет его.</li>
-<li>📥 — экспорт всех измерений в CSV.</li></ul>
+<li>Кнопка CSV — экспорт всех измерений в CSV.</li></ul>
 <h3>🧩 Кнопки панели</h3><ul>
-<li>🔤 — показать/скрыть подписи атомов.</li>
-<li>📋 — экспорт таблицы нековалентных контактов в CSV (формат IUCr).</li>
+<li>🏷️ — показать/скрыть подписи атомов.</li>
+<li>Кнопка IUCr — экспорт таблицы нековалентных контактов в CSV (формат IUCr). Выводятся все найденные контакты, независимо от фильтров отображения и изоляции.</li>
 <li>⛶ <b>Фрагмент</b> — кликните атом и нажмите кнопку: останется только эта молекула. 👁 <b>Всё</b> — вернуть обратно.</li>
-<li><b>Shift + клик</b> по атомам из разных молекул — мульти-выделение (оранжевая подсветка). Затем «Фрагмент» оставит все молекулы, содержащие выделенные атомы. Повторный Shift+клик по тому же атому снимает выделение; Shift+клик по пустому месту очищает всё.</li>
+<li><b>Shift + клик</b> по атомам из разных молекул — мульти-выделение (бирюзовая подсветка). Затем «Фрагмент» оставит все молекулы, содержащие выделенные атомы. Повторный Shift+клик по тому же атому снимает выделение; Shift+клик по пустому месту очищает всё.</li>
 <li>Полупрозрачная сфера на месте скрытого атома-партнёра — клик по ней раскрывает скрытый фрагмент.</li>
-<li>Разделы «Вид» и «Цвет» — фон, стиль отображения, шрифт подписей и цвета линий.</li></ul>
-<h3>⚛️ Нековалентные взаимодействия</h3><ul>
-<li><b>σ-дырки</b> — H-связи (синие) и галогенные/халькогенные/пниктогенные связи (фиолетовые/жёлтые/оранжевые): пунктир с расстоянием и углом.</li>
+<li>«Стиль» и «Шрифт» находятся прямо в меню; раздел «Цвет» — фон и цвета линий.</li></ul>
+<h3>🔗 Нековалентные взаимодействия</h3><ul>
+<li>Строка «Найдено: …» — сколько контактов каждого типа обнаружено. 9 кнопок типов включают показ; мастер-кнопка «Показать все / Убрать все» показывает или убирает всё сразу и сбрасывает позиции перетащенных подписей. Активные кнопки — светло-зелёные.</li>
+<li><b>H-связи и σ-дырки</b> — H-связи (синие), галогенные (фиолетовые), халькогенные (жёлтые), пниктогенные (оранжевые), тетрельные (зелёные), аэрогенные (бирюзовые): пунктир с расстоянием и углом.</li>
+<li><b>π-дырки</b> — контакты нуклеофилов с π-дырками карбонилов/CO₂/нитрогрупп (тетрельные/пниктогенные π-дырки), плоской XeF₄ и «поясом» XeF₂ (аэрогенные), а также с π-дырками перфторированных колец (пурпурные).</li>
 <li><b>π-стэкинг</b> — стекинг ароматических колец (зелёный); sp³-циклы (например, циклогексил) не учитываются.</li>
-<li>Галочка «исключать гиперконъюгацию» убирает внутримолекулярные контакты близких по цепи атомов.</li>
-<li>Окно «Энергии» справа вверху: энергия каждого контакта и сумма Σ (кДж/моль); точность ±40%.</li></ul>`
+<li><b>Гидриды и триель</b> — H при атомах с низкой электроотрицательностью (B, Al, Si, Ge, Sn, металлы) — нуклеофилы: контакты с σ-дырками и π-дырками (в т.ч. с бензольными кольцами, слабые). Сам бор — донор триельной связи (3-координатный, а также 4-координатный в TS атаки нуклеофила): отдельный тип «Триел», пунктир B···O/N.</li>
+<li>Подпись у пунктира: в первой строке тип и расстояние (Å), во второй — угол и % от суммы ван-дер-ваальсовых радиусов; у π-стэкинга — одна строка без %. Подписи можно перетаскивать, позиции сохраняются при переключении типов; сброс — мастер-кнопкой.</li>
+<li>Внутримолекулярные контакты близких по цепи атомов (гиперконъюгация) исключаются всегда.</li>
+<li>Окно «Энергии» справа вверху: энергия каждого контакта и сумма Σ (кДж/моль); точность ~±10–15%; контакты слабее 2 кДж/моль скрываются с пометкой «ещё N скрыто».</li></ul>`
 },
 en: {
 branding: 'Developed by BOLLAB', hidePanel: 'Hide panel', load: '📂 Load',
 labelsTitle: 'Atom labels', exportTitle: 'Export measurements CSV',
 contactsTitle: 'Contact table (IUCr)', deleteTitle: 'Delete selected',
-fragment: '⛶ Fragment', showAll: '👁 All', sigmaBtn: 'σ-holes',
-sigmaTitle: 'H-bonds and σ-hole interactions', stackBtn: 'π-stacking',
-stackTitle: 'π-stacking interactions', chk14: 'exclude hyperconjugation in staggered conformations',
-secView: 'View', secColor: 'Color', lbBg: 'Background', lbStyle: 'Style', lbFont: 'Font',
-lbBonds: 'Bonds', lbAtoms: 'At.', lbHbond: 'H-bond', lbHalogen: 'Halogen',
-lbChalcogen: 'Chalcogen', lbPnictogen: 'Pnictogen', lbRings: '⬡ Rings',
+fragment: '⛶ Fragment', showAll: '👁 All',
+isolateTitle: 'Keep only this molecule', showAllTitle: 'Show everything again',
+showAllInter: 'Show all', hideAllInter: 'Hide all',
+tHbond: 'H-bond', tHalogen: 'Halogen', tChalcogen: 'Chalcogen', tPnictogen: 'Pnictogen',
+tTetrel: 'Tetrel', tAerogen: 'Aerogen', tPihole: 'π-hole', tTriel: 'Triel', tStacking: 'π-stack',
+secColor: 'Color', secInter: '🔗 Noncovalent interactions', lbBg: 'Background', lbStyle: 'Style', lbFont: 'Font',
+lbBonds: 'Bonds', lbAtoms: 'Labels', lbHbond: 'H-bond', lbHalogen: 'Halogen',
+lbChalcogen: 'Chalcogen', lbPnictogen: 'Pnictogen', lbTetrel: 'Tetrel', lbAerogen: 'Aerogen', lbPihole: 'π-hole', lbTriel: 'Triel', lbRings: '⬡ Rings',
 optBallstick: 'Ball-and-stick', optVdw: 'van der Waals',
 optEllipsoid: 'Ellipsoids', optSticks: 'Sticks only',
 noStructures: '-- No structures --', dropH2: '📂 Drop files here',
 helpTitle: 'Help & user guide', helpClose: '✕ Close',
 energiesHead: 'Energies, kJ/mol', units: 'kJ/mol',
-energyNote: 'H-bonds — Gasteiger electrostatics + dispersion; σ-holes and π-stacking — empirical geometric model; accuracy ±40%',
-qWeakF: 'weak', qMedF: 'medium', qStrongF: 'strong',
+energyNote: 'Charges: Electronegativity Equalization (Sanderson). H-bonds — electrostatics + dispersion; σ/π-holes — geometric model. Accuracy ~±10–15%.',
+weakNote: '{n} more hidden (energy below {e} kJ/mol)',
+qWeakF: 'weak', qMedF: 'medium', qStrongF: 'strong', qCovalent: '⚠ covalent',
 qWeakM: 'weak', qMedM: 'medium', qStrongM: 'strong',
-found: 'Found', cntH: 'H-bonds', cntHal: 'halogen',
-cntCha: 'chalcogen', cntPni: 'pnictogen', cntAer: 'aerogen', cntStack: 'π-stacking',
+found: 'Found', cntH: 'H-bond|H-bonds', cntHal: 'halogen bond|halogen bonds',
+cntCha: 'chalcogen bond|chalcogen bonds', cntPni: 'pnictogen bond|pnictogen bonds', cntTet: 'tetrel bond|tetrel bonds', cntAer: 'aerogen bond|aerogen bonds', cntPi: 'π-hole|π-holes', cntTri: 'triel bond|triel bonds', cntStack: 'π-stack|π-stacks',
 noneFound: 'No noncovalent interactions found',
 selectedAtoms: 'Atoms selected', alertLoadFirst: 'Load a structure first',
 alertClickAtom: 'First click any atom of the desired molecule',
-alertFormats: 'Supported: .xyz, .cif, .pdb, .mol, .sdf',
+alertFormats: 'Supported: .xyz, .cif, .pdb, .mol, .sdf', largeFileWarning: 'The file contains more than 10000 atoms. Interaction detection may take a long time. Continue?',
 alertNoStruct: 'No structures found in', exampleName: 'Example', loadError: 'File load error: ', atomsWord: 'atom(s)', structureWord: 'Structure',
-help: `<h2>SigmaLens — User Guide</h2>
+help: `<h2>NCI-Lens — User Guide</h2>
 <div class="sub">3D viewer of molecular structures with measurements and noncovalent interaction analysis</div>
 <h3>📂 Loading structures</h3><ul>
 <li>“Load” button or drag & drop a file into the window: .xyz, .cif, .pdb, .mol, .sdf (multiple files allowed).</li>
@@ -905,46 +940,53 @@ help: `<h2>SigmaLens — User Guide</h2>
 <li><b>Important:</b> you have ~1 second to click the next atom. A pause finalizes the measurement and starts a new one. Clicking empty space cancels the current selection.</li>
 <li>Result labels can be <b>dragged</b>; a pointer line appears when moved away.</li>
 <li>Click a label to select the measurement; 🗑️ deletes it.</li>
-<li>📥 — export all measurements to CSV.</li></ul>
+<li>CSV button — export all measurements to CSV.</li></ul>
 <h3>🧩 Panel buttons</h3><ul>
-<li>🔤 — show/hide atom labels.</li>
-<li>📋 — export the noncovalent contact table to CSV (IUCr format).</li>
+<li>🏷️ — show/hide atom labels.</li>
+<li>IUCr button — export the noncovalent contact table to CSV (IUCr format). All detected contacts are exported, regardless of the display filters and isolation.</li>
 <li>⛶ <b>Fragment</b> — click an atom, then press the button: only that molecule remains. 👁 <b>All</b> — restore everything.</li>
-<li><b>Shift + click</b> atoms from different molecules to multi-select them (orange highlight). Then press "Fragment" to keep all molecules containing the selected atoms. Shift+click the same atom again to deselect; Shift+click empty space clears all.</li>
+<li><b>Shift + click</b> atoms from different molecules to multi-select them (turquoise highlight). Then press "Fragment" to keep all molecules containing the selected atoms. Shift+click the same atom again to deselect; Shift+click empty space clears all.</li>
 <li>A translucent sphere marks a hidden partner atom; clicking it reveals that fragment.</li>
-<li>“View” and “Color” sections — background, display style, label font and line colors.</li></ul>
-<h3>⚛️ Noncovalent interactions</h3><ul>
-<li><b>σ-holes</b> — H-bonds (blue) and halogen/chalcogen/pnictogen bonds (violet/yellow/orange): dashed lines with distance and angle.</li>
+<li>“Style” and “Font” are directly in the menu; the “Color” section holds the background and line colors.</li></ul>
+<h3>🔗 Noncovalent interactions</h3><ul>
+<li>The “Found: …” line reports how many contacts of each type were detected. The nine type buttons toggle the display; the master “Show all / Hide all” button shows or hides everything at once and resets dragged label positions. Active buttons are light green.</li>
+<li><b>H-bonds & σ-holes</b> — H-bonds (blue), halogen (violet), chalcogen (yellow), pnictogen (orange), tetrel (green), aerogen (teal): dashed lines with distance and angle.</li>
+<li><b>π-holes</b> — nucleophile contacts with π-holes of carbonyls/CO₂/nitro groups (tetrel/pnictogen π-holes), planar XeF₄ and the belt of XeF₂ (aerogen), and π-holes of perfluorinated rings (magenta).</li>
 <li><b>π-stacking</b> — stacking of aromatic rings (green); sp³ rings (e.g. cyclohexyl) are not counted.</li>
-<li>The “exclude hyperconjugation” checkbox removes intramolecular contacts of chain-close atoms.</li>
-<li>“Energies” box (top right): per-contact energy and total Σ (kJ/mol); accuracy ±40%.</li></ul>`
+<li><b>Hydrides & triel</b> — H bonded to a low-electronegativity atom (B, Al, Si, Ge, Sn, metals) is a nucleophile: it forms contacts with σ-holes and π-holes (incl. benzene rings, weak). Boron itself is a triel-bond donor (3-coordinate, and 4-coordinate in the TS of nucleophile attack): separate “Triel” type, a B···O/N dashed line.</li>
+<li>Contact labels: first line — type and distance (Å), second line — angle and % of the van der Waals radii sum; π-stacking — a single line without %. Labels can be dragged and their positions persist when switching types; the master button resets them.</li>
+<li>Intramolecular contacts of chain-close atoms (hyperconjugation) are always excluded.</li>
+<li>“Energies” box (top right): per-contact energy and total Σ (kJ/mol); accuracy ~±10–15%; contacts weaker than 2 kJ/mol are hidden with an “N more hidden” note.</li></ul>`
 },
 pt: {
 branding: 'Desenvolvido por BOLLAB', hidePanel: 'Ocultar painel', load: '📂 Carregar',
 labelsTitle: 'Rótulos de átomos', exportTitle: 'Exportar medições CSV',
 contactsTitle: 'Tabela de contatos (IUCr)', deleteTitle: 'Excluir seleção',
-fragment: '⛶ Fragmento', showAll: '👁 Tudo', sigmaBtn: 'buracos σ',
-sigmaTitle: 'Ligações de H e interações de buraco σ', stackBtn: 'π-empilhamento',
-stackTitle: 'Interações de π-empilhamento', chk14: 'excluir hiperconjugação em conformações escalonadas',
-secView: 'Visualização', secColor: 'Cor', lbBg: 'Fundo', lbStyle: 'Estilo', lbFont: 'Fonte',
-lbBonds: 'Ligações', lbAtoms: 'Át.', lbHbond: 'Ligação H', lbHalogen: 'Halogênio',
-lbChalcogen: 'Calcogênio', lbPnictogen: 'Pnictogênio', lbRings: '⬡ Anéis',
+fragment: '⛶ Fragmento', showAll: '👁 Tudo',
+isolateTitle: 'Manter somente esta molécula', showAllTitle: 'Mostrar tudo novamente',
+showAllInter: 'Mostrar tudo', hideAllInter: 'Ocultar tudo',
+tHbond: 'Ligação H', tHalogen: 'Halogênio', tChalcogen: 'Calcogênio', tPnictogen: 'Pnictogênio',
+tTetrel: 'Tetrel', tAerogen: 'Aerogênio', tPihole: 'π-buraco', tTriel: 'Triel', tStacking: 'π-empilhamento',
+secColor: 'Cor', secInter: '🔗 Interações não covalentes', lbBg: 'Fundo', lbStyle: 'Estilo', lbFont: 'Fonte',
+lbBonds: 'Ligações', lbAtoms: 'Rótulos', lbHbond: 'Ligação H', lbHalogen: 'Halogênio',
+lbChalcogen: 'Calcogênio', lbPnictogen: 'Pnictogênio', lbTetrel: 'Tetrel', lbAerogen: 'Aerogênio', lbPihole: 'π-buraco', lbTriel: 'Triel', lbRings: '⬡ Anéis',
 optBallstick: 'Bolas e varetas', optVdw: 'van der Waals',
 optEllipsoid: 'Elipsoides', optSticks: 'Somente ligações',
 noStructures: '-- Sem estruturas --', dropH2: '📂 Solte os arquivos aqui',
 helpTitle: 'Ajuda e guia do usuário', helpClose: '✕ Fechar',
 energiesHead: 'Energias, kJ/mol', units: 'kJ/mol',
-energyNote: 'Ligações H — eletrostática de Gasteiger + dispersão; buracos σ e π-empilhamento — modelo geométrico empírico; precisão ±40%',
-qWeakF: 'fraca', qMedF: 'média', qStrongF: 'forte',
+energyNote: 'Cargas: Equalização de Eletronegatividade (Sanderson). Ligações H — eletrostática + dispersão; buracos σ/π — modelo geométrico. Precisão ~±10–15%.',
+weakNote: 'Mais {n} ocultas (energia abaixo de {e} kJ/mol)',
+qWeakF: 'fraca', qMedF: 'média', qStrongF: 'forte', qCovalent: '⚠ covalente',
 qWeakM: 'fraco', qMedM: 'médio', qStrongM: 'forte',
-found: 'Encontrado', cntH: 'ligações H', cntHal: 'halogênio',
-cntCha: 'calcogênio', cntPni: 'pnictogênio', cntAer: 'aerogênio', cntStack: 'π-empilhamento',
+found: 'Encontrado', cntH: 'ligação H|ligações H', cntHal: 'halogênio',
+cntCha: 'calcogênio|calcogênios', cntPni: 'pnictogênio|pnictogênios', cntTet: 'tetrel', cntAer: 'aerogênio|aerogênios', cntPi: 'π-buraco|π-buracos', cntTri: 'triel', cntStack: 'π-empilhamento|π-empilhamentos',
 noneFound: 'Nenhuma interação não covalente encontrada',
 selectedAtoms: 'Átomos selecionados', alertLoadFirst: 'Carregue uma estrutura primeiro',
 alertClickAtom: 'Primeiro clique em qualquer átomo da molécula desejada',
-alertFormats: 'Suportados: .xyz, .cif, .pdb, .mol, .sdf',
+alertFormats: 'Suportados: .xyz, .cif, .pdb, .mol, .sdf', largeFileWarning: 'O arquivo contém mais de 10000 áтомos. A detecção de interações pode demorar muito. Continuar?',
 alertNoStruct: 'Estruturas não encontradas em', exampleName: 'Exemplo', loadError: 'Erro ao carregar arquivo: ', atomsWord: 'átomo(s)', structureWord: 'Estrutura',
-help: `<h2>SigmaLens — Guia do usuário</h2>
+help: `<h2>NCI-Lens — Guia do usuário</h2>
 <div class="sub">Visualizador 3D de estruturas moleculares com medições e análise de interações não covalentes</div>
 <h3>📂 Carregamento de estruturas</h3><ul>
 <li>Botão «Carregar» ou arraste o arquivo para a janela: .xyz, .cif, .pdb, .mol, .sdf (vários arquivos).</li>
@@ -961,19 +1003,23 @@ help: `<h2>SigmaLens — Guia do usuário</h2>
 <li><b>Importante:</b> você tem ~1 segundo para clicar no próximo átomo. Uma pausa finaliza a medição e inicia uma nova. Clicar no vazio cancela a seleção atual.</li>
 <li>Os rótulos com resultados podem ser <b>arrastados</b>; ao afastá-los, aparece uma linha apontadora.</li>
 <li>Clique no rótulo para selecionar a medição; 🗑️ a exclui.</li>
-<li>📥 — exporta todas as medições para CSV.</li></ul>
+<li>Botão CSV — exporta todas as medições para CSV.</li></ul>
 <h3>🧩 Botões do painel</h3><ul>
-<li>🔤 — mostrar/ocultar rótulos de átomos.</li>
-<li>📋 — exporta a tabela de contatos não covalentes para CSV (formato IUCr).</li>
+<li>🏷️ — mostrar/ocultar rótulos de átomos.</li>
+<li>Botão IUCr — exporta a tabela de contatos não covalentes para CSV (formato IUCr). Todos os contatos detectados são exportados, independentemente dos filtros de exibição e isolamento.</li>
 <li>⛶ <b>Fragmento</b> — clique num átomo e pressione o botão: só essa molécula permanece. 👁 <b>Tudo</b> — restaura tudo.</li>
-<li><b>Shift + clique</b> em átomos de moléculas diferentes para seleção múltipla (destaque laranja). Depois pressione «Fragmento» para manter todas as moléculas que contêm os átomos selecionados. Shift+clique no mesmo átomo remove a seleção; Shift+clique no vazio limpa tudo.</li>
+<li><b>Shift + clique</b> em átomos de moléculas diferentes para seleção múltipla (destaque turquesa). Depois pressione «Fragmento» para manter todas as moléculas que contêm os átomos selecionados. Shift+clique no mesmo átomo remove a seleção; Shift+clique no vazio limpa tudo.</li>
 <li>Uma esfera translúcida marca um átomo parceiro oculto; clicar nela revela aquele fragmento.</li>
-<li>Seções «Visualização» e «Cor» — fundo, estilo de exibição, fonte dos rótulos e cores das linhas.</li></ul>
-<h3>⚛️ Interações não covalentes</h3><ul>
-<li><b>Buracos σ</b> — ligações H (azuis) e ligações de halogênio/calcogênio/pnictogênio (violeta/amarelo/laranja): tracejado com distância e ângulo.</li>
+<li>«Estilo» e «Fonte» ficam diretamente no menu; a seção «Cor» reúne fundo e cores das linhas.</li></ul>
+<h3>🔗 Interações não covalentes</h3><ul>
+<li>A linha «Encontrado: …» informa quantos contatos de cada tipo foram detectados. Os nove botões de tipo alternam a exibição; o botão mestre «Mostrar tudo / Ocultar tudo» mostra ou oculta tudo de uma vez e repõe as posições dos rótulos arrastados. Botões ativos ficam verde-claros.</li>
+<li><b>Ligações H e buracos σ</b> — ligações H (azuis), halogênio (violeta), calcogênio (amarelo), pnictogênio (laranja), tetrel (verde), aerogênio (turquesa): tracejado com distância e ângulo.</li>
+<li><b>Buracos π</b> — contatos de nucleófilos com buracos π de carbonilas/CO₂/nitro (buracos π tetrel/pnictogênio), XeF₄ plana e o cinturão de XeF₂ (aerogênio), e buracos π de anéis perfluorados (magenta).</li>
 <li><b>π-empilhamento</b> — empilhamento de anéis aromáticos (verde); anéis sp³ (ex.: ciclo-hexil) não contam.</li>
-<li>A caixa «excluir hiperconjugação» remove contatos intramoleculares de átomos próximos na cadeia.</li>
-<li>Janela «Energias» no alto à direita: energia de cada contato e a soma Σ (kJ/mol); precisão ±40%.</li></ul>`
+<li><b>Hidretos e triel</b> — H ligado a um átomo de baixa eletronegatividade (B, Al, Si, Ge, Sn, metais) é nucleófilo: contatos com buracos σ e π (inclusive anéis benzênicos, fracos). O próprio boro é doador de ligação de triel (3-coordenado e 4-coordenado no TS do ataque de nucleófilo): tipo separado «Triel», tracejado B···O/N.</li>
+<li>Rótulos dos contatos: linha 1 — tipo e distância (Å), linha 2 — ângulo e % da soma dos raios de van der Waals; π-empilhamento — uma linha sem %. Os rótulos podem ser arrastados e as posições persistem ao alternar tipos; o botão mestre as repõe.</li>
+<li>Contatos intramoleculares de átomos próximos na cadeia (hiperconjugação) são sempre excluídos.</li>
+<li>Janela «Energias» no alto à direita: energia de cada contato e a soma Σ (kJ/mol); precisão ~±10–15%; interações mais fracas que 2 kJ/mol ficam ocultas com a nota «mais N ocultas».</li></ul>`
 }
 };
 function currentLang() { return I18N[AppState.lang]; }
@@ -981,6 +1027,15 @@ function currentLang() { return I18N[AppState.lang]; }
 // UTILS
 // ============================================================
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+function darkenColor(hex, f) {
+const m = /^#?([0-9a-f]{6})$/i.exec(String(hex).trim());
+if (!m) return hex;
+const num = parseInt(m[1], 16);
+const r = Math.round(((num >> 16) & 255) * f);
+const g = Math.round(((num >> 8) & 255) * f);
+const b = Math.round((num & 255) * f);
+return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+}
 const getCovalentRadius = (element) => COVALENT_RADII[element] || 1.0;
 const getVdwRadius = (element) => VDW_RADII[element] || 1.7;
 // Elements whose short noncovalent σ-hole contacts must not be
@@ -1515,12 +1570,24 @@ const identityOps = operations.filter(isIdentityOp);
 const otherOps = operations.filter(op => !isIdentityOp(op));
 if (!identityOps.length) identityOps.push((x, y, z) => [x, y, z]);
 const placed = [];
+const cartToFrac = (x, y, z) => {
+if (orthoMatrix) {
+const m00 = orthoMatrix[0][0], m01 = orthoMatrix[0][1], m02 = orthoMatrix[0][2];
+const m11 = orthoMatrix[1][1], m12 = orthoMatrix[1][2], m22 = orthoMatrix[2][2];
+const fz = z / m22;
+const fy = (y - m12 * fz) / m11;
+const fx = (x - m01 * fy - m02 * fz) / m00;
+return [fx, fy, fz];
+}
+return [x, y, z];
+};
 const pushAtom = (element, x, y, z, label, U) => {
 const key = `${element}:${x.toFixed(3)},${y.toFixed(3)},${z.toFixed(3)}`;
 if (seen.has(key)) return;
 seen.add(key);
+const f = cartToFrac(x, y, z);
 atomsOut.push({ element, x, y, z, label, U });
-placed.push({ x, y, z, r: getCovalentRadius(element), element });
+placed.push({ x, y, z, fx: f[0], fy: f[1], fz: f[2], r: getCovalentRadius(element), element });
 };
 // Lattice translations: −1…1 for internal gluing, −2…2 for placement
 const INNER_DELTAS = [], PLACE_DELTAS = [];
@@ -1666,32 +1733,40 @@ a.x += ox; a.y += oy; a.z += oz;
 // otherwise it is a neighboring molecule and is simply wrapped whole
 // into the unit cell.
 const placeComponent = (comp) => {
-let bestBonds = 0, bestDist = Infinity, bestOff = null;
-for (const [, , , off] of PLACE_DELTAS) {
-let bonds = 0, minD = Infinity;
+// A covalent bond is much shorter than a cell edge, so the needed translation is
+// found by rounding the difference of fractional coordinates: O(comp × placed) instead of O(125 × comp × placed).
+const candidates = new Map();
 for (const c of comp) {
-const cx2 = c.x + off[0], cy2 = c.y + off[1], cz2 = c.z + off[2];
 for (const p of placed) {
+const dx = Math.round(p.fx - c.fx);
+const dy = Math.round(p.fy - c.fy);
+const dz = Math.round(p.fz - c.fz);
+if (dx < -4 || dx > 4 || dy < -4 || dy > 4 || dz < -4 || dz > 4) continue;
+const off = fracToCart(dx, dy, dz);
 const thr = c.cr + p.r + bondTolerance(c.element, p.element);
-const dX = cx2 - p.x;
+const dX = c.x + off[0] - p.x;
 if (dX > thr || dX < -thr) continue;
-const dY = cy2 - p.y;
+const dY = c.y + off[1] - p.y;
 if (dY > thr || dY < -thr) continue;
-const dZ = cz2 - p.z;
+const dZ = c.z + off[2] - p.z;
 if (dZ > thr || dZ < -thr) continue;
 const d2 = dX * dX + dY * dY + dZ * dZ;
-if (d2 < thr * thr && d2 > 0.16) {
-bonds++;
-if (d2 < minD) minD = d2;
+if (d2 >= thr * thr || d2 <= 0.16) continue;
+const key = (dx + 4) * 81 + (dy + 4) * 9 + (dz + 4);
+let rec = candidates.get(key);
+if (!rec) { rec = { bonds: 0, minD: Infinity, off }; candidates.set(key, rec); }
+rec.bonds++;
+if (d2 < rec.minD) rec.minD = d2;
 }
 }
+let bestBonds = 0, bestDist = Infinity, bestOff = null;
+candidates.forEach(rec => {
+if (rec.bonds > bestBonds || (rec.bonds === bestBonds && rec.minD < bestDist)) {
+bestBonds = rec.bonds;
+bestDist = rec.minD;
+bestOff = rec.off;
 }
-if (bonds > bestBonds || (bonds > 0 && bonds === bestBonds && minD < bestDist)) {
-bestBonds = bonds;
-bestDist = minD;
-bestOff = off;
-}
-}
+});
 if (bestBonds > 0 && bestOff) {
 for (const a of comp) { a.x += bestOff[0]; a.y += bestOff[1]; a.z += bestOff[2]; }
 } else {
@@ -1779,65 +1854,141 @@ return [];
 }
 }
 // ============================================================
-// PEOE CHARGE CALCULATION (GASTEIGER)
+// CHARGE CALCULATION (SIMPLIFIED EQeq)
 // ============================================================
-function getPEOEKey(element, degree) {
-if (element === 'H') return 'H';
-if (element === 'C') return degree >= 4 ? 'C3' : (degree === 3 ? 'C2' : 'C1');
-if (element === 'N') return degree >= 3 ? 'N3' : 'N2';
-if (element === 'O') return degree >= 2 ? 'O3' : 'O2';
-if (element === 'S' || element === 'Se' || element === 'Te') return 'S';
-if (element === 'P' || element === 'As' || element === 'Sb') return 'P';
-if (element === 'F' || element === 'Cl' || element === 'Br' || element === 'I') return element;
-return null;
-}
 function computeCharges(structure) {
+if (!structure || !Array.isArray(structure.centeredAtoms)) return [];
 const atoms = structure.centeredAtoms;
-const bonds = structure.bonds;
 const n = atoms.length;
-// Neighbor list for each atom
-const neighbors = atoms.map(() => []);
-bonds.forEach(bond => {
-neighbors[bond.i].push(bond.j);
-neighbors[bond.j].push(bond.i);
-});
 const charges = new Array(n).fill(0);
-const keys = atoms.map((atom, i) => getPEOEKey(atom.element, neighbors[i].length));
-const electronegativity = (key, q) => {
-const p = PEOE_PARAMS[key];
-if (!p) return 0;
-return p[0] + p[1] * q + p[2] * q * q;
+if (!n) return charges;
+
+// Simplified embedded EQeq.
+// Parameters are [electronegativity, softness-like denominator].
+// This is not a full periodic-table EQeq, but is user-friendly and requires no external files.
+const EQEQ_PARAMS = {
+H: [2.20, 1.35],
+He: [3.00, 2.50],
+Li: [0.98, 1.20],
+Be: [1.57, 1.50],
+B: [2.04, 1.90],
+C: [2.55, 2.00],
+N: [3.04, 2.10],
+O: [3.44, 2.00],
+F: [3.98, 2.40],
+Ne: [3.50, 2.60],
+Na: [0.93, 1.20],
+Mg: [1.31, 1.40],
+Al: [1.61, 1.70],
+Si: [1.90, 1.80],
+P: [2.19, 1.90],
+S: [2.58, 2.00],
+Cl: [3.16, 2.20],
+Ar: [3.00, 2.50],
+K: [0.82, 1.20],
+Ca: [1.00, 1.30],
+Sc: [1.36, 1.60],
+Ti: [1.54, 1.70],
+V: [1.63, 1.70],
+Cr: [1.66, 1.70],
+Mn: [1.55, 1.70],
+Fe: [1.83, 1.80],
+Co: [1.88, 1.80],
+Ni: [1.91, 1.80],
+Cu: [1.90, 1.80],
+Zn: [1.65, 1.70],
+Ga: [1.81, 1.80],
+Ge: [2.01, 1.90],
+As: [2.18, 1.90],
+Se: [2.55, 2.00],
+Br: [2.96, 2.20],
+Kr: [3.00, 2.50],
+Rb: [0.82, 1.20],
+Sr: [0.95, 1.30],
+Y: [1.22, 1.50],
+Zr: [1.33, 1.60],
+Nb: [1.60, 1.70],
+Mo: [2.16, 1.80],
+Tc: [1.90, 1.80],
+Ru: [2.20, 1.80],
+Rh: [2.28, 1.80],
+Pd: [2.20, 1.90],
+Ag: [1.93, 1.80],
+Cd: [1.69, 1.70],
+In: [1.78, 1.80],
+Sn: [1.96, 1.80],
+Sb: [2.05, 1.90],
+Te: [2.10, 1.90],
+I: [2.66, 2.00],
+Xe: [2.60, 2.30],
+Cs: [0.79, 1.20],
+Ba: [0.89, 1.30],
+La: [1.10, 1.40],
+Hf: [1.30, 1.60],
+Ta: [1.50, 1.70],
+W: [2.36, 1.80],
+Re: [1.90, 1.80],
+Os: [2.20, 1.80],
+Ir: [2.20, 1.80],
+Pt: [2.28, 1.90],
+Au: [2.54, 1.90],
+Hg: [2.00, 1.80],
+Tl: [1.62, 1.80],
+Pb: [2.33, 1.80],
+Bi: [2.02, 1.90],
+Po: [2.00, 1.90],
+At: [2.20, 2.00],
+Rn: [2.60, 2.30]
 };
-for (let iter = 0; iter < CONSTANTS.PEOE_ITERATIONS; iter++) {
-const damping = Math.pow(0.5, iter + 1);
-for (const bond of bonds) {
-const keyA = keys[bond.i], keyB = keys[bond.j];
-if (!keyA || !keyB) continue;
-const deltaChi = electronegativity(keyA, charges[bond.i]) - electronegativity(keyB, charges[bond.j]);
-const denominator = PEOE_PARAMS[keyA][1] + PEOE_PARAMS[keyB][1];
-const transfer = (deltaChi / denominator) * damping;
-charges[bond.i] -= transfer;
-charges[bond.j] += transfer;
+
+const defaultParam = [2.10, 2.30];
+const EQEQ_SCALE = 1.15;
+
+let sumAlpha = 0;
+let sumBeta = 0;
+
+for (let i = 0; i < n; i++) {
+const p = EQEQ_PARAMS[atoms[i].element] || defaultParam;
+const chi = p[0];
+const hardness = Math.max(0.75, p[1]);
+const beta = 1.0 / hardness;
+sumAlpha += chi * beta;
+sumBeta += beta;
 }
+
+if (sumBeta === 0) return charges;
+
+const lambda = sumAlpha / sumBeta;
+
+for (let i = 0; i < n; i++) {
+const p = EQEQ_PARAMS[atoms[i].element] || defaultParam;
+const hardness = Math.max(0.75, p[1]);
+const beta = 1.0 / hardness;
+charges[i] = EQEQ_SCALE * (lambda - p[0]) * beta;
+charges[i] = Math.max(-1.35, Math.min(1.35, charges[i]));
 }
+
+// Make total charge exactly zero after clamping.
+let total = charges.reduce((s, q) => s + q, 0);
+for (let i = 0; i < n; i++) {
+charges[i] -= total / n;
+}
+
 return charges;
 }
 // ============================================================
 // NONCOVALENT INTERACTION ENERGY CALCULATION
 // ============================================================
 function dispersionEnergy(elementA, elementB, distance) {
-    const paramsA = LJ_PARAMS[elementA] || DEFAULT_LJ;
-    const paramsB = LJ_PARAMS[elementB] || DEFAULT_LJ;
-    const epsilon = Math.sqrt(paramsA[0] * paramsB[0]);
-    const sigma = paramsA[1] + paramsB[1];
-    const t = clamp(sigma / distance, 0.5, 1.6);
-    const energy = epsilon * (Math.pow(t, 12) - 2 * Math.pow(t, 6));
-
-    return clamp(
-        energy,
-        -CONSTANTS.ENERGY_LIMITS.DISPERSION_CLAMP_LOW * epsilon,
-        CONSTANTS.ENERGY_LIMITS.DISPERSION_MAX
-    );
+const paramsA = LJ_PARAMS[elementA] || DEFAULT_LJ;
+const paramsB = LJ_PARAMS[elementB] || DEFAULT_LJ;
+const epsilon = Math.sqrt(paramsA[0] * paramsB[0]);
+const sigma = paramsA[1] + paramsB[1];
+// Always-attractive dispersion: -epsilon * (sigma/d)^6
+// This is the proper attractive part of the Lennard-Jones potential
+const t = Math.max(0.5, sigma / distance);
+const energy = -epsilon * Math.pow(t, 6);
+return Math.max(-CONSTANTS.ENERGY_LIMITS.DISPERSION_CLAMP_LOW * epsilon, energy);
 }
 function getAtomNeighbors(structure) {
     if (!structure?.centeredAtoms || !structure.bonds) return [];
@@ -1860,82 +2011,147 @@ function getAtomNeighbors(structure) {
 }
 
 function sigmaSubstituentFactor(contact, structure) {
-    const neighbors = getAtomNeighbors(structure);
-
-    if (!neighbors.length || !structure.centeredAtoms?.[contact.iX]) {
-        return 1.0;
-    }
-
-    const scale = element => SIGMA_SUBSTITUENT_SCALE[element] ?? 0.20;
-
-    const oppositeElement = structure.centeredAtoms[contact.iD]?.element || 'C';
-    const oppositeFactor = scale(oppositeElement);
-
-    let inductiveFactor = 0;
-
-    (neighbors[contact.iX] || []).forEach(neighborIndex => {
-        if (neighborIndex === contact.iD) return;
-
-        const neighborAtom = structure.centeredAtoms[neighborIndex];
-        if (!neighborAtom) return;
-
-        inductiveFactor += scale(neighborAtom.element);
-    });
-
-    const c = CONSTANTS.SIGMA_HOLE;
-
-    const totalFactor =
-        c.SUBSTITUENT_BASE +
-        c.SUBSTITUENT_OPPOSITE * oppositeFactor +
-        c.SUBSTITUENT_INDUCTIVE * inductiveFactor;
-
-    return clamp(totalFactor, 0.10, c.SUBSTITUENT_CAP);
+const neighbors = getAtomNeighbors(structure);
+if (!neighbors.length || !structure.centeredAtoms?.[contact.iX]) {
+return 1.0;
 }
-
+const scale = element => {
+if (SIGMA_SUBSTITUENT_SCALE[element] !== undefined) return SIGMA_SUBSTITUENT_SCALE[element];
+if (METALS.has(element)) {
+const chi = METAL_ELECTRONEGATIVITY[element] ?? 1.5;
+return 0.30 + 0.55 * clamp((chi - 0.7) / 1.9, 0, 1);
+}
+return 0.20;
+};
+const oppositeElement = structure.centeredAtoms[contact.iD]?.element || 'C';
+const oppositeFactor = scale(oppositeElement);
+// --- BFS inductive effect with distance decay ---
+const maxDepth = CONSTANTS.SIGMA_HOLE.BFS_MAX_DEPTH;
+const decay = CONSTANTS.SIGMA_HOLE.BFS_DECAY;
+const visited = new Set([contact.iX, contact.iD]);
+let inductiveFactor = 0;
+const queue = [];
+// Start BFS from direct neighbors of donor (excluding opposite atom)
+(neighbors[contact.iX] || []).forEach(nIdx => {
+if (nIdx !== contact.iD && !visited.has(nIdx)) {
+queue.push([nIdx, 1, 1.0]);
+}
+});
+// Also BFS through the opposite atom (65% weight): captures activation
+// by substituents on R (e.g. fluorines in C6F5-I, 1,3,5-FIB)
+(neighbors[contact.iD] || []).forEach(nIdx => {
+if (nIdx !== contact.iX && !visited.has(nIdx)) {
+queue.push([nIdx, 1, 0.65]);
+}
+});
+while (queue.length > 0) {
+const [idx, depth, weight] = queue.shift();
+if (visited.has(idx) || depth > maxDepth) continue;
+visited.add(idx);
+const atom = structure.centeredAtoms[idx];
+if (atom) {
+inductiveFactor += weight * scale(atom.element) * Math.pow(decay, depth);
+}
+// Continue BFS deeper
+if (depth < maxDepth) {
+(neighbors[idx] || []).forEach(nIdx => {
+if (!visited.has(nIdx) && nIdx !== contact.iX) {
+queue.push([nIdx, depth + 1, weight]);
+}
+});
+}
+}
+const c = CONSTANTS.SIGMA_HOLE;
+const saturatedInductive = 1.6 * Math.tanh(inductiveFactor / 1.6);
+const totalFactor =
+c.SUBSTITUENT_BASE +
+c.SUBSTITUENT_OPPOSITE * oppositeFactor +
+c.SUBSTITUENT_INDUCTIVE * saturatedInductive;
+return clamp(totalFactor, 0.10, c.SUBSTITUENT_CAP);
+}
 function estimateContactEnergy(contact, charges, structure = null) {
-    const dispersionContribution = Math.abs(dispersionEnergy(contact.elX, contact.elA, contact.distance));
-    let totalEnergy;
-
-    if (contact.type === 'hbond') {
+    let dispersionContribution = Math.abs(dispersionEnergy(contact.elX, contact.elA, contact.distance));
+// Limit dispersion for very short contacts where covalent character dominates
+if (contact.type !== 'hbond') {
+const srTmp = SIGMA_HOLE_RADII[contact.elX] || getVdwRadius(contact.elX);
+const rhoTmp = contact.distance / (srTmp + getVdwRadius(contact.elA));
+if (rhoTmp < 0.55) dispersionContribution *= 0.5;
+}
+let totalEnergy;
+if (contact.type === 'pihole' || contact.type === 'triel') {
+return estimatePiHoleEnergy(contact, charges, structure);
+}
+if (contact.type === 'hbond') {
         const angleFactor = 0.4 + 0.6 * clamp((contact.angle - 90) / 90, 0, 1);
 
         let qH = charges ? charges[contact.iX] : 0;
-        let qA = charges ? charges[contact.iA] : 0;
-
-        if (!qH && !qA) {
-            qH = CONSTANTS.HYDROGEN_BOND.DEFAULT_H_CHARGE;
-            qA = CONSTANTS.HYDROGEN_BOND.DEFAULT_ACCEPTOR_CHARGE;
-        }
-
-        const electrostatics = Math.abs(1389 * qH * qA / (4 * contact.distance));
-
-        totalEnergy = clamp(
-            electrostatics * angleFactor + dispersionContribution,
-            1,
-            CONSTANTS.ENERGY_LIMITS.CONTACT_MAX
-        );
-    } else {
-        const donorInfo = SIGMA_HOLE_DONORS[contact.elX];
-
-        const intrinsicEnergy = donorInfo?.energy ?? 30;
-
-        const maxEnergy = Math.min(
-            donorInfo?.max ?? intrinsicEnergy * CONSTANTS.ENERGY_LIMITS.CONTACT_SIGMA_LIMIT_FACTOR,
-            CONSTANTS.ENERGY_LIMITS.CONTACT_MAX
-        );
-
-        const minAngle = donorInfo?.angleMin ?? 140;
-        const optimalAngle = donorInfo?.angleOpt ?? CONSTANTS.SIGMA_HOLE.OPTIMAL_ANGLE;
-        const angleWidth = Math.max(8, optimalAngle - minAngle);
-
-        let angleFactor = 0;
-
-        if (contact.angle >= minAngle) {
-            const deviation = Math.abs(contact.angle - optimalAngle) / angleWidth;
-            angleFactor = Math.exp(-CONSTANTS.SIGMA_HOLE.ANGULAR_DECAY * deviation * deviation);
-        }
-
-        const rho = contact.distance / (getVdwRadius(contact.elX) + getVdwRadius(contact.elA));
+let qA = charges ? charges[contact.iA] : 0;
+if (!qH && !qA) {
+qH = CONSTANTS.HYDROGEN_BOND.DEFAULT_H_CHARGE;
+qA = CONSTANTS.HYDROGEN_BOND.DEFAULT_ACCEPTOR_CHARGE;
+} else {
+if (Math.abs(qH) < 0.12) qH = 0.12;
+if (qH < 0) qH = 0.12;
+if (Math.abs(qA) < 0.12) qA = -0.12;
+if (qA > 0) qA = -0.12;
+}
+const hbAccFactor = HBOND_ACCEPTOR_FACTORS[contact.elA] ?? 1.0;
+const electrostatics = Math.abs(1389 * qH * qA / (4 * contact.distance)) * hbAccFactor;
+totalEnergy = clamp(
+electrostatics * angleFactor + dispersionContribution,
+1,
+CONSTANTS.ENERGY_LIMITS.CONTACT_MAX
+);    } else {
+const donorInfo = SIGMA_HOLE_DONORS[contact.elX];
+const intrinsicEnergy = donorInfo?.energy ?? 30;
+let maxEnergy = Math.min(
+donorInfo?.max ?? intrinsicEnergy * CONSTANTS.ENERGY_LIMITS.CONTACT_SIGMA_LIMIT_FACTOR,
+CONSTANTS.ENERGY_LIMITS.CONTACT_MAX
+);
+// Cation + anion (ref.12, 14, 27): the contact may enter the covalent regime,
+// so the per-donor cap is lifted and the covalent label becomes reachable.
+if (charges && charges[contact.iX] > 0.55 && charges[contact.iA] < -0.55) {
+maxEnergy = CONSTANTS.ENERGY_LIMITS.CONTACT_MAX;
+}
+// Heavy chalcogens (Se, Te, Po): enhanced dispersion contribution (ref.13)
+if (donorInfo?.dispersionScale) dispersionContribution *= donorInfo.dispersionScale;
+        let minAngle = donorInfo?.angleMin ?? 140;
+// Hypervalent aerogen donors (XeF6, XeF5): allow smaller R-X...A angles
+// so the angular factor does not zero out the energy.
+if (donorInfo?.type === 'aerogen' && structure?.bonds && contact.iX >= 0) {
+const donorNeighborCount = (getAtomNeighbors(structure)[contact.iX] || []).length;
+if (donorNeighborCount >= 5) minAngle = Math.min(minAngle, 120);
+}
+// Charge-assisted pentacoordinate tetrel attack (ref.14): broad angular well near 100°
+let pentacoord = false;
+if (donorInfo?.type === 'tetrel' && contact.elX !== 'C' &&
+charges && charges[contact.iA] < -0.30) {
+minAngle = Math.min(minAngle, 85);
+pentacoord = true;
+}
+const optimalAngle = donorInfo?.angleOpt ?? CONSTANTS.SIGMA_HOLE.OPTIMAL_ANGLE;
+const angleWidth = Math.max(8, optimalAngle - minAngle);
+// Soft angular decay (pnictogens, heavy tetrals): bifurcated bonds tolerate bent angles (ref.9)
+const angularDecay = donorInfo?.angleDecaySoft
+? CONSTANTS.SIGMA_HOLE.ANGULAR_DECAY * 0.60
+: CONSTANTS.SIGMA_HOLE.ANGULAR_DECAY;
+let angleFactor = 0;
+if (contact.angle >= minAngle) {
+const deviation = Math.abs(contact.angle - optimalAngle) / angleWidth;
+angleFactor = Math.exp(-angularDecay * deviation * deviation);
+if (donorInfo?.sideAngleOpt !== undefined && donorInfo?.sideWeight !== undefined) {
+const sideDeviation = Math.abs(contact.angle - donorInfo.sideAngleOpt) / angleWidth;
+const sideFactor = donorInfo.sideWeight * Math.exp(-angularDecay * sideDeviation * sideDeviation);
+angleFactor = Math.max(angleFactor, sideFactor);
+}
+}
+// Pentacoordinate well: attack at ~90-110° is normal for charge-assisted tetrel bonds
+if (pentacoord && contact.angle >= 85) {
+const devP = Math.abs(contact.angle - 100) / 45;
+angleFactor = Math.max(angleFactor, 0.7 * Math.exp(-1.2 * devP * devP));
+}
+        const sigmaHoleRadius = SIGMA_HOLE_RADII[contact.elX] || getVdwRadius(contact.elX);
+const rho = contact.distance / (sigmaHoleRadius + getVdwRadius(contact.elA));
 
         const rhoOpt = donorInfo?.rhoOpt ?? CONSTANTS.SIGMA_HOLE.OPTIMAL_RHO;
         const radialDecay = donorInfo?.radialDecay ?? CONSTANTS.SIGMA_HOLE.RADIAL_DECAY;
@@ -1944,50 +2160,230 @@ function estimateContactEnergy(contact, charges, structure = null) {
             ? 1.0
             : Math.exp(-radialDecay * (rho - rhoOpt));
 
-        const substituentFactor = structure
-            ? sigmaSubstituentFactor(contact, structure)
-            : 1.0;
-
-        const acceptorFactor = SIGMA_ACCEPTOR_FACTORS[contact.elA] ?? 1.0;
-
-        let shortRangeBonus = 0;
-        const shortRangeRho = CONSTANTS.SIGMA_HOLE.SHORT_RANGE_RHO;
-
-        if (rho < shortRangeRho) {
-            shortRangeBonus =
-                CONSTANTS.SIGMA_HOLE.SHORT_RANGE_BONUS *
-                intrinsicEnergy *
-                ((shortRangeRho - rho) / 0.10);
-
-            shortRangeBonus = clamp(shortRangeBonus, 0, 0.35 * maxEnergy);
-        }
-
-        const rawEnergy =
-            intrinsicEnergy *
-            substituentFactor *
-            acceptorFactor *
-            radialFactor *
-            angleFactor +
-            shortRangeBonus +
-            dispersionContribution;
-
-        totalEnergy = clamp(rawEnergy, 0, maxEnergy);
-    }
-
-    return totalEnergy;
+// Deformation correction for very short contacts (partial covalency)
+let deformationFactor = 1.0;
+if (rho < 0.55) deformationFactor = 0.55;
+else if (rho < 0.62) deformationFactor = 0.75;
+else if (rho < 0.68) deformationFactor = 0.90;
+// Nonlinear deformation penalty for Si/Ge with multiple EWG substituents (ref.8, 15):
+// E_def reaches ~70% of E_int
+if (donorInfo?.deformationSensitive && rho < 0.80 && structure?.bonds && contact.iX >= 0) {
+const EWG_DEFORM = ['F', 'Cl', 'Br', 'I', 'O', 'N'];
+let ewgCount = 0;
+(getAtomNeighbors(structure)[contact.iX] || []).forEach(nIdx => {
+if (nIdx !== contact.iD && EWG_DEFORM.includes(structure.centeredAtoms[nIdx]?.element)) ewgCount++;
+});
+if (ewgCount >= 3) deformationFactor *= 0.30;
+else if (ewgCount >= 2) deformationFactor *= 0.50;
 }
-function estimateStackingEnergy(stack) {
-const sizeFactor = clamp((stack.n1 + stack.n2) / 12, 0.5, 2);
+
+const substituentFactor = structure
+? sigmaSubstituentFactor(contact, structure)
+: 1.0;
+
+        let acceptorFactor = SIGMA_ACCEPTOR_FACTORS[contact.elA] ?? 1.0;
+{
+const softDonors = ['Br', 'I', 'Se', 'Te', 'Po', 'Sb', 'Bi'];
+const softAcceptors = ['S', 'Se', 'Te', 'I', 'Br', 'Cl'];
+if (softDonors.includes(contact.elX) && softAcceptors.includes(contact.elA)) {
+const softLinearity = clamp((contact.angle - minAngle) / Math.max(1, optimalAngle - minAngle), 0, 1);
+acceptorFactor *= 1.0 + (CONSTANTS.SIGMA_HOLE.SOFT_SOFT_FACTOR - 1.0) * softLinearity * angleFactor;
+}
+}
+// Halogen-halogen contacts (Ha···Ha "like-like"):
+// the halogen electron belt is a much weaker acceptor
+// than classic nucleophiles (N, O, S).
+{
+const halogens = ['Cl', 'Br', 'I'];
+if (halogens.includes(contact.elX) && halogens.includes(contact.elA)) {
+if (contact.angle < 160) {
+// Non-linear contact — weak "like-like" interaction
+acceptorFactor *= 0.30;
+} else {
+// Linear contact — classic HaB, but the acceptor is still weaker than N/O
+acceptorFactor *= 0.55;
+}
+// Same-element contacts (I···I, Br···Br) are weaker than mixed-element ones (I···Br):
+// the electron belt of the same halogen is a weaker acceptor
+if (contact.elX === contact.elA) {
+if (contact.elX === 'I') acceptorFactor *= 0.60;
+else if (contact.elX === 'Br') acceptorFactor *= 0.75;
+}
+// SAPT (Ibrahim 2022; Mertsalov 2021): like-like contacts are held together
+// mostly by dispersion — compensate for the underestimated molecular dispersion.
+dispersionContribution *= 1.8;
+}
+}
+// Acceptor coordination to a metal bonus: the metal increases the acceptor nucleophilicity
+if (structure?.bonds && contact.iA >= 0) {
+const accNeighbors = getAtomNeighbors(structure);
+const accNb = accNeighbors[contact.iA] || [];
+let accMetalBonus = 0;
+for (const nbIdx of accNb) {
+if (nbIdx === contact.iX) continue;
+const nbEl = structure.centeredAtoms[nbIdx]?.element;
+if (nbEl && METALS.has(nbEl)) {
+const chi = METAL_ELECTRONEGATIVITY[nbEl] ?? 1.5;
+accMetalBonus = Math.max(accMetalBonus, 0.15 + 0.25 * clamp((chi - 0.7) / 1.9, 0, 1));
+}
+}
+if (accMetalBonus > 0) acceptorFactor *= (1.0 + accMetalBonus);
+}
+// Charge-assisted sigma-hole bonds (Esrafili 2018; Scheiner 2018; ref.14, 15):
+// anion acceptors x2-4, cation donors x1.5-2.5.
+if (charges && charges[contact.iA] !== undefined) {
+const qAcc = charges[contact.iA];
+if (qAcc < -0.55) acceptorFactor *= 2.5;
+else if (qAcc < -0.30) acceptorFactor *= 1.4;
+if (charges[contact.iX] > 0.55) acceptorFactor *= 1.8;
+}
+let shortRangeBonus = 0;
+const shortRangeRho = CONSTANTS.SIGMA_HOLE.SHORT_RANGE_RHO;
+if (rho < shortRangeRho) {
+shortRangeBonus =
+CONSTANTS.SIGMA_HOLE.SHORT_RANGE_BONUS *
+intrinsicEnergy *
+((shortRangeRho - rho) / 0.10);
+shortRangeBonus = clamp(shortRangeBonus, 0, 0.35 * maxEnergy);
+}
+// --- Charge-transfer / polarization bonus (type-dependent) ---
+let chargeTransferBonus = 0;
+if (rho < 0.72) {
+const ctDepth = clamp((0.72 - rho) / 0.12, 0, 1.6);
+let ctScale = donorInfo?.type === 'halogen' ? 1.0 :
+donorInfo?.type === 'chalcogen' ? 0.75 :
+donorInfo?.type === 'pnictogen' ? 0.65 : 0.8;
+// Anionic nucleophiles: massive charge transfer (WBI 0.36-0.48, ref.14)
+if (charges && charges[contact.iA] < -0.55) ctScale *= 2.0;
+chargeTransferBonus = intrinsicEnergy * ctScale * Math.pow(ctDepth, 1.5) * acceptorFactor;
+chargeTransferBonus = clamp(chargeTransferBonus, 0, 0.6 * maxEnergy);
+}
+// --- Improved Coulomb term for EQeq charges ---
+let coulombEnergy = 0;
+if (charges && structure) {
+const qX = charges[contact.iX] || 0;
+const qA = charges[contact.iA] || 0;
+const c = CONSTANTS.SIGMA_HOLE;
+coulombEnergy = Math.abs(c.COULOMB_FACTOR * qX * qA / (4 * contact.distance));
+const coulombCap = (qX > 0.55 && qA < -0.55) ? 200 : 25;
+coulombEnergy = clamp(coulombEnergy * radialFactor * angleFactor, 0, coulombCap);
+// Screening: point-charge model overestimates for diffuse sigma-holes
+coulombEnergy *= 0.35;
+if (qA < -0.35 || qX > 0.35) coulombEnergy *= 1.35;
+if (qA < -0.60 || qX > 0.60) coulombEnergy *= 1.15;
+// Cap on the Coulomb term to prevent overestimation in weak interactions
+const mainGeometricTerm = intrinsicEnergy * substituentFactor * acceptorFactor * radialFactor * angleFactor;
+coulombEnergy = Math.min(coulombEnergy, 0.6 * mainGeometricTerm);
+// Chalcogen correction: the σ-hole of chalcogens (S, Se, Te, Po) is more diffuse
+// than the point-charge model assumes. Reduce the Coulomb contribution.
+if (donorInfo?.type === 'chalcogen') {
+coulombEnergy *= 0.75;
+}
+}
+// --- Explicit polarization (charge-induced dipole) term: -1/2 * alpha * q^2 / d^4 ---
+let polarizationEnergy = 0;
+if (charges && structure) {
+const qX = charges[contact.iX] || 0;
+const qA = charges[contact.iA] || 0;
+const aX = ATOMIC_POLARIZABILITY[contact.elX] ?? 6;
+const aA = ATOMIC_POLARIZABILITY[contact.elA] ?? 7;
+const polCap = (qX > 0.55 && qA < -0.55) ? 40 : 8;
+polarizationEnergy = clamp(0.5 * 102.9 * (qX * qX * aA + qA * qA * aX) / Math.pow(contact.distance, 4), 0, polCap);
+}
+
+// --- Improved metal activation: multiplicative + additive ---
+let metalBonus = 1.0;
+let metalAdditive = 0.0;
+if (structure?.bonds && contact.iX >= 0) {
+const neighbors = getAtomNeighbors(structure);
+const nb = neighbors[contact.iX] || [];
+let bestMetalStrength = 0;
+let metalCount = 0;
+for (const nbIdx of nb) {
+if (nbIdx === contact.iD) continue;
+const nbEl = structure.centeredAtoms[nbIdx]?.element;
+if (nbEl && METALS.has(nbEl)) {
+metalCount++;
+const chi = METAL_ELECTRONEGATIVITY[nbEl] ?? 1.5;
+bestMetalStrength = Math.max(bestMetalStrength, clamp((chi - 0.7) / 1.9, 0, 1));
+}
+}
+if (metalCount > 0) {
+const cooperativity = 1.0 + 0.15 * (Math.min(metalCount, 3) - 1);
+const metalActivation = (1.30 + 2.70 * bestMetalStrength) * cooperativity;
+const metalAdd = CONSTANTS.SIGMA_HOLE.METAL_ADDITIVE_BONUS ?? 0.0;
+const metalDamping = clamp((rhoOpt + 0.35 - rho) / 0.40, 0.55, 1.0);
+metalBonus = 1.0 + (metalActivation - 1.0) * metalDamping;
+metalAdditive = metalAdd * (0.5 + 0.5 * bestMetalStrength) * metalDamping;
+}
+}
+const rawEnergy =
+CONSTANTS.SIGMA_HOLE.GLOBAL_CORE_SCALE *
+intrinsicEnergy *
+substituentFactor *
+acceptorFactor *
+radialFactor *
+angleFactor *
+metalBonus *
+deformationFactor +
+shortRangeBonus +
+chargeTransferBonus +
+dispersionContribution +
+coulombEnergy +
+polarizationEnergy +
+metalAdditive;        
+// Crystal environment screening: reduce energy for CIF structures
+// Stronger screening for atoms with a larger number of covalent bonds
+let screeningFactor = 1.0;
+if (structure && structure.cell) {
+const nNeighbors = (getAtomNeighbors(structure)[contact.iX] || []).length;
+screeningFactor = clamp(CONSTANTS.SIGMA_HOLE.CRYSTAL_SCREENING - 0.03 * Math.max(0, nNeighbors - 2), 0.65, 0.85);
+}
+totalEnergy = clamp(rawEnergy * screeningFactor, 0, maxEnergy);
+}
+return totalEnergy;
+}
+function ringStackProps(structure, idxs) {
+const atoms = structure.centeredAtoms;
+const neighbors = getAtomNeighbors(structure);
+const SUBST_THETA = { H: 0.0, C: 0.2, N: 0.8, O: 1.0, F: 3.0, Cl: 1.2, Br: 1.5, I: 2.0, S: 0.6, Se: 0.8 };
+let pol = 0, theta = 0;
+idxs.forEach(i => {
+const el = atoms[i].element;
+pol += ATOMIC_POLARIZABILITY[el] ?? 6;
+theta += (el === 'N' ? 0.6 : -1.4);
+(neighbors[i] || []).forEach(j => {
+if (idxs.includes(j)) return;
+const se = atoms[j].element;
+pol += 0.5 * (ATOMIC_POLARIZABILITY[se] ?? 5);
+theta += (SUBST_THETA[se] !== undefined ? SUBST_THETA[se] : 0.2);
+});
+});
+return { pol, theta };
+}
+function estimateStackingEnergy(stack, structure) {
+const p1 = ringStackProps(structure, stack.a1);
+const p2 = ringStackProps(structure, stack.a2);
+const sizePol = Math.sqrt(p1.pol * p2.pol) / 38; // =1 for benzene dimer (pol ≈ 38)
 const distanceFactor = Math.exp(-Math.pow(stack.distance - 3.5, 2) / 0.8);
-const orientationFactor = Math.max(0, 1 - stack.pa / 60) * Math.max(0, 1 - stack.slip / 60);
-return clamp(
-4 * sizeFactor * distanceFactor * (0.4 + 0.6 * orientationFactor),
-0,
-CONSTANTS.ENERGY_LIMITS.STACKING_MAX
-);
+const overlap = Math.max(0, 1 - stack.slip / 90) * Math.max(0, 1 - stack.pa / 60);
+const geom = 0.30 + 0.70 * overlap;
+const disp = -16.0 * sizePol * distanceFactor * geom;
+const quad = 0.055 * p1.theta * p2.theta * distanceFactor * geom;
+// Fluorination bonus (ref.26): +2 kJ/mol per fluorine on the rings
+let nF = 0;
+const nb = getAtomNeighbors(structure);
+[...stack.a1, ...stack.a2].forEach(idx => {
+(nb[idx] || []).forEach(j => {
+if (!stack.a1.includes(j) && !stack.a2.includes(j) && structure.centeredAtoms[j]?.element === 'F') nF++;
+});
+});
+const fBonus = 2.0 * Math.min(nF, 8);
+return clamp(-(disp + quad) + fBonus, 0, CONSTANTS.ENERGY_LIMITS.STACKING_MAX);
 }
 function contactQuality(energy) {
 const { WEAK, MEDIUM } = CONSTANTS.ENERGY_QUALITY.CONTACT;
+if (energy > CONSTANTS.ENERGY_LIMITS.COVALENT_THRESHOLD) return currentLang().qCovalent;
 if (energy < WEAK) return currentLang().qWeakF;
 if (energy < MEDIUM) return currentLang().qMedF;
 return currentLang().qStrongF;
@@ -2229,7 +2625,7 @@ function createMoleculeGroup(structure, options = {}) {
     structure.bonds = computeBonds(centered);
     structure.charges = computeCharges(structure);
   }
-  const colorScheme = ATOM_COLOR_SCHEMES[settings.atomScheme] || ATOM_COLOR_SCHEMES.default;
+  const colorScheme = ATOM_COLOR_SCHEMES.default;
 structure.pickables = [];
 structure.pickMap = [];
 structure.atomLabels = [];
@@ -2250,6 +2646,7 @@ group.add(cellGroup);
 return group;
 }
 function addEllipsoids(group, atoms, structure, colorScheme) {
+const M4 = new THREE.Matrix4();
 atoms.forEach((atom, idx) => {
 const color = atomColor(atom.element, colorScheme);
 let mesh = atom.U ? createEllipsoid(atom.U, color.getHex(), structure) : null;
@@ -2261,11 +2658,37 @@ new THREE.MeshStandardMaterial({ color, roughness: 0.4 })
 }
 mesh.position.set(atom.x, atom.y, atom.z);
 mesh.userData.atomIndex = idx;
+mesh.userData.baseScale = mesh.scale.clone();
 group.add(mesh);
 structure.pickables.push(mesh);
 structure.pickMap[idx] = { mesh, li: -1, base: color.clone() };
 addLabelIf(structure, group, atom, idx, 0.4);
 });
+if (structure.bonds.length) {
+const bondMesh = new THREE.InstancedMesh(
+new THREE.CylinderGeometry(0.08, 0.08, 1, CONSTANTS.BOND_CYLINDER_SEGMENTS),
+new THREE.MeshStandardMaterial({ color: settings.bondColor, roughness: 0.6 }),
+structure.bonds.length
+);
+const up = new THREE.Vector3(0, 1, 0);
+const quaternion = new THREE.Quaternion();
+const scale = new THREE.Vector3();
+structure.bonds.forEach((bond, i) => {
+const p1 = atoms[bond.i], p2 = atoms[bond.j];
+const v = new THREE.Vector3(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z);
+const length = v.length();
+quaternion.setFromUnitVectors(up, v.normalize());
+M4.compose(
+new THREE.Vector3((p1.x + p2.x) / 2, (p1.y + p2.y) / 2, (p1.z + p2.z) / 2),
+quaternion,
+scale.set(1, length, 1)
+);
+bondMesh.setMatrixAt(i, M4);
+});
+bondMesh.instanceMatrix.needsUpdate = true;
+group.add(bondMesh);
+structure.bondMesh = bondMesh;
+}
 }
 function addStickStyle(group, atoms, structure, colorScheme) {
 const bondRadius = 0.12;
@@ -2428,22 +2851,26 @@ camera.position.set(center.x + distance * 0.7, center.y + distance * 0.5, center
 controls.update();
 }
 function loadStructure(index, keepView = false, fresh = false) {
-  if (!AppState.structures.length || index < 0 || index >= AppState.structures.length) return;
-
-  const structure = AppState.structures[index];
-
-  const preserveState = !fresh;
-  const savedVisibleAtoms = preserveState ? (structure.visibleAtoms || null) : null;
-
-  AppState.currentSelectedAtomIndex = -1;
-  AppState.shiftSelectedAtoms.clear();
-
-  if (fresh) {
-    structure.visibleAtoms = null;
-    structure._inter = null;
-    structure._stack = null;
-    clearAllMeasurements();
-  }
+if (!AppState.structures.length || index < 0 || index >= AppState.structures.length) return;
+const structure = AppState.structures[index];
+if (fresh && structure.baseAtoms) {
+structure.atoms = structure.baseAtoms;
+structure.baseAtoms = null;
+structure.centeredAtoms = null;
+structure.bonds = null;
+structure.charges = null;
+}
+const preserveState = !fresh;
+const savedVisibleAtoms = preserveState ? (structure.visibleAtoms || null) : null;
+AppState.currentSelectedAtomIndex = -1;
+AppState.shiftSelectedAtoms.clear();
+if (fresh) {
+structure.visibleAtoms = null;
+structure._inter = null;
+structure._stack = null;
+structure._cutCtx = null;
+clearAllMeasurements();
+}
 
   const cameraPos = camera.position.clone();
   const target = controls.target.clone();
@@ -2510,6 +2937,107 @@ sym: formatSymmetry(dx, dy, dz)
 }
 return result;
 }
+function buildAcceptorIndex(acceptorList) {
+const CELL = 6.0;
+const grid = new Map();
+acceptorList.forEach(a => {
+const k = Math.floor(a.pos.x / CELL) + ',' + Math.floor(a.pos.y / CELL) + ',' + Math.floor(a.pos.z / CELL);
+let arr = grid.get(k);
+if (!arr) { arr = []; grid.set(k, arr); }
+arr.push(a);
+});
+return (pos) => {
+const out = [];
+const cx = Math.floor(pos.x / CELL), cy = Math.floor(pos.y / CELL), cz = Math.floor(pos.z / CELL);
+for (let dx = -1; dx <= 1; dx++)
+for (let dy = -1; dy <= 1; dy++)
+for (let dz = -1; dz <= 1; dz++) {
+const arr = grid.get((cx + dx) + ',' + (cy + dy) + ',' + (cz + dz));
+if (arr) for (let i = 0; i < arr.length; i++) out.push(arr[i]);
+}
+return out;
+};
+}
+function getCutContext(structure) {
+if (structure._cutCtx) return structure._cutCtx;
+const ctx = { cut: new Set(), missing: {}, viaCut: () => false };
+if (!structure.cell || !structure.orthoM) {
+structure._cutCtx = ctx;
+return ctx;
+}
+const atoms = structure.centeredAtoms;
+const M = structure.orthoM;
+const CELL = 6.0;
+const grid = new Map();
+atoms.forEach((a, idx) => {
+const k = Math.floor(a.x / CELL) + ',' + Math.floor(a.y / CELL) + ',' + Math.floor(a.z / CELL);
+let arr = grid.get(k);
+if (!arr) { arr = []; grid.set(k, arr); }
+arr.push(idx);
+});
+const trans = [];
+for (let dx = -1; dx <= 1; dx++)
+for (let dy = -1; dy <= 1; dy++)
+for (let dz = -1; dz <= 1; dz++) {
+if (!dx && !dy && !dz) continue;
+trans.push(new THREE.Vector3(
+M[0][0] * dx + M[0][1] * dy + M[0][2] * dz,
+M[1][1] * dy + M[1][2] * dz,
+M[2][2] * dz
+));
+}
+const near = (x, y, z) => {
+const out = [];
+const cx = Math.floor(x / CELL), cy = Math.floor(y / CELL), cz = Math.floor(z / CELL);
+for (let dx = -1; dx <= 1; dx++)
+for (let dy = -1; dy <= 1; dy++)
+for (let dz = -1; dz <= 1; dz++) {
+const arr = grid.get((cx + dx) + ',' + (cy + dy) + ',' + (cz + dz));
+if (arr) for (let q = 0; q < arr.length; q++) out.push(arr[q]);
+}
+return out;
+};
+const atomAt = (x, y, z) => {
+for (const k of near(x, y, z)) {
+const a = atoms[k];
+const d2 = (a.x - x) * (a.x - x) + (a.y - y) * (a.y - y) + (a.z - z) * (a.z - z);
+if (d2 < 0.01) return true;
+}
+return false;
+};
+atoms.forEach((atom, i) => {
+const pos = new THREE.Vector3(atom.x, atom.y, atom.z);
+for (const T of trans) {
+const qx = pos.x - T.x, qy = pos.y - T.y, qz = pos.z - T.z;
+for (const j of near(qx, qy, qz)) {
+const b = atoms[j];
+const thr = getCovalentRadius(atom.element) + getCovalentRadius(b.element) + bondTolerance(atom.element, b.element);
+const px = b.x + T.x, py = b.y + T.y, pz = b.z + T.z;
+const d2 = (px - pos.x) * (px - pos.x) + (py - pos.y) * (py - pos.y) + (pz - pos.z) * (pz - pos.z);
+if (d2 >= thr * thr || d2 <= 0.16) continue;
+if (!atomAt(px, py, pz)) {
+ctx.cut.add(i);
+if (!ctx.missing[i]) ctx.missing[i] = [];
+ctx.missing[i].push({ x: px, y: py, z: pz, element: b.element });
+}
+}
+}
+});
+ctx.viaCut = (idxs, pos, el) => {
+for (const s of idxs) {
+const mps = ctx.missing[s];
+if (!mps) continue;
+for (const mp of mps) {
+const thr = getCovalentRadius(mp.element) + getCovalentRadius(el) + bondTolerance(mp.element, el);
+const dx = mp.x - pos.x, dy = mp.y - pos.y, dz = mp.z - pos.z;
+if (dx * dx + dy * dy + dz * dz < thr * thr) return true;
+}
+}
+return false;
+};
+structure._cutCtx = ctx;
+return ctx;
+}
 function detectInteractions(structure) {
 if (structure._inter) return structure._inter;
 const atoms = structure.centeredAtoms;
@@ -2532,21 +3060,41 @@ pos: new THREE.Vector3(atom.x + copy.vec.x, atom.y + copy.vec.y, atom.z + copy.v
 });
 });
 const isSelfInteraction = (sym, j, excluded) => sym === 'x,y,z' && excluded.includes(j);
+const nearAcceptors = buildAcceptorIndex(acceptorList);
+const cutCtx = getCutContext(structure);
+const cut = cutCtx.cut;
+const hydridicH = new Set();
+atoms.forEach((a, idx) => {
+if (a.element === 'H' && neighbors[idx].some(j => HYDRIDE_CENTER_ATOMS.has(atoms[j].element))) hydridicH.add(idx);
+});
 atoms.forEach((atom, i) => {
 const positionX = new THREE.Vector3(atom.x, atom.y, atom.z);
 const distances = settings.exclude14 ? bfsDistances(i, neighbors, atoms.length) : null;
-const isClose = (j) => distances && distances[j] <= 3;
+const isClose = (j, accPos) => {
+if (distances && distances[j] <= 3) return true;
+if (structure.cell && accPos) {
+const elJ = atoms[j].element;
+if (positionX.distanceTo(accPos) < getCovalentRadius(atom.element) + getCovalentRadius(elJ) + bondTolerance(atom.element, elJ)) return true;
+for (const nIdx of neighbors[i]) {
+const nA = atoms[nIdx];
+if (new THREE.Vector3(nA.x, nA.y, nA.z).distanceTo(accPos) < getCovalentRadius(nA.element) + getCovalentRadius(elJ) + bondTolerance(nA.element, elJ)) return true;
+}
+}
+return false;
+};
 // H-bonds
 if (atom.element === 'H') {
 const donorIndex = neighbors[i].find(n => HBOND_DONOR_ATOMS.has(atoms[n].element));
 if (donorIndex === undefined) return;
+if (cut.has(i) || cut.has(donorIndex)) return;
 const donor = atoms[donorIndex];
 const positionD = new THREE.Vector3(donor.x, donor.y, donor.z);
 const distDH = positionX.distanceTo(positionD);
-acceptorList.forEach(acceptor => {
+nearAcceptors(positionX).forEach(acceptor => {
 if (!ACCEPTORS.has(atoms[acceptor.j].element)) return;
 if (isSelfInteraction(acceptor.sym, acceptor.j, [i, donorIndex])) return;
-if (isClose(acceptor.j)) return;
+if (isClose(acceptor.j, acceptor.pos)) return;
+if (cutCtx.viaCut([i, donorIndex], acceptor.pos, atoms[acceptor.j].element)) return;
 const distHA = positionX.distanceTo(acceptor.pos);
 const vdwSum = getVdwRadius('H') + getVdwRadius(atoms[acceptor.j].element);
 const angle = angleBetween(positionD, positionX, acceptor.pos);
@@ -2574,19 +3122,76 @@ return;
 // Sigma-holes
 const donorInfo = SIGMA_HOLE_DONORS[atom.element];
 if (!donorInfo || !neighbors[i].length) return;
+if (cut.has(i)) return;
+// Carbon is a tetrel (sigma-hole) donor ONLY when activated by an
+// electron-withdrawing neighbor (F, O, N, halogen, S/Se) — as in nitriles,
+// isocyanides, carbonyls, CF3 groups. Hydrocarbon/aromatic carbons have
+// no sigma-hole and must not generate tetrel contacts.
+if (atom.element === 'C') {
+  const EWG = ['F', 'Cl', 'Br', 'I', 'O', 'N', 'S', 'Se', 'Te'];
+  let hasEWG = false;
+  let hasMetal = false;
+  for (const n of neighbors[i]) {
+    const el = atoms[n].element;
+    if (EWG.includes(el)) hasEWG = true;
+    if (METALS.has(el)) hasMetal = true;
+  }
+  // carbanion-like C (bonded to a metal) is a nucleophile, not a donor
+  // Terminal (monovalent) C — isocyanides, CO — has its lone pair exactly
+  // opposite its single bond: the "linear sigma-hole" direction is in fact
+  // the nucleophilic lone pair, so such C is an ACCEPTOR, never a donor.
+  if (!hasEWG || hasMetal || neighbors[i].length < 2) return;
+}
+// Hypervalent aerogen donors (e.g. XeF6): the sigma-hole region points
+// toward a face/edge of the coordination polyhedron, so the R-X...A
+// angle can be far from 180 degrees.
+const effectiveAngleMin = (donorInfo.type === 'aerogen' && neighbors[i].length >= 5)
+? Math.min(donorInfo.angleMin, 120)
+: donorInfo.angleMin;
 neighbors[i].forEach(neighborIndex => {
 const R = atoms[neighborIndex];
 const positionR = new THREE.Vector3(R.x, R.y, R.z);
 const distRX = positionX.distanceTo(positionR);
-acceptorList.forEach(acceptor => {
-if (!ACCEPTORS.has(atoms[acceptor.j].element)) return;
+nearAcceptors(positionX).forEach(acceptor => {
+const accEl = atoms[acceptor.j].element;
+const hyd = accEl === 'H' && hydridicH.has(acceptor.j);
+if (!SIGMA_ACCEPTORS.has(accEl) && !hyd) return;
+// Carbon accepts a sigma-hole only when clearly anionic (isocyanides, CO)
+if (accEl === 'C' &&
+structure.charges && structure.charges[acceptor.j] > -0.2) return;
 if (isSelfInteraction(acceptor.sym, acceptor.j, [i, neighborIndex])) return;
-if (isClose(acceptor.j)) return;
+if (isClose(acceptor.j, acceptor.pos)) return;
+if (cutCtx.viaCut([i, neighborIndex], acceptor.pos, accEl)) return;
+// Double σ-hole guard: an acceptor that is itself a σ-hole donor must not
+// face the donor with its own σ-hole axis; nucleophilic attack goes through
+// the lone pair / electron belt (perpendicular to R–A bonds).
+if (acceptor.sym === 'x,y,z' && accEl !== 'C' && SIGMA_HOLE_DONORS[accEl]) {
+const accNb = neighbors[acceptor.j];
+if (accNb.length) {
+const toX = positionX.clone().sub(acceptor.pos).normalize();
+let minDev = 180;
+accNb.forEach(k => {
+const ext = acceptor.pos.clone().sub(new THREE.Vector3(atoms[k].x, atoms[k].y, atoms[k].z)).normalize();
+const dev = ext.angleTo(toX) * 180 / Math.PI;
+if (dev < minDev) minDev = dev;
+});
+if (minDev < 60) return;
+}
+}
+// Charge-assisted tetrel bonds (ref.14): anionic attack at pentacoordinate ~90° geometry.
+// Carbon is EXCLUDED: bent C...A contacts are pi-hole (carbonyl/CO2) cases, not tetrel bonds.
+let accMinAngle = effectiveAngleMin;
+if (donorInfo?.type === 'tetrel' && atom.element !== 'C' &&
+structure.charges && structure.charges[acceptor.j] < -0.30) {
+accMinAngle = Math.min(accMinAngle, 85);
+}
 const distXA = positionX.distanceTo(acceptor.pos);
+if (distXA < getCovalentRadius(atom.element) + getCovalentRadius(accEl) + bondTolerance(atom.element, accEl)) return;
 const angle = angleBetween(positionR, positionX, acceptor.pos);
-const vdwSum = getVdwRadius(atom.element) + getVdwRadius(atoms[acceptor.j].element);
-if (distXA < CONSTANTS.SIGMA_HOLE.DISTANCE_FACTOR * vdwSum &&
-angle > donorInfo.angleMin) {
+const vdwSum = getVdwRadius(atom.element) + getVdwRadius(accEl);
+const distFactor = hyd ? CONSTANTS.HYDRIDE.DISTANCE_FACTOR : CONSTANTS.SIGMA_HOLE.DISTANCE_FACTOR;
+if (distXA < distFactor * vdwSum &&
+angle > accMinAngle) {
 interactions.push({
 type: donorInfo.type,
 iD: neighborIndex,
@@ -2606,9 +3211,285 @@ elA: atoms[acceptor.j].element
 });
 });
 });
-structure._inter = interactions;
-structure.lastInteractions = interactions;
-return interactions;
+// Deduplicate contacts: for the same donor X and acceptor A (same symmetry
+// copy) keep only the interaction with the most linear R-X...A angle.
+const bestByKey = new Map();
+interactions.forEach(x => {
+const key = x.iX + '|' + x.iA + '|' + x.sym;
+const prev = bestByKey.get(key);
+if (!prev || x.angle > prev.angle) bestByKey.set(key, x);
+});
+const piContacts = detectPiHoles(structure);
+// Cross-dedup: the same X...A pair must not be shown twice (sigma + pi).
+// The pi-hole/triel description wins over the sigma-hole one.
+const piKeys = new Set();
+piContacts.forEach(x => {
+if (x.iX >= 0) piKeys.add(x.iX + '|' + x.iA + '|' + x.sym);
+});
+const sigmaContacts = [...bestByKey.values()].filter(x =>
+!piKeys.has(x.iX + '|' + x.iA + '|' + x.sym));
+const deduped = [...sigmaContacts, ...piContacts];
+// Spatial dedup: after a fragment copy has been revealed, the same physical
+// contact can be found twice (via symmetry copy and via the revealed copy).
+const bySpace = new Map();
+deduped.forEach(x => {
+const key = x.iX + '|' + x.to.x.toFixed(2) + ',' + x.to.y.toFixed(2) + ',' + x.to.z.toFixed(2);
+const prev = bySpace.get(key);
+if (!prev || (prev.sym !== 'x,y,z' && x.sym === 'x,y,z')) bySpace.set(key, x);
+});
+const final = [...bySpace.values()];
+structure._inter = final;
+structure.lastInteractions = final;
+return final;
+}
+// ============================================================
+// PI-HOLE DETECTION (v3.18)
+// ============================================================
+function estimatePiHoleEnergy(contact, charges, structure = null) {
+const c = CONSTANTS.PI_HOLE;
+const intrinsic = contact.intrinsic || 6;
+let acceptorFactor = SIGMA_ACCEPTOR_FACTORS[contact.elA] ?? 1.0;
+// Charge-assisted anion-pi complexes (Scheiner 2018; Frontera 2020; Wysokinski 2021):
+// anionic nucleophiles bind pi-holes far more strongly than neutral ones.
+if (charges && charges[contact.iA] !== undefined) {
+const qAcc = charges[contact.iA];
+if (qAcc < -0.55) acceptorFactor *= 1.8;
+else if (qAcc < -0.30) acceptorFactor *= 1.3;
+}
+const rX = SIGMA_HOLE_RADII[contact.elX] || getVdwRadius(contact.elX);
+const rho = contact.distance / (rX + getVdwRadius(contact.elA));
+const radialFactor = rho < c.OPTIMAL_RHO ? 1.0 : Math.exp(-c.RADIAL_DECAY * (rho - c.OPTIMAL_RHO));
+const tiltFactor = Math.exp(-CONSTANTS.SIGMA_HOLE.ANGULAR_DECAY * Math.pow(contact.angle / c.TILT_WIDTH, 2));
+const dispersionContribution = Math.abs(dispersionEnergy(contact.elX, contact.elA, contact.distance));
+let coulombEnergy = 0;
+let polarizationEnergy = 0;
+if (charges && structure && (contact.iX >= 0 || contact.qeff)) {
+const qX = contact.iX >= 0 ? (charges[contact.iX] || 0) : (contact.qeff || 0);
+const qA = charges[contact.iA] || 0;
+coulombEnergy = Math.abs(CONSTANTS.SIGMA_HOLE.COULOMB_FACTOR * qX * qA / (4 * contact.distance));
+coulombEnergy = clamp(coulombEnergy * radialFactor * tiltFactor, 0, 15) * 0.35;
+const aX = ATOMIC_POLARIZABILITY[contact.elX] ?? 6;
+const aA = ATOMIC_POLARIZABILITY[contact.elA] ?? 7;
+polarizationEnergy = clamp(0.5 * 102.9 * (qX * qX * aA + qA * qA * aX) / Math.pow(contact.distance, 4), 0, 8);
+}
+const raw = c.GLOBAL_SCALE * intrinsic * acceptorFactor * radialFactor * tiltFactor +
+dispersionContribution + coulombEnergy + polarizationEnergy;
+const screening = structure && structure.cell ? 0.80 : 1.0;
+return clamp(raw * screening, 0, 60);
+}
+function detectPiHoles(structure) {
+const atoms = structure.centeredAtoms;
+const bonds = structure.bonds;
+const n = atoms.length;
+const contacts = [];
+const neighbors = atoms.map(() => []);
+bonds.forEach(b => { neighbors[b.i].push(b.j); neighbors[b.j].push(b.i); });
+const P = i => new THREE.Vector3(atoms[i].x, atoms[i].y, atoms[i].z);
+const c = CONSTANTS.PI_HOLE;
+const acceptorList = [];
+buildCopies(structure).forEach(copy => {
+atoms.forEach((atom, j) => {
+acceptorList.push({ j, sym: copy.sym, pos: P(j).add(copy.vec) });
+});
+});
+const isSelf = (sym, j, excl) => sym === 'x,y,z' && excl.includes(j);
+const nearAcceptors = buildAcceptorIndex(acceptorList);
+const cutCtx = getCutContext(structure);
+const cut = cutCtx.cut;
+const hydridicH = new Set();
+atoms.forEach((a, idx) => {
+if (a.element === 'H' && neighbors[idx].some(j => HYDRIDE_CENTER_ATOMS.has(atoms[j].element))) hydridicH.add(idx);
+});
+const pushContact = (kind, iX, elX, intrinsic, axis, centerPos, excl, close, type = 'pihole') => {
+nearAcceptors(centerPos).forEach(acc => {
+const accEl = atoms[acc.j].element;
+const hyd = accEl === 'H' && hydridicH.has(acc.j);
+if (!SIGMA_ACCEPTORS.has(accEl) && !hyd) return;
+if (accEl === 'C' && structure.charges && structure.charges[acc.j] > -0.2) return;
+if (iX >= 0 && cut.has(iX)) return;
+if (iX >= 0 && cutCtx.viaCut([iX, ...neighbors[iX]], acc.pos, accEl)) return;
+if (isSelf(acc.sym, acc.j, excl)) return;
+if (close && close[acc.j] <= 3) return;
+if (structure.cell && iX >= 0) {
+const cA = atoms[iX];
+if (new THREE.Vector3(cA.x, cA.y, cA.z).distanceTo(acc.pos) < getCovalentRadius(cA.element) + getCovalentRadius(accEl) + bondTolerance(cA.element, accEl)) return;
+for (const nI of (neighbors[iX] || [])) {
+const nA = atoms[nI];
+if (new THREE.Vector3(nA.x, nA.y, nA.z).distanceTo(acc.pos) < getCovalentRadius(nA.element) + getCovalentRadius(accEl) + bondTolerance(nA.element, accEl)) return;
+}
+}
+const d = centerPos.distanceTo(acc.pos);
+const vdwSum = getVdwRadius(elX) + getVdwRadius(accEl);
+if (d > (hyd ? CONSTANTS.HYDRIDE.DISTANCE_FACTOR : c.DISTANCE_FACTOR) * vdwSum) return;
+if (d < getCovalentRadius(elX) + getCovalentRadius(accEl) + bondTolerance(elX, accEl)) return;
+const w = acc.pos.clone().sub(centerPos);
+let tilt = axis.angleTo(w) * 180 / Math.PI;
+tilt = Math.min(tilt, 180 - tilt);
+if (tilt > c.MAX_TILT) return;
+contacts.push({
+type, kind, iD: -1, iX, iA: acc.j, sym: acc.sym,
+from: centerPos.clone(), to: acc.pos.clone(),
+distance: d, distDX: 0, distDA: d, angle: tilt,
+elX, elA: atoms[acc.j].element, intrinsic
+});
+});
+};
+atoms.forEach((atom, i) => {
+const nb = neighbors[i];
+const pos = P(i);
+const close = settings.exclude14 ? bfsDistances(i, neighbors, n) : null;
+const shortO = nb.filter(j => atoms[j].element === 'O' && pos.distanceTo(P(j)) < 1.30);
+const normalOf = () => {
+if (nb.length < 2) return null;
+const v1 = P(nb[0]).sub(pos), v2 = P(nb[1]).sub(pos);
+const nrm = new THREE.Vector3().crossVectors(v1, v2);
+if (nrm.length() < 1e-6) return null;
+return nrm.normalize();
+};
+if (atom.element === 'C') {
+if (nb.length === 3 && shortO.length === 1) {
+let hal = 0;
+nb.forEach(j => { if (atoms[j].element === 'F' || atoms[j].element === 'Cl') hal++; });
+const nrm = normalOf();
+if (nrm) pushContact('carbonyl', i, 'C', c.ENERGY_CARBONYL + 3 * hal, nrm, pos, [i, ...nb], close);
+} else if (nb.length === 2 && shortO.length === 2) {
+if (cut.has(i)) return;
+const axis = P(nb[0]).sub(pos).normalize();
+nearAcceptors(pos).forEach(acc => {
+const accEl = atoms[acc.j].element;
+const hyd = accEl === 'H' && hydridicH.has(acc.j);
+if (!SIGMA_ACCEPTORS.has(accEl) && !hyd) return;
+if (isSelf(acc.sym, acc.j, [i, ...nb])) return;
+if (close && close[acc.j] <= 3) return;
+if (cutCtx.viaCut([i, ...nb], acc.pos, accEl)) return;
+if (structure.cell) {
+if (pos.distanceTo(acc.pos) < getCovalentRadius('C') + getCovalentRadius(accEl) + bondTolerance('C', accEl)) return;
+for (const nI of nb) {
+const nA = atoms[nI];
+if (new THREE.Vector3(nA.x, nA.y, nA.z).distanceTo(acc.pos) < getCovalentRadius(nA.element) + getCovalentRadius(accEl) + bondTolerance(nA.element, accEl)) return;
+}
+}
+const d = pos.distanceTo(acc.pos);
+const vdwSum = getVdwRadius('C') + getVdwRadius(atoms[acc.j].element);
+if (d > (hyd ? CONSTANTS.HYDRIDE.DISTANCE_FACTOR : c.DISTANCE_FACTOR) * vdwSum) return;
+if (d < getCovalentRadius('C') + getCovalentRadius(atoms[acc.j].element) + bondTolerance('C', atoms[acc.j].element)) return;
+const ang = axis.angleTo(acc.pos.clone().sub(pos)) * 180 / Math.PI;
+if (ang < 60 || ang > 120) return;
+contacts.push({ type: 'pihole', kind: 'co2', iD: -1, iX: i, iA: acc.j, sym: acc.sym, from: pos.clone(), to: acc.pos.clone(), distance: d, distDX: 0, distDA: d, angle: Math.abs(90 - ang), elX: 'C', elA: atoms[acc.j].element, intrinsic: c.ENERGY_CO2 });
+});
+}
+return;
+}
+if (atom.element === 'N' && nb.length === 3 && shortO.length === 2) {
+const nrm = normalOf();
+if (nrm) pushContact('nitro', i, 'N', c.ENERGY_NITRO, nrm, pos, [i, ...nb], close);
+}
+if (atom.element === 'B' && nb.length >= 2 && nb.length <= 4) {
+const cent = new THREE.Vector3();
+nb.forEach(j => cent.add(P(j)));
+cent.multiplyScalar(1 / nb.length);
+const axis = pos.clone().sub(cent);
+if (axis.length() > CONSTANTS.HYDRIDE.TRIEL4_AXIS_MIN) {
+// Pyramidal B (TS of the nucleophile attack, 3–4 substituents visible):
+// the hole is opposite the substituent centroid; works even if some H atoms are unresolved.
+axis.normalize();
+pushContact('triel', i, 'B', c.ENERGY_TRIEL, axis, pos, [i, ...nb], close, 'triel');
+} else if (nb.length === 3) {
+// Planar BX3: the hole is perpendicular to the substituent plane.
+const nrm = normalOf();
+if (nrm) pushContact('triel', i, 'B', c.ENERGY_TRIEL, nrm, pos, [i, ...nb], close, 'triel');
+}
+// nb = 4 with a small axis = tetrahedral borate (BH3CN, BH4): no hole.
+}
+// Hypervalent/deformed tetrel centers: square-planar TF4-type geometries
+// (Zierkiewicz, Michalczyk & Scheiner 2021, Table 1) carry deep pi-holes
+// above and below the substituent plane.
+if ((atom.element === 'Si' || atom.element === 'Ge' || atom.element === 'Sn' || atom.element === 'Pb') && nb.length === 4) {
+const s = nb.map(j => P(j));
+const v1 = s[1].clone().sub(s[0]);
+const v2 = s[2].clone().sub(s[0]);
+const v3 = s[3].clone().sub(s[0]);
+const nrm = v1.clone().cross(v2).add(v2.clone().cross(v3));
+if (nrm.length() > 1e-6) {
+nrm.normalize();
+const dev = Math.max(...s.map(q => Math.abs(nrm.dot(q.clone().sub(s[0])))));
+const devT = Math.abs(nrm.dot(pos.clone().sub(s[0])));
+if (dev < 0.30 && devT < 0.35) {
+pushContact('tetrelpi', i, atom.element, c.ENERGY_TETREL_PI, nrm, pos, [i, ...nb], close);
+}
+}
+}
+if (atom.element === 'Xe' || atom.element === 'Kr' || atom.element === 'Rn') {
+if (nb.length === 2) {
+const axis = P(nb[0]).sub(pos).normalize();
+nearAcceptors(pos).forEach(acc => {
+const accEl = atoms[acc.j].element;
+const hyd = accEl === 'H' && hydridicH.has(acc.j);
+if (!SIGMA_ACCEPTORS.has(accEl) && !hyd) return;
+if (isSelf(acc.sym, acc.j, [i, ...nb])) return;
+if (close && close[acc.j] <= 3) return;
+if (cutCtx.viaCut([i, ...nb], acc.pos, accEl)) return;
+if (structure.cell) {
+if (pos.distanceTo(acc.pos) < getCovalentRadius(atom.element) + getCovalentRadius(accEl) + bondTolerance(atom.element, accEl)) return;
+for (const nI of nb) {
+const nA = atoms[nI];
+if (new THREE.Vector3(nA.x, nA.y, nA.z).distanceTo(acc.pos) < getCovalentRadius(nA.element) + getCovalentRadius(accEl) + bondTolerance(nA.element, accEl)) return;
+}
+}
+const d = pos.distanceTo(acc.pos);
+const vdwSum = getVdwRadius(atom.element) + getVdwRadius(atoms[acc.j].element);
+if (d > (hyd ? CONSTANTS.HYDRIDE.DISTANCE_FACTOR : c.DISTANCE_FACTOR) * vdwSum) return;
+if (d < getCovalentRadius(atom.element) + getCovalentRadius(atoms[acc.j].element) + bondTolerance(atom.element, atoms[acc.j].element)) return;
+const ang = axis.angleTo(acc.pos.clone().sub(pos)) * 180 / Math.PI;
+if (ang < 55 || ang > 125) return;
+contacts.push({ type: 'pihole', kind: 'aebelt', iD: -1, iX: i, iA: acc.j, sym: acc.sym, from: pos.clone(), to: acc.pos.clone(), distance: d, distDX: 0, distDA: d, angle: Math.abs(90 - ang), elX: atom.element, elA: atoms[acc.j].element, intrinsic: c.ENERGY_AE_BELT });
+});
+} else if (atom.element === 'Xe' && nb.length === 4) {
+const nrm = normalOf();
+if (nrm) pushContact('aeplane', i, 'Xe', c.ENERGY_AE_PLANE, nrm, pos, [i, ...nb], close);
+}
+}
+});
+// Perfluorinated aromatic rings: pi-hole at the ring centroid
+findRings(atoms, bonds).forEach(ring => {
+let ok = true;
+for (const idx of ring.atoms) {
+if (neighbors[idx].length > 3) { ok = false; break; }
+}
+if (!ok) return;
+const plane = new THREE.Plane().setFromNormalAndCoplanarPoint(ring.normal, ring.centroid);
+for (const idx of ring.atoms) {
+if (Math.abs(plane.distanceToPoint(P(idx))) > CONSTANTS.PI_STACKING.RING_COPLANARITY_TOLERANCE) { ok = false; break; }
+}
+if (!ok) return;
+let nF = 0;
+ring.atoms.forEach(idx => {
+neighbors[idx].forEach(j => { if (atoms[j].element === 'F') nF++; });
+});
+const hydrideOnly = nF < 2;
+const intrinsic = hydrideOnly ? CONSTANTS.HYDRIDE.RING_INTRINSIC : c.RING_BASE + c.RING_PER_F * nF;
+nearAcceptors(ring.centroid).forEach(acc => {
+const accEl = atoms[acc.j].element;
+const hyd = accEl === 'H' && hydridicH.has(acc.j);
+if (!SIGMA_ACCEPTORS.has(accEl) && !hyd) return;
+if (hydrideOnly && !hyd) return;
+if (cutCtx.viaCut(ring.atoms, acc.pos, accEl)) return;
+for (const idx of ring.atoms) {
+if (acc.sym === 'x,y,z' && (acc.j === idx || neighbors[acc.j].includes(idx))) return;
+const covR = getCovalentRadius(atoms[idx].element) + getCovalentRadius(accEl) + bondTolerance(atoms[idx].element, accEl);
+if (acc.pos.distanceTo(P(idx)) < covR) return;
+}
+const d = ring.centroid.distanceTo(acc.pos);
+const boost = hyd ? CONSTANTS.HYDRIDE.RING_DISTANCE_BOOST : 1.0;
+if (d > c.RING_DISTANCE_FACTOR * boost * (1.7 + getVdwRadius(accEl))) return;
+const w = acc.pos.clone().sub(ring.centroid);
+let tilt = ring.normal.angleTo(w) * 180 / Math.PI;
+tilt = Math.min(tilt, 180 - tilt);
+if (tilt > c.MAX_TILT) return;
+contacts.push({ type: 'pihole', kind: 'ring', iD: -1, iX: -1, iA: acc.j, sym: acc.sym, from: ring.centroid.clone(), to: acc.pos.clone(), distance: d, distDX: 0, distDA: d, angle: tilt, elX: 'C', elA: atoms[acc.j].element, intrinsic, qeff: 0.05 * nF });
+});
+});
+return contacts;
 }
 function detectStacking(structure) {
 if (structure._stack) return structure._stack;
@@ -2677,6 +3558,16 @@ stacks.forEach((stack, i) => stack.idx = i + 1);
 structure._stack = { rings, stacks };
 return structure._stack;
 }
+function formatCount(key, n) {
+const value = currentLang()[key];
+if (!value.includes('|')) return value;
+const forms = value.split('|');
+if (forms.length === 2) return (n === 1) ? forms[0] : forms[1];
+const n10 = n % 10, n100 = n % 100;
+if (n10 === 1 && n100 !== 11) return forms[0];
+if (n10 >= 2 && n10 <= 4 && (n100 < 12 || n100 > 14)) return forms[1];
+return forms[2];
+}
 function updateNcStatus(structure) {
 const element = document.getElementById('nc-status');
 if (!structure) {
@@ -2688,7 +3579,7 @@ const { stacks } = detectStacking(structure);
 const visible = structure.visibleAtoms;
 const counts = {};
 interactions.forEach(x => {
-const visibleI = !visible || visible.has(x.iX);
+const visibleI = !visible || (x.iX >= 0 && visible.has(x.iX));
 const visibleA = !visible || (visible.has(x.iA) && x.sym === 'x,y,z');
 if (!visibleI && !visibleA) return;
 counts[x.type] = (counts[x.type] || 0) + 1;
@@ -2700,12 +3591,15 @@ return vis1 || vis2;
 }).length;
 const lang = currentLang();
 const parts = [];
-if (counts.hbond) parts.push(counts.hbond + ' ' + lang.cntH);
-if (counts.halogen) parts.push(counts.halogen + ' ' + lang.cntHal);
-if (counts.chalcogen) parts.push(counts.chalcogen + ' ' + lang.cntCha);
-if (counts.pnictogen) parts.push(counts.pnictogen + ' ' + lang.cntPni);
-if (counts.aerogen) parts.push(counts.aerogen + ' ' + lang.cntAer);
-if (stackCount) parts.push(stackCount + ' ' + lang.cntStack);
+if (counts.hbond) parts.push(counts.hbond + ' ' + formatCount('cntH', counts.hbond));
+if (counts.halogen) parts.push(counts.halogen + ' ' + formatCount('cntHal', counts.halogen));
+if (counts.chalcogen) parts.push(counts.chalcogen + ' ' + formatCount('cntCha', counts.chalcogen));
+if (counts.pnictogen) parts.push(counts.pnictogen + ' ' + formatCount('cntPni', counts.pnictogen));
+if (counts.tetrel) parts.push(counts.tetrel + ' ' + formatCount('cntTet', counts.tetrel));
+if (counts.aerogen) parts.push(counts.aerogen + ' ' + formatCount('cntAer', counts.aerogen));
+if (counts.pihole) parts.push(counts.pihole + ' ' + formatCount('cntPi', counts.pihole));
+if (counts.triel) parts.push(counts.triel + ' ' + formatCount('cntTri', counts.triel));
+if (stackCount) parts.push(stackCount + ' ' + formatCount('cntStack', stackCount));
 element.textContent = parts.length
 ? lang.found + ': ' + parts.join(', ')
 : lang.noneFound;
@@ -2713,18 +3607,34 @@ element.textContent = parts.length
 // ============================================================
 // CONTACT RENDERING
 // ============================================================
-function makeInteractionLabel(text, from, to, color) {
+function makeInteractionLabel(text, from, to, color, structure, key, centroid) {
 const anchor = from.clone().add(to).multiplyScalar(0.5);
-const sprite = createTextSprite(text, anchor.clone().add(new THREE.Vector3(0, 0.15, 0)), color, settings.fontSize);
+let pos = anchor.clone().add(new THREE.Vector3(0, 0.15, 0));
+let pinned = false;
+if (structure && key && structure._labelPos && structure._labelPos.has(key)) {
+pos = structure._labelPos.get(key).clone();
+pinned = true;
+} else if (centroid) {
+const dir = to.clone().sub(from);
+const perp = new THREE.Vector3().crossVectors(dir, new THREE.Vector3(0, 1, 0));
+if (perp.lengthSq() < 1e-6) perp.crossVectors(dir, new THREE.Vector3(1, 0, 0));
+perp.normalize();
+if (perp.dot(anchor.clone().sub(centroid)) < 0) perp.negate();
+pos = anchor.clone().addScaledVector(perp, 2.4).add(new THREE.Vector3(0, 0.4, 0));
+pinned = true;
+}
+const sprite = createTextSprite(text, pos, color, settings.fontSize);
 sprite.userData = {
 text,
 anchorPos: anchor,
 lineToLabel: null,
 isInteraction: true,
-wasDragged: false,
-color
+wasDragged: pinned,
+color,
+key
 };
 interactionGroup.add(sprite);
+if (pinned) updateLabelLine(sprite);
 }
 // Adds a ghost sphere for a hidden partner atom, computing the offset
 // between the rendered contact position and the atom's home position.
@@ -2734,48 +3644,77 @@ const offset = new THREE.Vector3(position.x - atom.x, position.y - atom.y, posit
 interactionGroup.add(createGhostSphere(position, color, atomIndex, offset));
 }
 function drawContacts(structure) {
+if (structure) {
+if (structure._labelPosClear) {
+structure._labelPos = new Map();
+structure._labelPosClear = false;
+} else {
+if (!structure._labelPos) structure._labelPos = new Map();
+interactionGroup.children.forEach(obj => {
+if (obj.isSprite && obj.userData && obj.userData.isInteraction && obj.userData.userDragged && obj.userData.key) {
+structure._labelPos.set(obj.userData.key, obj.position.clone());
+}
+});
+}
+}
 disposeGroup(interactionGroup);
 const energyRows = [];
 let totalEnergy = 0;
-if (structure && settings.showNoncovalent) {
+let centroid = null;
+if (structure && structure.centeredAtoms && structure.centeredAtoms.length) {
+centroid = new THREE.Vector3();
+structure.centeredAtoms.forEach(a => { centroid.x += a.x; centroid.y += a.y; centroid.z += a.z; });
+centroid.divideScalar(structure.centeredAtoms.length);
+}
+let hiddenWeak = 0;
+const interVisible = settings.interVisible;
+const anySigmaOn = ['hbond','halogen','chalcogen','pnictogen','tetrel','aerogen','pihole','triel'].some(t => interVisible[t]);
+if (structure && anySigmaOn) {
 const colorMap = {
 hbond: settings.hbondColor,
 halogen: settings.halogenColor,
 chalcogen: settings.chalcogenColor,
 pnictogen: settings.pnictogenColor,
-aerogen: '#00b3b3'
+tetrel: settings.tetrelColor,
+aerogen: settings.aerogenColor,
+pihole: settings.piholeColor,
+triel: settings.trielColor
 };
-const typeCounters = { hbond: 0, halogen: 0, chalcogen: 0, pnictogen: 0, aerogen: 0 };
+const typeCounters = { hbond: 0, halogen: 0, chalcogen: 0, pnictogen: 0, tetrel: 0, aerogen: 0, pihole: 0, triel: 0 };
 detectInteractions(structure).forEach(x => {
-const visibleI = !structure.visibleAtoms || structure.visibleAtoms.has(x.iX);
+if (!interVisible[x.type]) return;
+const visibleI = !structure.visibleAtoms || (x.iX >= 0 && structure.visibleAtoms.has(x.iX));
 const visibleA = !structure.visibleAtoms || (structure.visibleAtoms.has(x.iA) && x.sym === 'x,y,z');
 if (!visibleI && !visibleA) return;
+const energy = estimateContactEnergy(x, structure.charges, structure);
+if (energy < CONSTANTS.ENERGY_QUALITY.MIN_DISPLAY) { hiddenWeak++; return; }
 typeCounters[x.type]++;
 const tag = TYPE_LETTER[x.type] + sub(typeCounters[x.type]);
-const color = colorMap[x.type] || '#888888';
+const color = darkenColor(colorMap[x.type] || '#888888', 0.6);
 interactionGroup.add(createFatDashedLine(x.from, x.to, color, 3));
-makeInteractionLabel(`${tag} ${x.distance.toFixed(2)} Å\n∠${x.angle.toFixed(0)}°`, x.from, x.to, color);
-// Ghost spheres for hidden partners
+const pctVdw = Math.round(100 * x.distance / (getVdwRadius(x.elX) + getVdwRadius(x.elA)));
+makeInteractionLabel(`${tag} ${x.distance.toFixed(2)} Å
+∠${x.angle.toFixed(0)}° · ${pctVdw}%`, x.from, x.to, color, structure, x.type + '|' + x.iX + '|' + x.iA + '|' + x.sym + '|' + x.distance.toFixed(2), centroid);
+// Ghost spheres for hidden partners (iX = -1 for ring pi-hole donors)
 if (visibleI && !visibleA) {
 addPartnerGhost(structure, x.to, color, x.iA);
-} else if (!visibleI && visibleA) {
+} else if (!visibleI && visibleA && x.iX >= 0) {
 addPartnerGhost(structure, x.from, color, x.iX);
 } else if (!structure.visibleAtoms && x.sym !== 'x,y,z') {
 // "All" mode: ghost at the symmetry copy end
 addPartnerGhost(structure, x.to, color, x.iA);
 }
-const energy = estimateContactEnergy(x, structure.charges, structure);
 totalEnergy += energy;
 energyRows.push({
 t: tag,
 color,
-label: `${structure.centeredAtoms[x.iX].element}···${structure.centeredAtoms[x.iA].element}`,
+label: `${x.iX === -1 ? 'π' : x.elX}···${x.elA}`,
 E: energy,
 q: contactQuality(energy)
 });
 });
 }
-if (structure && settings.showStacking) {
+if (structure && interVisible.stacking) {
 const { rings, stacks } = detectStacking(structure);
 const ringVisible = (ring) => !structure.visibleAtoms || ring.atoms.some(i => structure.visibleAtoms.has(i));
 rings.forEach(ring => {
@@ -2791,21 +3730,23 @@ stacks.forEach(s => {
 const vis1 = !structure.visibleAtoms || s.a1.some(i => structure.visibleAtoms.has(i));
 const vis2 = !structure.visibleAtoms || (s.sym === 'x,y,z' && s.a2.some(i => structure.visibleAtoms.has(i)));
 if (!vis1 && !vis2) return;
-interactionGroup.add(createFatDashedLine(s.from, s.to, settings.ringColor, 3));
-makeInteractionLabel(`π${sub(s.idx)} ${s.distance.toFixed(2)} Å`, s.from, s.to, settings.ringColor);
+const energy = estimateStackingEnergy(s, structure);
+if (energy < CONSTANTS.ENERGY_QUALITY.MIN_DISPLAY) { hiddenWeak++; return; }
+const stackColor = darkenColor(settings.ringColor, 0.6);
+interactionGroup.add(createFatDashedLine(s.from, s.to, stackColor, 3));
+makeInteractionLabel(`π${sub(s.idx)} ${s.distance.toFixed(2)} Å`, s.from, s.to, stackColor, structure, 'stack|' + s.a1[0] + '|' + s.a2[0] + '|' + s.sym + '|' + s.distance.toFixed(2), centroid);
 if (vis1 && !vis2) {
-interactionGroup.add(createGhostSphere(s.to, settings.ringColor, s.a2[0], s.copyVec));
+interactionGroup.add(createGhostSphere(s.to, stackColor, s.a2[0], s.copyVec));
 } else if (!vis1 && vis2) {
-interactionGroup.add(createGhostSphere(s.from, settings.ringColor, s.a1[0], s.copyVec));
+interactionGroup.add(createGhostSphere(s.from, stackColor, s.a1[0], s.copyVec));
 } else if (!structure.visibleAtoms && s.sym !== 'x,y,z') {
 // "All" mode: ghost at the symmetry copy end
-interactionGroup.add(createGhostSphere(s.to, settings.ringColor, s.a2[0], s.copyVec))
+interactionGroup.add(createGhostSphere(s.to, stackColor, s.a2[0], s.copyVec))
 }
-const energy = estimateStackingEnergy(s);
 totalEnergy += energy;
 energyRows.push({
 t: 'π' + sub(s.idx),
-color: settings.ringColor,
+color: stackColor,
 label: `(${s.n1}/${s.n2})`,
 E: energy,
 q: stackingQuality(energy)
@@ -2813,9 +3754,21 @@ q: stackingQuality(energy)
 });
 }
 updateNcStatus(structure);
-updateEnergyBox(structure, energyRows, totalEnergy);
+updateEnergyBox(structure, energyRows, totalEnergy, hiddenWeak);
 }
-function updateEnergyBox(structure, rows, totalEnergy) {
+function syncInterButtons() {
+const interTypes = ['hbond','halogen','chalcogen','pnictogen','tetrel','aerogen','pihole','triel','stacking'];
+interTypes.forEach(t => {
+const btn = document.getElementById('btn-int-' + t);
+if (btn) btn.classList.toggle('active', settings.interVisible[t]);
+});
+const allOn = interTypes.every(t => settings.interVisible[t]);
+const master = document.getElementById('btn-inter-all');
+if (master) {
+master.textContent = allOn ? currentLang().hideAllInter : currentLang().showAllInter;
+}
+}
+function updateEnergyBox(structure, rows, totalEnergy, hiddenWeak) {
 const box = document.getElementById('energy-box');
 if (!structure || !rows.length) {
 box.style.display = 'none';
@@ -2823,8 +3776,12 @@ return;
 }
 box.style.display = 'block';
 const lang = currentLang();
+const weakLine = hiddenWeak > 0
+? `<div class="e-hidden">${lang.weakNote.replace('{n}', hiddenWeak).replace('{e}', CONSTANTS.ENERGY_QUALITY.MIN_DISPLAY)}</div>`
+: '';
 const body = AppState.energyCollapsed ? '' :
 rows.map(r => `<div class="e-row"><span class="e-dot" style="background:${r.color}"></span><span class="e-t">${r.t}</span>${r.label} — <b>${r.E.toFixed(0)}</b> (${r.q})</div>`).join('') +
+weakLine +
 `<div class="e-total">Σ ≈ ${totalEnergy.toFixed(0)} ${lang.units}</div>` +
 `<div class="e-note">${lang.energyNote}</div>`;
 box.innerHTML = `<div class="e-head"><b class="h">${lang.energiesHead}</b><button id="e-collapse">${AppState.energyCollapsed ? '▸' : '▾'}</button></div>` + body;
@@ -2856,22 +3813,16 @@ function resetAtomHighlights() { highlightSessionAtoms(); }
 function highlightShiftSelection() {
 const structure = AppState.structures[AppState.currentStructureIndex];
 if (!structure || !structure.pickMap) return;
-const shiftColor = new THREE.Color(0xff8c00);
-const highlightColor = new THREE.Color(0xffff66);
+const selectColor = new THREE.Color(0x00e5ff);
 structure.pickMap.forEach((entry, atomIndex) => {
 if (!entry) return;
-const isShift = AppState.shiftSelectedAtoms.has(atomIndex);
-const isSession = AppState.measureSession.atoms.some(a => a.index === atomIndex);
+const isSelected = AppState.shiftSelectedAtoms.has(atomIndex) ||
+AppState.measureSession.atoms.some(a => a.index === atomIndex);
 if (entry.li >= 0) {
-let color = entry.base;
-if (isShift) color = shiftColor;
-else if (isSession) color = highlightColor;
-entry.mesh.setColorAt(entry.li, color);
+entry.mesh.setColorAt(entry.li, isSelected ? selectColor : entry.base);
 if (entry.mesh.instanceColor) entry.mesh.instanceColor.needsUpdate = true;
 } else if (entry.mesh.material.emissive) {
-if (isShift) entry.mesh.material.emissive.setHex(0x663300);
-else if (isSession) entry.mesh.material.emissive.setHex(0x444400);
-else entry.mesh.material.emissive.setHex(0);
+entry.mesh.material.emissive.setHex(isSelected ? 0x00aacc : 0);
 }
 });
 }
@@ -2912,7 +3863,7 @@ structure.centeredAtoms[i].z
 const type = getMeasurementType(indices.length);
 let labelText = '';
 const anchorPos = new THREE.Vector3();
-const lineMaterial = new THREE.LineBasicMaterial({ color: 0xff6600 });
+const lineMaterial = new THREE.LineBasicMaterial({ color: getColorForMeasurementType(type) });
 for (let i = 0; i < points.length - 1; i++) {
 const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints([points[i], points[i + 1]]), lineMaterial);
 measurementGroup.add(line);
@@ -2930,10 +3881,16 @@ anchorPos.copy(points[1]);
 const b1 = points[1].clone().sub(points[0]);
 const b2 = points[2].clone().sub(points[1]);
 const b3 = points[3].clone().sub(points[2]);
-const n1 = b1.clone().cross(b2).normalize();
-const n2 = b2.clone().cross(b3).normalize();
+const n1Raw = b1.clone().cross(b2);
+const n2Raw = b2.clone().cross(b3);
+if (n1Raw.lengthSq() < 1e-8 || n2Raw.lengthSq() < 1e-8) {
+labelText = '—';
+} else {
+const n1 = n1Raw.normalize();
+const n2 = n2Raw.normalize();
 const m1 = n1.clone().cross(b2.clone().normalize());
 labelText = (Math.atan2(m1.dot(n2), n1.dot(n2)) * 180 / Math.PI).toFixed(1) + '°';
+}
 anchorPos.addVectors(points[1], points[2]).multiplyScalar(0.5);
 }
 const color = getColorForMeasurementType(type);
@@ -3028,6 +3985,8 @@ controls.enabled = false;
 return;
 }
 if (AppState.activePointers.size > 1) return;
+AppState.pointerDownPos.set(event.clientX, event.clientY);
+AppState.pointerTravel = 0;
 const sprite = pickDraggableSprite(event.clientX, event.clientY);
 if (sprite) {
 AppState.selectedMeasurement = AppState.persistentMeasurements.find(m => m.sprite === sprite) || null;
@@ -3053,6 +4012,8 @@ document.getElementById('delete-selected-btn').classList.remove('show');
 function onPointerMove(event) {
 if (!AppState.activePointers.has(event.pointerId)) return;
 AppState.activePointers.set(event.pointerId, { clientX: event.clientX, clientY: event.clientY });
+AppState.pointerTravel = Math.max(AppState.pointerTravel,
+Math.hypot(event.clientX - AppState.pointerDownPos.x, event.clientY - AppState.pointerDownPos.y));
 if (AppState.activePointers.size === 3 && AppState.isThreeFingerPan) {
 event.preventDefault();
 const points = [...AppState.activePointers.values()];
@@ -3079,12 +4040,13 @@ const intersection = new THREE.Vector3();
 if (raycaster.ray.intersectPlane(AppState.dragPlane, intersection)) {
 AppState.draggedObject.position.copy(intersection.add(AppState.dragOffset));
 AppState.draggedObject.userData.wasDragged = true;
+AppState.draggedObject.userData.userDragged = true;
 updateLabelLine(AppState.draggedObject);
 }
 }
 }
 function onPointerUp(event) {
-AppState.activePointers.delete(event.pointerId);
+const wasPressed = AppState.activePointers.delete(event.pointerId);
 if (AppState.activePointers.size < 3 && AppState.isThreeFingerPan) {
 AppState.isThreeFingerPan = false;
 controls.enabled = true;
@@ -3095,7 +4057,10 @@ AppState.draggedObject = null;
 controls.enabled = true;
 return;
 }
-if (AppState.activePointers.size === 0) {
+if (AppState.activePointers.size === 0 && wasPressed) {
+const wasDrag = AppState.pointerTravel > 6;
+AppState.pointerTravel = 0;
+if (wasDrag) return;
 const rect = renderer.domElement.getBoundingClientRect();
 const mouse = new THREE.Vector2(
 ((event.clientX - rect.left) / rect.width) * 2 - 1,
@@ -3169,11 +4134,31 @@ if (object.userData.lineToLabel.parent) object.userData.lineToLabel.parent.remov
 object.userData.lineToLabel = null;
 }
 if (!object.userData.wasDragged) return;
-if (object.userData.anchorPos.distanceTo(object.position) > CONSTANTS.LABEL_LINE_DISTANCE_THRESHOLD) {
-const line = new THREE.Line(
-new THREE.BufferGeometry().setFromPoints([object.userData.anchorPos, object.position]),
-new THREE.LineBasicMaterial({ color: 0xaaaaaa })
-);
+const anchor = object.userData.anchorPos;
+const pos = object.position;
+const full = anchor.distanceTo(pos);
+if (full > CONSTANTS.LABEL_LINE_DISTANCE_THRESHOLD) {
+// The pointer line stops at the text edge (ellipse in the camera plane)
+// so that it does not cover the label.
+const fs = settings.fontSize;
+const halfW = 1.4 * fs;
+const halfH = 0.55 * fs;
+const dir = new THREE.Vector3().subVectors(anchor, pos);
+const right = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 0);
+const up = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 1);
+const ux = dir.dot(right) / full;
+const uy = dir.dot(up) / full;
+const denom = Math.sqrt((ux * ux) / (halfW * halfW) + (uy * uy) / (halfH * halfH));
+const stopAt = denom > 1e-9 ? Math.min(full, 1 / denom) : full;
+const end = pos.clone().addScaledVector(dir.normalize(), stopAt);
+const geometry = new LineGeometry();
+geometry.setPositions([anchor.x, anchor.y, anchor.z, end.x, end.y, end.z]);
+const material = new LineMaterial({
+color: new THREE.Color(object.userData.color || '#aaaaaa').getHex(),
+linewidth: 2
+});
+material.resolution.set(window.innerWidth, window.innerHeight);
+const line = new Line2(geometry, material);
 const targetGroup = object.userData.isAtomLabel
 ? modelGroup
 : (object.userData.isInteraction ? interactionGroup : measurementGroup);
@@ -3226,13 +4211,15 @@ parsed.forEach(s => {
 s.atoms = (s.atoms || []).filter(a => isFinite(a.x) && isFinite(a.y) && isFinite(a.z));
 });
 parsed = parsed.filter(s => s.atoms.length);
+const totalAtoms = parsed.reduce((sum, s) => sum + s.atoms.length, 0);
+if (totalAtoms > 10000 && !confirm(currentLang().largeFileWarning)) return;
 const baseName = file.name.replace(/\.[^.]+$/, '');
 parsed.forEach((s, i) => {
 if (ext === 'xyz') {
 s.name = parsed.length > 1 ? `${baseName} #${i + 1}` : baseName;
 } else if (parsed.length > 1) {
 s.name = `${baseName} · ${s.name || i + 1}`;
-} else if (!s.name || s.name.includes('')) {
+} else if (!s.name || s.name === 'crystal' || s.name === 'MOL structure' || s.name === 'PDB structure') {
 s.name = baseName;
 }
 });
@@ -3283,6 +4270,7 @@ return visible;
 }
 function applyIsolation(structure, visibleSet, options = {}) {
 if (!structure) return;
+structure._labelPosClear = true;
 structure.visibleAtoms = visibleSet;
 const dummyMatrix = new THREE.Matrix4();
 const zeroScaleMatrix = new THREE.Matrix4().makeScale(0, 0, 0);
@@ -3309,7 +4297,8 @@ obj.scale.set(0, 0, 0);
 } else {
 const atom = structure.centeredAtoms[atomIndex];
 obj.position.set(atom.x, atom.y, atom.z);
-obj.scale.set(1, 1, 1);
+if (obj.userData.baseScale) obj.scale.copy(obj.userData.baseScale);
+else obj.scale.set(1, 1, 1);
 }
 }
 });
@@ -3391,31 +4380,59 @@ function revealFragmentByGhost(fragmentStartIndex, offset) {
 const structure = AppState.structures[AppState.currentStructureIndex];
 if (!structure) return;
 const fragmentAtoms = findFragmentAtoms(structure, fragmentStartIndex);
-if (!structure.visibleAtoms) structure.visibleAtoms = new Set();
-fragmentAtoms.forEach(idx => structure.visibleAtoms.add(idx));
-// Apply the offset to the fragment atoms so it appears exactly at the ghost sphere position
-if (offset && (offset.x !== 0 || offset.y !== 0 || offset.z !== 0)) {
-fragmentAtoms.forEach(idx => {
-structure.centeredAtoms[idx].x += offset.x;
-structure.centeredAtoms[idx].y += offset.y;
-structure.centeredAtoms[idx].z += offset.z;
-});
-// Remove old atom labels so they are recreated at the new positions
-(structure.atomLabels || []).forEach(label => {
-if (label.userData.lineToLabel) {
-label.userData.lineToLabel.geometry.dispose();
-label.userData.lineToLabel.material.dispose();
-if (label.userData.lineToLabel.parent) label.userData.lineToLabel.parent.remove(label.userData.lineToLabel);
-}
-label.material.dispose();
-if (label.parent) label.parent.remove(label);
-});
-structure.atomLabels = [];
-}
-structure._inter = null;
-structure._stack = null;
+const fragList = [...fragmentAtoms];
+// Zero offset: the partner fragment is already in the scene at its home
+// position (donor-side ghost) — just add it to the visible set.
+if (!offset || (offset.x === 0 && offset.y === 0 && offset.z === 0)) {
+if (structure.visibleAtoms) fragList.forEach(idx => structure.visibleAtoms.add(idx));
 applyIsolation(structure, structure.visibleAtoms);
 drawContacts(structure);
+return;
+}
+// Non-zero offset: duplicate the fragment. The original stays in place,
+// a copy appears at the ghost sphere position. This can be repeated
+// endlessly to walk along the contacts through the crystal.
+if (!structure.baseAtoms) structure.baseAtoms = structure.atoms;
+const src0 = structure.atoms[0];
+const home0 = structure.centeredAtoms[0];
+const bx = src0.x - home0.x, by = src0.y - home0.y, bz = src0.z - home0.z;
+const indexMap = new Map();
+const newCentered = [];
+const newSource = [];
+fragList.forEach(idx => {
+const a = structure.centeredAtoms[idx];
+const nx = a.x + offset.x, ny = a.y + offset.y, nz = a.z + offset.z;
+indexMap.set(idx, structure.centeredAtoms.length + newCentered.length);
+newCentered.push({ ...a, x: nx, y: ny, z: nz });
+newSource.push({ ...a, x: nx + bx, y: ny + by, z: nz + bz });
+});
+structure.centeredAtoms.push(...newCentered);
+structure.atoms = structure.atoms.concat(newSource);
+const newBonds = [];
+structure.bonds.forEach(b => {
+if (fragmentAtoms.has(b.i) && fragmentAtoms.has(b.j)) newBonds.push({ i: indexMap.get(b.i), j: indexMap.get(b.j) });
+});
+structure.bonds.push(...newBonds);
+if (Array.isArray(structure.charges)) fragList.forEach(idx => structure.charges.push(structure.charges[idx]));
+structure._neighbors = null;
+structure._neighborsBonds = null;
+structure._inter = null;
+structure._stack = null;
+structure._cutCtx = null;
+if (structure.visibleAtoms) {
+for (let i = structure.centeredAtoms.length - newCentered.length; i < structure.centeredAtoms.length; i++) structure.visibleAtoms.add(i);
+}
+loadStructure(AppState.currentStructureIndex, true, false);
+// Rotation center — at the centroid of the visible fragment
+let cx = 0, cy = 0, cz = 0, n = 0;
+if (structure.visibleAtoms) {
+structure.visibleAtoms.forEach(i => { const a = structure.centeredAtoms[i]; cx += a.x; cy += a.y; cz += a.z; });
+n = structure.visibleAtoms.size;
+} else {
+structure.centeredAtoms.forEach(a => { cx += a.x; cy += a.y; cz += a.z; });
+n = structure.centeredAtoms.length;
+}
+if (n) { controls.target.set(cx / n, cy / n, cz / n); controls.update(); }
 }
 // ============================================================
 // UI SETUP
@@ -3430,8 +4447,7 @@ document.querySelectorAll('[data-i18n-title]').forEach(el => {
 const key = el.dataset.i18nTitle;
 if (lang[key] !== undefined) el.title = lang[key];
 });
-document.getElementById('btn-noncovalent').title = lang.sigmaTitle;
-document.getElementById('btn-stacking').title = lang.stackTitle;
+syncInterButtons();
 AppState.structures.forEach(s => { if (s.isExample) s.name = lang.exampleName; });
 const select = document.getElementById('structure-select');
 const currentValue = select.value;
@@ -3525,6 +4541,7 @@ const structure = AppState.structures[AppState.currentStructureIndex];
 if (!structure) return;
 const interactions = detectInteractions(structure);
 const labelFn = i => {
+if (i < 0) return '–';
 const atom = structure.centeredAtoms[i];
 return atom.element + (i + 1);
 };
@@ -3549,14 +4566,20 @@ anchor.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-
 anchor.download = 'contacts_iucr.csv';
 anchor.click();
 });
-document.getElementById('btn-noncovalent').addEventListener('click', () => {
-settings.showNoncovalent = !settings.showNoncovalent;
-document.getElementById('btn-noncovalent').classList.toggle('active', settings.showNoncovalent);
+const interTypes = ['hbond','halogen','chalcogen','pnictogen','tetrel','aerogen','pihole','triel','stacking'];
+interTypes.forEach(type => {
+document.getElementById('btn-int-' + type).addEventListener('click', () => {
+settings.interVisible[type] = !settings.interVisible[type];
+syncInterButtons();
 drawContacts(AppState.structures[AppState.currentStructureIndex]);
 });
-document.getElementById('btn-stacking').addEventListener('click', () => {
-settings.showStacking = !settings.showStacking;
-document.getElementById('btn-stacking').classList.toggle('active', settings.showStacking);
+});
+document.getElementById('btn-inter-all').addEventListener('click', () => {
+const allOn = interTypes.every(t => settings.interVisible[t]);
+interTypes.forEach(t => { settings.interVisible[t] = !allOn; });
+const st = AppState.structures[AppState.currentStructureIndex];
+if (st) st._labelPosClear = true;
+syncInterButtons();
 drawContacts(AppState.structures[AppState.currentStructureIndex]);
 });
 document.getElementById('delete-selected-btn').addEventListener('click', () => {
@@ -3603,11 +4626,16 @@ document.getElementById('status-msg').textContent = '';
 document.getElementById('btn-show-all').addEventListener('click', () => {
 const structure = AppState.structures[AppState.currentStructureIndex];
 if (!structure) return;
+if (structure.baseAtoms) {
+loadStructure(AppState.currentStructureIndex, true, true);
+return;
+}
 applyIsolation(structure, null);
 drawContacts(structure);
 });
 document.getElementById('btn-labels').addEventListener('click', () => {
 settings.showLabels = !settings.showLabels;
+document.getElementById('btn-labels').classList.toggle('active-green', settings.showLabels);
 rebuildLabels();
 });
 document.getElementById('bg-color').addEventListener('input', e => {
@@ -3655,6 +4683,10 @@ const colorBindings = [
 ['halogen-color', 'halogenColor'],
 ['chalcogen-color', 'chalcogenColor'],
 ['pnictogen-color', 'pnictogenColor'],
+['tetrel-color', 'tetrelColor'],
+['aerogen-color', 'aerogenColor'],
+['pihole-color', 'piholeColor'],
+['triel-color', 'trielColor'],
 ['ring-color', 'ringColor']
 ];
 colorBindings.forEach(([id, key]) => {
@@ -3662,13 +4694,6 @@ document.getElementById(id).addEventListener('input', e => {
 settings[key] = e.target.value;
 drawContacts(AppState.structures[AppState.currentStructureIndex]);
 });
-});
-document.addEventListener('change', e => {
-if (e.target && e.target.id === 'chk-14') {
-settings.exclude14 = e.target.checked;
-AppState.structures.forEach(s => s._inter = null);
-drawContacts(AppState.structures[AppState.currentStructureIndex]);
-}
 });
 document.addEventListener('click', e => {
 if (e.target && e.target.id === 'e-collapse') {
@@ -3684,13 +4709,15 @@ document.getElementById('pad-down').addEventListener('click', () => panCameraUp(
 function refreshAllSprites() {
 AppState.persistentMeasurements.forEach(m => {
 if (m.sprite) {
-updateSpriteAppearance(m.sprite, m.sprite.userData.text, getColorForMeasurementType(m.type), settings.fontSize);
+m.sprite.userData.color = getColorForMeasurementType(m.type);
+updateSpriteAppearance(m.sprite, m.sprite.userData.text, m.sprite.userData.color, settings.fontSize);
 updateLabelLine(m.sprite);
 }
 });
 AppState.structures.forEach(s => {
 if (s.atomLabels) {
 s.atomLabels.forEach(label => {
+label.userData.color = settings.labelColor;
 updateSpriteAppearance(label, label.userData.text, settings.labelColor, settings.fontSize);
 updateLabelLine(label);
 });
@@ -3702,7 +4729,7 @@ updateSpriteAppearance(obj, obj.userData.text, obj.userData.color, settings.font
 updateLabelLine(obj);
 }
 });
-if (settings.showNoncovalent || settings.showStacking) {
+if (Object.values(settings.interVisible).some(v => v)) {
 drawContacts(AppState.structures[AppState.currentStructureIndex]);
 }
 }
@@ -3754,7 +4781,7 @@ camera.aspect = window.innerWidth / window.innerHeight;
 camera.updateProjectionMatrix();
 renderer.setSize(window.innerWidth, window.innerHeight);
 controls.handleResize();
-interactionGroup.traverse(obj => {
+scene.traverse(obj => {
 if (obj.material && obj.material.resolution) {
 obj.material.resolution.set(window.innerWidth, window.innerHeight);
 }
@@ -3781,25 +4808,35 @@ AppState.structures = [{
 name: currentLang().exampleName,
 isExample: true,
 atoms: [
-{ element: 'I', x: -2.4526, y: 1.1615, z: -0.4372 }, { element: 'S', x: -6.1481, y: 3.1498, z: -1.0225 },
-{ element: 'F', x: -5.5448, y: 4.4235, z: -3.2362 }, { element: 'F', x: -3.8551, y: 3.9554, z: -1.9958 },
-{ element: 'O', x: -5.5052, y: 2.0364, z: -0.3611 }, { element: 'O', x: -6.1338, y: 4.3817, z: -0.2843 },
-{ element: 'F', x: -4.7984, y: 2.416, z: -3.1502 }, { element: 'O', x: -7.3932, y: 2.8495, z: -1.6627 },
-{ element: 'N', x: 1.1716, y: -0.7598, z: 0.4728 }, { element: 'N', x: 1.2905, y: -0.6975, z: -0.8887 },
-{ element: 'C', x: -0.5927, y: 0.2695, z: -0.3193 }, { element: 'C', x: 2.2364, y: -2.7057, z: 1.4928 },
-{ element: 'H', x: 1.6243, y: -3.2768, z: 1.044 }, { element: 'C', x: 2.1883, y: -1.3305, z: 1.3153 },
-{ element: 'C', x: 0.0183, y: -0.161, z: 0.8393 }, { element: 'C', x: 4.0826, y: -2.3778, z: 2.994 },
-{ element: 'H', x: 4.7321, y: -2.7402, z: 3.5853 }, { element: 'C', x: 3.2014, y: -3.2247, z: 2.3394 },
-{ element: 'H', x: 3.2594, y: -4.1632, z: 2.4719 }, { element: 'C', x: -0.4072, y: -0.0925, z: 2.2608 },
-{ element: 'H', x: -0.7216, y: -0.9747, z: 2.5499 }, { element: 'H', x: -1.1334, y: 0.5601, z: 2.3536 },
-{ element: 'H', x: 0.3516, y: 0.1835, z: 2.8157 }, { element: 'C', x: 4.027, y: -1.0058, z: 2.7958 },
-{ element: 'H', x: 4.6363, y: -0.4338, z: 3.2471 }, { element: 'C', x: 0.2242, y: -0.0773, z: -1.3963 },
-{ element: 'C', x: 3.0777, y: -0.4731, z: 1.937 }, { element: 'H', x: 3.0398, y: 0.4624, z: 1.7789 },
-{ element: 'C', x: 2.4238, y: -1.3088, z: -1.5697 }, { element: 'H', x: 3.2584, y: -0.9747, z: -1.1786 },
-{ element: 'H', x: 2.395, y: -1.0795, z: -2.5216 }, { element: 'H', x: 2.3807, y: -2.2815, z: -1.4667 },
-{ element: 'C', x: 0.0514, y: 0.1585, z: -2.8557 }, { element: 'H', x: 0.8803, y: 0.5275, z: -3.2273 },
-{ element: 'H', x: -0.682, y: 0.7923, z: -2.999 }, { element: 'H', x: -0.1574, y: -0.6887, z: -3.301 },
-{ element: 'C', x: -5.0274, y: 3.5015, z: -2.4195 }
+{ element: 'C', x: -5.434723, y: -0.343589, z: -0.100227 },
+{ element: 'H', x: -5.323473, y: 0.413516, z: -0.861542 },
+{ element: 'H', x: -5.441678, y: -0.047787, z: 0.938289 },
+{ element: 'H', x: -5.154862, y: -1.354572, z: -0.354668 },
+{ element: 'Cl', x: -3.011196, y: -0.007755, z: 0.190312 },
+{ element: 'O', x: -7.183545, y: -0.580643, z: -0.342401 },
+{ element: 'H', x: -7.700179, y: 0.232197, z: -0.195533 },
+{ element: 'H', x: -7.556428, y: -1.272830, z: 0.232977 },
+{ element: 'C', x: 1.862489, y: 1.335226, z: -0.033325 },
+{ element: 'C', x: 2.676959, y: -2.331851, z: -0.027280 },
+{ element: 'H', x: 2.129624, y: -3.268081, z: 0.003858 },
+{ element: 'C', x: 2.689503, y: 0.122189, z: -0.053318 },
+{ element: 'C', x: 0.475454, y: 1.200412, z: 0.023856 },
+{ element: 'C', x: 2.032746, y: -1.107872, z: -0.014830 },
+{ element: 'C', x: 2.344841, y: 2.649164, z: -0.066013 },
+{ element: 'H', x: 3.414564, y: 2.825043, z: -0.111951 },
+{ element: 'C', x: 4.087545, y: 0.094095, z: -0.107058 },
+{ element: 'H', x: 4.646466, y: 1.023679, z: -0.138147 },
+{ element: 'C', x: -0.437813, y: 2.231585, z: 0.053451 },
+{ element: 'H', x: -1.505458, y: 2.041507, z: 0.102058 },
+{ element: 'C', x: 4.765056, y: -1.117750, z: -0.120602 },
+{ element: 'H', x: 5.848839, y: -1.122481, z: -0.162618 },
+{ element: 'C', x: 4.069069, y: -2.325747, z: -0.081379 },
+{ element: 'H', x: 4.607164, y: -3.267539, z: -0.092677 },
+{ element: 'C', x: 1.467567, y: 3.725261, z: -0.040043 },
+{ element: 'H', x: 1.863015, y: 4.734947, z: -0.066163 },
+{ element: 'C', x: 0.089523, y: 3.522826, z: 0.019933 },
+{ element: 'H', x: -0.587154, y: 4.370258, z: 0.041479 },
+{ element: 'I', x: -0.088888, y: -0.876501, z: 0.065086 }
 ]
 }];
 const select = document.getElementById('structure-select');
@@ -3807,6 +4844,15 @@ select.innerHTML = '<option value="0">' + currentLang().exampleName + '</option>
 select.value = '0';
 AppState.currentStructureIndex = 0;
 loadStructure(0);
+const demoBox = new THREE.Box3().setFromObject(modelGroup);
+const demoCenter = demoBox.getCenter(new THREE.Vector3());
+const demoSize = demoBox.getSize(new THREE.Vector3());
+const demoDistance = Math.max(demoSize.x, demoSize.y, demoSize.z) / 2 / Math.tan(camera.fov * Math.PI / 360) * CONSTANTS.CAMERA_FIT_PADDING;
+camera.up.set(0, 1, 0);
+controls.target.copy(demoCenter);
+camera.position.set(demoCenter.x, demoCenter.y, demoCenter.z + demoDistance);
+controls.update();
+document.getElementById('btn-labels').classList.toggle('active-green', settings.showLabels);
 }
 }, 100);
 </script>
