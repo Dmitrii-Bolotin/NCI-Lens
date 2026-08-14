@@ -1,110 +1,63 @@
-# SigmaLens
+# NCI-Lens 🔬
+### 3D Viewer and Analyzer of Noncovalent Interactions
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![GitHub release](https://img.shields.io/github/v/release/Dmitrii-Bolotin/SigmaLens)](https://github.com/Dmitrii-Bolotin/SigmaLens/releases)
-[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.21894729-blue)](https://doi.org/10.5281/zenodo.21894729)
-[![Live demo](https://img.shields.io/badge/Demo-Live-blue?logo=github)](https://dmitrii-bolotin.github.io/SigmaLens/)
+**NCI-Lens** (former *SigmaLens*) is a fast, browser-based 3D molecular viewer designed for crystallographers, computational chemists, and students. It automatically detects, visualizes, and estimates the energy of a wide spectrum of noncovalent interactions (NCIs) directly from structural files.
 
+🌐 **[Launch Web App](https://dmitrii-bolotin.github.io/NCI-Lens/)** *(No installation required)*
 
-**A browser-based 3D molecular structure viewer with built-in analysis of hydrogen bonds, σ-hole interactions, and π-stacking in crystal structures.**
+![NCI-Lens Interface](https://github.com/Dmitrii-Bolotin/NCI-Lens/assets/screenshot.png) <!-- Замените эту ссылку на ту, что сгенерирует GitHub при загрузке картинки в шаге Г -->
 
-SigmaLens is a zero-installation single-file web application designed for supramolecular chemists and crystallographers who need fast inspection of non-covalent interactions directly from CIF, PDB, MOL, SDF, and XYZ files.
+---
 
-![screenshot](screenshot.png)
+## 🚀 Key Features (v4.23)
 
-## ✨ Key Features
+*   **Comprehensive NCI Detection:** Automatically finds Hydrogen bonds, Halogen, Chalcogen, Pnictogen, **Tetrel**, **Triel**, **Aerogen**, and **π-hole** bonds, as well as **π-stacking**.
+*   **Hydridic Hydrogens:** Correctly identifies H atoms bonded to low-electronegativity centers (B, Al, Si, metals) acting as nucleophiles.
+*   **Advanced Energy Model:** Estimates interaction energies (kJ/mol) using a geometric model augmented with EQeq charges, polarization, charge-transfer, and metal-coordination activation.
+*   **Crystal Walking:** Clicking a "ghost sphere" of a hidden partner atom now *clones* the fragment at the contact site, allowing you to visually "walk" through infinite crystal lattices.
+*   **Smart UI:** 9 individual toggle buttons for each NCI type. Dragged labels remember their positions. Pointer lines intelligently stop at the text boundary to avoid overlapping.
+*   **Multi-language:** Full support for English, Russian, and Portuguese.
 
-### 🔬 Non-covalent interaction detection
-- **Hydrogen bonds** — distance + angular criteria (D–H···A)
-- **σ-hole interactions** — halogen, chalcogen, pnictogen bonds with geometric and energetic scoring
-- **π-stacking** — aromatic ring stacking with coplanarity and slip-angle filters
-- **Gasteiger (PEOE) partial charges** for electrostatic component
-- **Lennard-Jones dispersion** contribution
-- **Empirical energy estimation** (kJ/mol, ±40% accuracy)
+## 🔗 Supported Interactions
 
-### 🧪 Crystallography-aware
-- Full **CIF parsing** with unit cell parameters and symmetry operations
-- Automatic molecule reconstruction across cell boundaries
-- Neighbor contacts via lattice translations
-- **IUCr-format contact tables** ready for journal submission
+| Type | Description | Visual |
+| :--- | :--- | :--- |
+| **H-bond** | Classic D–H···A electrostatic + dispersion | Blue dashed |
+| **Halogen** | σ-hole on Cl, Br, I | Violet dashed |
+| **Chalcogen** | σ-hole on S, Se, Te, Po | Yellow dashed |
+| **Pnictogen** | σ-hole on P, As, Sb, Bi | Orange dashed |
+| **Tetrel** | σ-hole on C (activated), Si, Ge, Sn, Pb | Green dashed |
+| **Aerogen** | σ-hole on Kr, Xe, Rn | Teal dashed |
+| **π-hole** | Carbonyls, CO₂, NO₂, perfluorinated rings | Magenta dashed |
+| **Triel** | Electron deficiency on Boron | Pink dashed |
+| **π-stack** | Aromatic ring stacking (excluding sp³) | Green centroid lines |
 
-### 📐 Measurements & visualization
-- Click-to-measure **distances, angles, torsions**
-- Multiple rendering modes: ball-and-stick, van der Waals, ellipsoids (anisotropic displacement), sticks
-- **Fragment isolation** with ghost-sphere click-to-reveal
-- Drag-and-drop label positioning
-- CSV export of measurements and contacts
+## 📂 Supported File Formats
 
-### 🌐 Accessibility
-- **Zero installation** — runs in any modern browser
-- Multilingual interface: **Русский / English / Português**
-- Touch-friendly controls (tablet/mobile support)
-- Three-finger pan gesture on touch devices
+*   **`.xyz`** (Standard and Chem3D, supports trajectories)
+*   **`.cif`** (Full crystallographic support: unit cells, symmetry operations, anisotropic displacement parameters. Intermolecular contacts across symmetry boundaries are automatically detected).
+*   **`.pdb`**, **`.mol`**, **`.sdf`**
 
-## 🚀 Quick Start
+## 🖱️ Controls
 
-### Online (no installation)
-👉 Open **https://Dmitrii-Bolotin.github.io/SigmaLens/** and drag a CIF/PDB/XYZ file into the window.
+*   **Rotate:** Left Mouse Button / 1-finger touch
+*   **Zoom:** Scroll Wheel / Pinch
+*   **Pan:** Right Mouse Button / 3-finger touch / Joystick
+*   **Measure:** Click atoms sequentially (2 for distance, 3 for angle, 4 for torsion).
+*   **Isolate Fragment:** Click an atom ➔ press `⛶ Fragment`.
+*   **Multi-select:** `Shift + Click` atoms across different molecules, then isolate.
 
-### Local usage
-1. Download `index.html` from the [latest release](https://github.com/Dmitrii-Bolotin/SigmaLens/releases).
-2. Double-click to open in your browser.
-3. Click **📂 Load** or drag-and-drop your structure file.
+## ⚛️ Scientific Background
 
-That's it. No Python, no compilation, no dependencies.
+The energy estimation model relies on empirical geometric parameters calibrated against high-level quantum chemistry benchmarks (SAPT, DLPNO-CCSD(T)). 
+*   **Charges:** Calculated via a simplified Electronegativity Equalization (EQeq/Sanderson) method.
+*   **Accuracy:** ~±10–15% for typical noncovalent contacts. 
+*   **Thresholds:** Interactions weaker than 2 kJ/mol are hidden to reduce visual clutter. Contacts exceeding 150 kJ/mol are flagged as having significant covalent character.
 
-## 📂 Supported formats
+## 👨‍🔬 Credits & Citation
 
-| Format | Extensions | Notes |
-|--------|------------|-------|
-| CIF | `.cif` | Unit cell + symmetry fully handled |
-| XYZ | `.xyz` | Standard and Chem3D variants; multi-frame supported |
-| PDB | `.pdb` | Standard ATOM/HETATM records |
-| MOL | `.mol` | V2000 connection table |
-| SDF | `.sdf` | Multiple MOL blocks parsed |
+Developed by **BOLLAB** (Dmitrii Bolotin).
+If you use NCI-Lens in your research, please cite the repository and the underlying geometric models for σ/π-hole interactions.
 
-## 🧩 Energy model
-
-For each contact the total interaction energy is computed as:
-
-$$E_\text{total} = E_\text{electrostatic} + E_\text{dispersion} + E_\text{geometry}$$
-
-- **H-bonds**: Coulombic term from Gasteiger PEOE charges (6 iterations), plus Lennard-Jones dispersion.
-- **σ-hole contacts**: empirical donor-dependent intrinsic energy scaled by Gaussian angular decay around the optimal R–X···A angle (~170°), with exponential radial decay.
-- **π-stacking**: ring-size, distance, planarity and slip-angle factors combined multiplicatively.
-
-All energies are reported in **kJ/mol** with qualitative labels (*weak / medium / strong*).
-
-## 🛠️ For developers
-
-The entire application is a single HTML file using [Three.js r157](https://threejs.org/) with:
-
-- ES modules via import map (no bundler needed)
-- Spatial hashing for O(n) bond detection
-- InstancedMesh for GPU-efficient rendering of thousands of atoms
-- Custom Jacobi eigenvalue solver for anisotropic displacement ellipsoids
-- LRU texture cache for labels
-
-### Local development
-
-```bash
-# Just serve with any static server, e.g.:
-python -m http.server 8000
-# then open http://localhost:8000
-```
-
-## 📝 Citation
-
-If you use SigmaLens in academic work, please cite:
-
-```bibtex
-@software{sigmalens,
-  author  = {Bolotin, Dmitrii S.},
-  title   = {SigmaLens: Browser-based analyzer of σ-hole and π-stacking interactions},
-  year    = {2026},
-  publisher = {GitHub},
-  url     = {https://github.com/Dmitrii-Bolotin/SigmaLens},
-  doi     = {10.5281/zenodo.21894729},
-  version = {3.3}
-}
-```
+---
+*© 2024-2026 BOLLAB. Released under MIT License.*
