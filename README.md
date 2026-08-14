@@ -5,7 +5,7 @@
 
 🌐 **[Launch Web App](https://dmitrii-bolotin.github.io/NCI-Lens/)** *(No installation required)*
 
-![NCI-Lens Interface](https://github.com/Dmitrii-Bolotin/NCI-Lens/assets/screenshot.png) <!-- Замените эту ссылку на ту, что сгенерирует GitHub при загрузке картинки в шаге Г -->
+![NCI-Lens Interface](https://github.com/Dmitrii-Bolotin/NCI-Lens/blob/main/screenshot.png)
 
 ---
 
@@ -60,4 +60,4 @@ Developed by **BOLLAB** (Dmitrii Bolotin).
 If you use NCI-Lens in your research, please cite the repository and the underlying geometric models for σ/π-hole interactions.
 
 ---
-*© 2024-2026 BOLLAB. Released under MIT License.*
+*© 2021-2026 BOLLAB. Released under MIT License.*
