@@ -923,12 +923,12 @@ Rh: 2.20, Ir: 2.20, Ru: 1.90, Os: 1.90, Fe: 1.50, Co: 1.50,
 Hg: 1.60, Cd: 1.50, Zn: 1.30};
 
 // H-bond donor/acceptor atoms
-const HBOND_DONOR_ATOMS = new Set(['N', 'O', 'S', 'F']);
+const HBOND_DONOR_ATOMS = new Set(['N', 'O', 'S', 'Se', 'F', 'Cl', 'Br', 'I', 'At', 'C']);
 // Low-electronegativity atoms: a bonded H is hydridic (nucleophilic, δ–).
 const HYDRIDE_CENTER_ATOMS = new Set(['B', 'Al', 'Ga', 'In', 'Tl', 'Si', 'Ge', 'Sn', 'Li', 'Na', 'K', 'Mg', 'Ca', 'Zn']);
 // H-bond acceptor basicity (covalently bound F is a very poor acceptor)
-const HBOND_ACCEPTOR_FACTORS = { O: 1.00, N: 1.00, S: 0.80, Se: 0.75, Te: 0.80, F: 0.18, Cl: 0.40, Br: 0.50, I: 0.55, At: 0.60 };
-const ACCEPTORS = new Set(['N', 'O', 'S', 'Se', 'F', 'Cl', 'Br', 'I', 'At']);
+const HBOND_ACCEPTOR_FACTORS = { O: 1.00, N: 1.00, S: 0.80, Se: 0.75, Te: 0.80, F: 0.18, Cl: 0.40, Br: 0.50, I: 0.55, At: 0.60, H: 0.65, B: 0.75 };
+const ACCEPTORS = new Set(['N', 'O', 'S', 'Se', 'F', 'Cl', 'Br', 'I', 'At', 'B']);
 const SIGMA_ACCEPTORS = new Set(['N', 'O', 'S', 'Se', 'Te', 'F', 'Cl', 'Br', 'I', 'At', 'C', 'P',
 'Pt', 'Pd', 'Au', 'Ag', 'Cu', 'Ni', 'Rh', 'Ir', 'Ru', 'Os', 'Fe', 'Co',
 'Si', 'Ge', 'Sn', 'Pb']);
@@ -1029,7 +1029,7 @@ optEllipsoid: 'Эллипсоиды', optSticks: 'Только связи',
 noStructures: '-- Нет структур --', dropH2: '📂 Бросьте файлы сюда',
 helpTitle: 'Справка и руководство пользователя', helpClose: '✕ Закрыть',
 energiesHead: 'Энергии', units: 'кДж/моль', unitsKcal: 'ккал/моль',
-energyNote: 'Заряды: выравнивание электроотрицательности (Сандерсон). H-связи — электростатика + дисперсия; σ/π-дырки — геометр. модель. Точность ~±10–15%.',
+energyNote: 'Калибровка: ассоциаты органических/элементоорганических молекул, контактные ионные пары. Для прочих систем — оценочно.',
 weakNote: 'Скрыто ещё {n} (энергия ниже {e} {u})',
 qWeakF: 'слабая', qMedF: 'средняя', qStrongF: 'прочная', qCovalent: '⚠ ковалентная',
 qWeakM: 'слабый', qMedM: 'средний', qStrongM: 'прочный',
@@ -1320,6 +1320,7 @@ pro: `<h2>NCI-Lens PRO — физико-химическая модель</h2>
 </table>
 <h3>20. Ограничения модели</h3>
 <ul>
+<li><b>Модель расчёта энергии откалибрована на ассоциатах органических и элементоорганических молекул, а также контактных ионных парах. Она неприменима к комплексам металлов с преимущественно ионной связью и к разделённым ионным парам.</b></li>
 <li>EQeq не учитывает формальные заряды ионов.</li>
 <li>Не учитывается кооперативность и многотельные эффекты [29,30].</li>
 <li>Галоген-галоген (like-like): E_disp × 8 [17].</li>
@@ -1384,7 +1385,7 @@ optEllipsoid: 'Ellipsoids', optSticks: 'Sticks only',
 noStructures: '-- No structures --', dropH2: '📂 Drop files here',
 helpTitle: 'Help & user guide', helpClose: '✕ Close',
 energiesHead: 'Energies', units: 'kJ/mol', unitsKcal: 'kcal/mol',
-energyNote: 'Charges: Electronegativity Equalization (Sanderson). H-bonds — electrostatics + dispersion; σ/π-holes — geometric model. Accuracy ~±10–15%.',
+energyNote: 'Calibration: associates of organic/organoelement molecules, contact ion pairs. For other systems — estimated.',
 weakNote: '{n} more hidden (energy below {e} {u})',
 qWeakF: 'weak', qMedF: 'medium', qStrongF: 'strong', qCovalent: '⚠ covalent',
 qWeakM: 'weak', qMedM: 'medium', qStrongM: 'strong',
@@ -1675,6 +1676,7 @@ pro: `<h2>NCI-Lens PRO — Physicochemical Model</h2>
 </table>
 <h3>20. Model limitations</h3>
 <ul>
+<li><b>The energy calculation model is calibrated on associates of organic and organoelement molecules, as well as contact ion pairs. It is not applicable to metal complexes with predominantly ionic bonding and to separated ion pairs.</b></li>
 <li>EQeq does not account for formal ion charges.</li>
 <li>Cooperativity and many-body effects not included [29,30].</li>
 <li>Halogen-halogen (like-like): E_disp × 8 [17].</li>
@@ -1740,7 +1742,7 @@ optEllipsoid: 'Elipsoides', optSticks: 'Somente ligações',
 noStructures: '-- Sem estruturas --', dropH2: '📂 Solte os arquivos aqui',
 helpTitle: 'Ajuda e guia do usuário', helpClose: '✕ Fechar',
 energiesHead: 'Energias', units: 'kJ/mol', unitsKcal: 'kcal/mol',
-energyNote: 'Cargas: Equalização de Eletronegatividade (Sanderson). Ligações H — eletrostática + dispersão; buracos σ/π — modelo geométrico. Precisão ~±10–15%.',
+energyNote: 'Calibração: associados de moléculas orgânicas/organoelementares, pares iônicos de contato. Para outros sistemas — estimativo.',
 weakNote: 'Mais {n} ocultas (energia abaixo de {e} {u})',
 qWeakF: 'fraca', qMedF: 'média', qStrongF: 'forte', qCovalent: '⚠ covalente',
 qWeakM: 'fraco', qMedM: 'médio', qStrongM: 'forte',
@@ -2031,6 +2033,7 @@ pro: `<h2>NCI-Lens PRO — Modelo físico-químico</h2>
 </table>
 <h3>20. Limitações do modelo</h3>
 <ul>
+<li><b>O modelo de cálculo de energia é calibrado em associados de moléculas orgânicas e organoelementares, bem como em pares iônicos de contato. Ele não é aplicável a complexos metálicos com ligação predominantemente iônica e a pares iônicos separados.</b></li>
 <li>EQeq não considera cargas formais de íons.</li>
 <li>Cooperatividade e efeitos de muitos corpos não incluídos [29,30].</li>
 <li>Halogênio-halogênio (like-like): E_disp × 8 [17].</li>
@@ -3017,13 +3020,22 @@ Rn: [2.60, 2.30]
 
 const defaultParam = [2.10, 2.30];
 const EQEQ_SCALE = 1.15;
-
+const C_CHI_HYBRID = { 4: 2.48, 3: 2.75, 2: 3.29, 1: 3.29 };
+const nbCount = new Array(n).fill(0);
+if (structure.bonds) {
+for (let b = 0; b < structure.bonds.length; b++) {
+nbCount[structure.bonds[b].i]++;
+nbCount[structure.bonds[b].j]++;
+}
+}
 let sumAlpha = 0;
 let sumBeta = 0;
-
 for (let i = 0; i < n; i++) {
 const p = EQEQ_PARAMS[atoms[i].element] || defaultParam;
-const chi = p[0];
+let chi = p[0];
+if (atoms[i].element === 'C') {
+chi = C_CHI_HYBRID[nbCount[i]] !== undefined ? C_CHI_HYBRID[nbCount[i]] : 2.55;
+}
 const hardness = Math.max(0.75, p[1]);
 const beta = 1.0 / hardness;
 sumAlpha += chi * beta;
@@ -4375,7 +4387,7 @@ const donor = atoms[donorIndex];
 const positionD = new THREE.Vector3(donor.x, donor.y, donor.z);
 const distDH = positionX.distanceTo(positionD);
 nearAcceptors(positionX).forEach(acceptor => {
-if (!ACCEPTORS.has(atoms[acceptor.j].element)) return;
+if (!ACCEPTORS.has(atoms[acceptor.j].element) && !hydridicH.has(acceptor.j)) return;
 if (isNitroLikeN(structure, acceptor.j)) return;
 if (isSelfInteraction(acceptor.sym, acceptor.j, [i, donorIndex])) return;
 if (isClose(acceptor.j, acceptor.pos)) return;
@@ -5597,7 +5609,7 @@ const body = AppState.energyCollapsed ? '' :
 rows.map(r => `<div class="e-row"><span class="e-dot" style="background:${r.color}"></span><span class="e-t">${r.t}</span>${r.label} — <b>${fmt(r.E)}</b> (${r.q})</div>`).join('') +
 weakLine +
 `<div class="e-total">Σ ≈ ${fmt(totalEnergy)} ${unitLabel()}</div>`;
-box.innerHTML = `<div class="e-head"><b class="h">${lang.energiesHead}, ${unitLabel()}</b><button id="e-collapse">${AppState.energyCollapsed ? '▸' : '▾'}</button></div>` + body;
+box.innerHTML = `<div class="e-head"><b class="h">${lang.energiesHead}, ${unitLabel()}</b><button id="e-collapse">${AppState.energyCollapsed ? '▸' : '▾'}</button></div>` + body + `<div class="e-note">${lang.energyNote}</div>`;
 }
 // ============================================================
 // MEASUREMENTS
