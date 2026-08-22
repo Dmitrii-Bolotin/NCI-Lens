@@ -1,7 +1,7 @@
 # NCI-Lens 🔬
 ### 3D Viewer and Analyzer of Noncovalent Interactions
 
-📦 **DOI:** [10.5281/zenodo.22017076](https://doi.org/10.5281/zenodo.22017076)
+📦 **DOI:** [10.5281/zenodo.22017076](https://doi.org/10.5281/zenodo.22055369)
 
 **NCI-Lens** is a fast, browser-based 3D molecular viewer designed for crystallographers, computational chemists, and students. It automatically detects, visualizes, and estimates the energy of a wide spectrum of noncovalent interactions (NCIs) directly from structural files. 
 
